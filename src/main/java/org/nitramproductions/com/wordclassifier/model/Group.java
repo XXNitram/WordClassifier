@@ -1,6 +1,8 @@
 package org.nitramproductions.com.wordclassifier.model;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.time.LocalDateTime;
@@ -14,9 +16,9 @@ public class Group {
           this(null,null);
      }
 
-     public Group(StringProperty name, ObjectProperty<LocalDateTime> dateModified) {
-          this.name = name;
-          this.dateModified = dateModified;
+     public Group(String name, LocalDateTime dateModified) {
+          this.name = new SimpleStringProperty(name);
+          this.dateModified = new SimpleObjectProperty<>(dateModified);
      }
 
      public String getName() {

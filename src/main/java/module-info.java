@@ -16,4 +16,5 @@ module org.nitramproductions.com.wordclassifier {
     exports org.nitramproductions.com.wordclassifier;
     exports org.nitramproductions.com.wordclassifier.controller;
     opens org.nitramproductions.com.wordclassifier.controller to javafx.fxml;
+    exports org.nitramproductions.com.wordclassifier.model;
 }
