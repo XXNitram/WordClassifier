@@ -13,8 +13,9 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException, SQLException, ClassNotFoundException {
         ConnectionManager.initialize();
-        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("controller/main-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("controller/main.fxml"));
+        // TODO Set minimum stage size
+        Scene scene = new Scene(fxmlLoader.load(), 1040, 585);
         stage.setTitle("WordClassifier");
         stage.setScene(scene);
         stage.show();
