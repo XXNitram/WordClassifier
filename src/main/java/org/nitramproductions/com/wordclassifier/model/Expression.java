@@ -1,6 +1,8 @@
 package org.nitramproductions.com.wordclassifier.model;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.time.LocalDateTime;
@@ -14,9 +16,9 @@ public class Expression {
         this(null, null);
     }
 
-    public Expression(StringProperty content, ObjectProperty<LocalDateTime> dateModified) {
-        this.content = content;
-        this.dateModified = dateModified;
+    public Expression(String content, LocalDateTime dateModified) {
+        this.content = new SimpleStringProperty(content);
+        this.dateModified = new SimpleObjectProperty<>(dateModified);
     }
 
     public String getContent() {

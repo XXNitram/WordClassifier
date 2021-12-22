@@ -1,7 +1,6 @@
 package org.nitramproductions.com.wordclassifier;
 
 import javafx.application.Application;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -37,7 +36,7 @@ public class MainApplication extends Application {
         // TODO Set minimum stage size
         Scene scene = new Scene(fxmlLoader.load(), 1040, 585);
         MainController mainController = fxmlLoader.getController();
-        mainController.setLeftTableViewData(ConnectionManager.getGroups());
+        //mainController.setLeftTableViewData(ConnectionManager.getAllGroups());
         stage.setTitle("WordClassifier");
         stage.setScene(scene);
         stage.show();
