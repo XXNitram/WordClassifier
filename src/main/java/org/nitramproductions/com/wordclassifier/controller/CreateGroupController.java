@@ -61,7 +61,7 @@ public class CreateGroupController {
 
     @FXML
     private void initialize() throws SQLException, ClassNotFoundException {
-        leftList = ConnectionManager.getAllExpressions();
+        leftList = FXCollections.observableArrayList(ConnectionManager.getAllExpressions());
         rightList = FXCollections.observableArrayList();
         leftTableView.setItems(leftList);
         rightTableView.setItems(rightList);

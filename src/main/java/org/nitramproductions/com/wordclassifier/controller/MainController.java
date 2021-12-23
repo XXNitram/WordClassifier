@@ -1,5 +1,6 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -72,11 +73,11 @@ public class MainController {
         leftTableViewTextField.setPromptText("Gib hier ein Suchwort ein!");
         rightTableViewTextField.setPromptText("Gib hier ein Suchwort ein!");
 
-        observableGroupList = ConnectionManager.getAllGroups();
+        observableGroupList = FXCollections.observableArrayList(ConnectionManager.getAllGroups());
         updateGroupLists();
         updateGroupListsIfChange();
 
-        observableExpressionList = ConnectionManager.getAllExpressions();
+        observableExpressionList = FXCollections.observableArrayList(ConnectionManager.getAllExpressions());
         updateExpressionLists();
         updateExpressionListsIfChange();
 
