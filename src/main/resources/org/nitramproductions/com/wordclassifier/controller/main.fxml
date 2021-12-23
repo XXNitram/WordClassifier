@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -12,6 +13,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import org.controlsfx.control.ToggleSwitch?>
@@ -47,7 +49,7 @@
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <TableView fx:id="leftTableView" layoutX="48.0" layoutY="87.0" prefHeight="373.0" prefWidth="296.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <TableView fx:id="leftTableView" layoutX="48.0" layoutY="27.0" prefHeight="531.0" prefWidth="516.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
                     <columns>
                       <TableColumn fx:id="leftTableViewNameColumn" prefWidth="75.0" text="Name" />
                       <TableColumn fx:id="leftTableViewDateModifiedColumn" prefWidth="75.0" text="Änderungsdatum" />
@@ -56,11 +58,13 @@
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                      </columnResizePolicy>
                   </TableView>
+                  <ChoiceBox fx:id="leftTableViewChoiceBox" focusTraversable="false" prefHeight="28.0" prefWidth="257.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="1.0" />
+                  <TextField fx:id="leftTableViewTextField" layoutX="258.0" layoutY="5.0" prefHeight="28.0" prefWidth="257.0" AnchorPane.leftAnchor="258.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0" />
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <TableView fx:id="rightTableView" layoutX="158.0" layoutY="116.0" prefHeight="519.0" prefWidth="516.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <TableView fx:id="rightTableView" layoutX="158.0" layoutY="116.0" prefHeight="519.0" prefWidth="516.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
                     <columns>
                       <TableColumn fx:id="rightTableViewNameColumn" prefWidth="75.0" text="Name" />
                       <TableColumn fx:id="rightTableViewDateModifiedColumn" prefWidth="75.0" text="Änderungsdatum" />
@@ -81,6 +85,8 @@
                         <Button focusTraversable="false" mnemonicParsing="false" text="Löschen" translateX="-10.0" />
                     </buttons>
                   </ButtonBar>
+                  <ChoiceBox fx:id="rightTableViewChoiceBox" focusTraversable="false" prefHeight="28.0" prefWidth="256.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />
+                  <TextField fx:id="rightTableViewTextField" prefHeight="28.0" prefWidth="257.0" AnchorPane.leftAnchor="258.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0" />
                </children>
             </AnchorPane>
         </items>
