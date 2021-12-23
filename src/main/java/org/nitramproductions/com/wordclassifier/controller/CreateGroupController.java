@@ -1,16 +1,11 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
-import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
 import net.synedra.validatorfx.Validator;
@@ -18,9 +13,10 @@ import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CreateGroupController {
 
@@ -45,6 +41,8 @@ public class CreateGroupController {
 
     private ObservableList<Expression> leftList;
     private ObservableList<Expression> rightList;
+    private List<Group> groupList;
+
     private Validator validator = new Validator();
 
     private Button createNewButton = new Button("Erstellen");
@@ -61,6 +59,7 @@ public class CreateGroupController {
 
     @FXML
     private void initialize() throws SQLException, ClassNotFoundException {
+        groupList = ConnectionManager.getAllGroups();
         leftList = FXCollections.observableArrayList(ConnectionManager.getAllExpressions());
         rightList = FXCollections.observableArrayList();
         leftTableView.setItems(leftList);
@@ -68,8 +67,6 @@ public class CreateGroupController {
 
         leftTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         rightTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        validateNewNameTextField();
 
         cancelButton.setCancelButton(true);
         cancelButton.setOnAction(e -> onCancelButtonClick());
@@ -79,6 +76,7 @@ public class CreateGroupController {
         createNewButton.translateXProperty().set(-25);
         buttonBar.getButtons().addAll(createNewWrapper, cancelButton);
 
+        validateNewNameTextField();
         deselectLeftIfRightSelected();
         deselectRightIfLeftSelected();
 
@@ -91,8 +89,47 @@ public class CreateGroupController {
                 .dependsOn("newGroupName", newNameTextField.textProperty())
                 .withMethod(c -> {
                     String newGroupName = c.get("newGroupName");
-                    if (!(newGroupName.trim().length() > 0)) {
+                    if (newGroupName.trim().isEmpty()) {
                         c.error("Bitte gib einen Namen ein!");
+                    }
+                })
+                .decorates(newNameTextField)
+                .immediate();
+
+        validator.createCheck()
+                .dependsOn("newGroupName", newNameTextField.textProperty())
+                .withMethod(c -> {
+                    String newGroupName = c.get("newGroupName");
+                    Pattern pattern = Pattern.compile("[^a-zA-Z0-9äöüÄÖÜß]");
+                    Matcher matcher = pattern.matcher(newGroupName.trim());
+                    if (matcher.find()) {
+                        c.error("Es sind keine Sonderzeichen erlaubt!");
+                    }
+                })
+                .decorates(newNameTextField)
+                .immediate();
+
+        validator.createCheck()
+                .dependsOn("newGroupName", newNameTextField.textProperty())
+                .withMethod(c -> {
+                    String newGroupName = c.get("newGroupName");
+                    if (newGroupName.trim().length() > 250) {
+                        c.error("Der Name ist zu lang!");
+                    }
+                })
+                .decorates(newNameTextField)
+                .immediate();
+
+        validator.createCheck()
+                .dependsOn("newGroupName", newNameTextField.textProperty())
+                .withMethod(c -> {
+                    String newGroupName = c.get("newGroupName");
+                    if (!groupList.isEmpty()) {
+                        for (Group group : groupList) {
+                            if (newGroupName.trim().equals(group.getName())) {
+                                c.error("Diese Gruppe existiert bereits!");
+                            }
+                        }
                     }
                 })
                 .decorates(newNameTextField)
