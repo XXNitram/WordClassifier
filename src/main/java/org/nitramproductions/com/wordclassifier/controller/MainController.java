@@ -214,7 +214,7 @@ public class MainController {
     }
 
     @FXML
-    protected void onCreateNewMenuItemClick(ActionEvent event) throws IOException {
+    private void onCreateNewMenuItemClick(ActionEvent event) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGroup.fxml"));
         Parent root = fxmlLoader.load();
         Stage stage = new Stage();
