@@ -34,20 +34,16 @@ public class CreateGroupController {
     private TableView<Expression> rightTableView;
     @FXML
     private TableColumn<Expression, String> rightTableViewNameColumn;
-    @FXML
-    private Button rightArrowButton;
-    @FXML
-    private Button leftArrowButton;
 
     private ObservableList<Expression> leftList;
     private ObservableList<Expression> rightList;
     private List<Group> groupList;
 
-    private Validator validator = new Validator();
+    private final Validator validator = new Validator();
 
-    private Button createNewButton = new Button("Erstellen");
-    private Button cancelButton = new Button("Abbrechen");
-    private TooltipWrapper<Button> createNewWrapper = new TooltipWrapper<>(
+    private final Button createNewButton = new Button("Erstellen");
+    private final Button cancelButton = new Button("Abbrechen");
+    private final TooltipWrapper<Button> createNewWrapper = new TooltipWrapper<>(
             createNewButton,
             validator.containsErrorsProperty(),
             Bindings.concat("Gruppe kann nicht erstellt werden:\n", validator.createStringBinding())
@@ -100,9 +96,10 @@ public class CreateGroupController {
                 .dependsOn("newGroupName", newNameTextField.textProperty())
                 .withMethod(c -> {
                     String newGroupName = c.get("newGroupName");
-                    Pattern pattern = Pattern.compile("[^a-zA-Z0-9äöüÄÖÜß]");
+                    Pattern pattern = Pattern.compile("[^\\s+a-zA-Z0-9äöüÄÖÜß]");
                     Matcher matcher = pattern.matcher(newGroupName.trim());
                     if (matcher.find()) {
+
                         c.error("Es sind keine Sonderzeichen erlaubt!");
                     }
                 })
@@ -173,7 +170,21 @@ public class CreateGroupController {
     }
 
     private void onCreateNewButtonClick() {
+        String newGroupName = newNameTextField.getText().trim();
+        Group newGroup = new Group(newGroupName);
+        try {
+            ConnectionManager.addNewGroup(newGroup);
+            if (!rightList.isEmpty()) {
+                for (Expression expression : rightList) {
+                    ConnectionManager.addNewBelongToRelation(newGroup, expression);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
+        Stage stage = (Stage) cancelButton.getScene().getWindow();
+        stage.close();
     }
 
     private void onCancelButtonClick() {

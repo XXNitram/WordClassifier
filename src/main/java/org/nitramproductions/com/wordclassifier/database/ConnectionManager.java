@@ -91,6 +91,16 @@ public class ConnectionManager {
         return groups;
     }
 
+    public static void addNewGroup(Group newGroup) throws SQLException, ClassNotFoundException {
+        executeUpdateWithOneParameter("INSERT INTO \"GROUP\" (NAME) VALUES (?);", newGroup.getName());
+        closeConnection();
+    }
+
+    public static void addNewBelongToRelation(Group group, Expression expression) throws SQLException, ClassNotFoundException {
+        executeUpdateWithTwoParameters("INSERT INTO BELONGS_TO (NAME, CONTENT) VALUES (?, ?);", group.getName(), expression.getContent());
+        closeConnection();
+    }
+
     public static ResultSet executeQuery(String query) throws SQLException, ClassNotFoundException {
         openConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -106,6 +116,23 @@ public class ConnectionManager {
         preparedStatement.closeOnCompletion();
         preparedStatement.execute();
         return preparedStatement.getResultSet();
+    }
+
+    public static void executeUpdateWithOneParameter(String query, String parameter) throws SQLException, ClassNotFoundException {
+        openConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setObject(1, parameter);
+        preparedStatement.closeOnCompletion();
+        preparedStatement.executeUpdate();
+    }
+
+    public static void executeUpdateWithTwoParameters(String query, String parameter1, String parameter2) throws SQLException, ClassNotFoundException {
+        openConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setObject(1, parameter1);
+        preparedStatement.setObject(2, parameter2);
+        preparedStatement.closeOnCompletion();
+        preparedStatement.executeUpdate();
     }
 
     private static void openConnection() throws SQLException, ClassNotFoundException {
