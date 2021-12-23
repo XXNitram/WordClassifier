@@ -126,7 +126,7 @@ public class CreateGroupController {
                     String newGroupName = c.get("newGroupName");
                     if (!groupList.isEmpty()) {
                         for (Group group : groupList) {
-                            if (newGroupName.trim().equals(group.getName())) {
+                            if (newGroupName.trim().toLowerCase().equals(group.getName().toLowerCase())) {
                                 c.error("Diese Gruppe existiert bereits!");
                             }
                         }
