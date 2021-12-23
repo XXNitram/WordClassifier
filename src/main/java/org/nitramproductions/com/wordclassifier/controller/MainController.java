@@ -82,7 +82,9 @@ public class MainController {
 
         searchLeftTableView();
         searchRightTableView();
-        manageTableViewDependingOnToggleSwitch();
+        updateLeftTableViewDependingOnSelectionInRightTableView();
+        updateRightTableViewDependingOnSelectionInLeftTableView();
+        updateTableViewDependingOnToggleSwitch();
 
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().dateModifiedProperty());
@@ -148,7 +150,45 @@ public class MainController {
         });
     }
 
-    public void manageTableViewDependingOnToggleSwitch() {
+    public void updateRightTableViewDependingOnSelectionInLeftTableView() {
+        leftTableView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                rightTableView.getSelectionModel().clearSelection();
+                if (!toggleSwitch.isSelected()) {
+                    try {
+                        observableExpressionList.clear();
+                        observableExpressionList.addAll(ConnectionManager.getExpressionsFromGroup(newSelection));
+                        if ("Name".equals(leftTableViewChoiceBox.getValue())) {
+                            filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(rightTableViewTextField.getText().toLowerCase().trim()));
+                        }
+                    } catch (SQLException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    public void updateLeftTableViewDependingOnSelectionInRightTableView() {
+        rightTableView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                leftTableView.getSelectionModel().clearSelection();
+                if (toggleSwitch.isSelected()) {
+                    try {
+                        observableGroupList.clear();
+                        observableGroupList.addAll(ConnectionManager.getGroupsFromExpression(newSelection));
+                        if ("Name".equals(leftTableViewChoiceBox.getValue())) {
+                            filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(leftTableViewTextField.getText().toLowerCase().trim()));
+                        }
+                    } catch (SQLException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    public void updateTableViewDependingOnToggleSwitch() {
         toggleSwitch.selectedProperty().addListener((observableValue, oldSelection, newSelection) -> {
             leftTableViewTextField.setText("");
             rightTableViewTextField.setText("");
@@ -168,40 +208,6 @@ public class MainController {
                     observableExpressionList.addAll(ConnectionManager.getAllExpressions());
                 } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
-                }
-            }
-        });
-
-        leftTableView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                rightTableView.getSelectionModel().clearSelection();
-                if (!toggleSwitch.isSelected()) {
-                    try {
-                        observableExpressionList.clear();
-                        observableExpressionList.addAll(ConnectionManager.getExpressionsFromGroup(newSelection));
-                        if ("Name".equals(leftTableViewChoiceBox.getValue())) {
-                            filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(rightTableViewTextField.getText().toLowerCase().trim()));
-                        }
-                    } catch (SQLException | ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        rightTableView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                leftTableView.getSelectionModel().clearSelection();
-                if (toggleSwitch.isSelected()) {
-                    try {
-                        observableGroupList.clear();
-                        observableGroupList.addAll(ConnectionManager.getGroupsFromExpression(newSelection));
-                        if ("Name".equals(leftTableViewChoiceBox.getValue())) {
-                            filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(leftTableViewTextField.getText().toLowerCase().trim()));
-                        }
-                    } catch (SQLException | ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
         });
