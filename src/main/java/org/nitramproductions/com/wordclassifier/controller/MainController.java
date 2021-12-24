@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
+import org.nitramproductions.com.wordclassifier.MainApplication;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
@@ -85,7 +86,9 @@ public class MainController {
         searchRightTableView();
         updateLeftTableViewDependingOnSelectionInRightTableView();
         updateRightTableViewDependingOnSelectionInLeftTableView();
-        updateTableViewDependingOnToggleSwitch();
+        listenToToggleSwitchAndUpdateTableView();
+
+        reloadGroupData();
 
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().dateModifiedProperty());
@@ -119,6 +122,14 @@ public class MainController {
         observableExpressionList.addListener((ListChangeListener<Expression>) change -> {
             if (change.next()) {
                 updateExpressionLists();
+            }
+        });
+    }
+
+    public void reloadGroupData() {
+        MainApplication.needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
+            if (newSelection) {
+                updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
             }
         });
     }
@@ -189,38 +200,53 @@ public class MainController {
         });
     }
 
-    public void updateTableViewDependingOnToggleSwitch() {
+    public void listenToToggleSwitchAndUpdateTableView() {
         toggleSwitch.selectedProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            leftTableViewTextField.setText("");
-            rightTableViewTextField.setText("");
-            observableGroupList.clear();
-            leftTableView.getSelectionModel().clearSelection();
-            observableExpressionList.clear();
-            rightTableView.getSelectionModel().clearSelection();
-
-            if (!newSelection) {
-                try {
-                    observableGroupList.addAll(ConnectionManager.getAllGroups());
-                } catch (SQLException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                try {
-                    observableExpressionList.addAll(ConnectionManager.getAllExpressions());
-                } catch (SQLException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
+            updateTableViewDependingOnToggleSwitch(newSelection);
         });
     }
 
+    private void updateTableViewDependingOnToggleSwitch(Boolean expressionIsSwitchedOn) {
+        leftTableViewTextField.setText("");
+        rightTableViewTextField.setText("");
+        observableGroupList.clear();
+        leftTableView.getSelectionModel().clearSelection();
+        observableExpressionList.clear();
+        rightTableView.getSelectionModel().clearSelection();
+
+        if (!expressionIsSwitchedOn) {
+            try {
+                observableGroupList.addAll(ConnectionManager.getAllGroups());
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                observableExpressionList.addAll(ConnectionManager.getAllExpressions());
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @FXML
-    private void onCreateNewMenuItemClick(ActionEvent event) throws IOException {
+    private void onCreateNewGroupMenuItemClick(ActionEvent event) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGroup.fxml"));
         Parent root = fxmlLoader.load();
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(((MenuItem)event.getTarget()).getParentPopup().getOwnerWindow());
+        stage.initOwner(((MenuItem)event.getTarget()).getParentMenu().getParentPopup().getOwnerWindow());
+        stage.setScene(new Scene(root, 783, 440));
+        stage.show();
+    }
+
+    @FXML
+    private void onCreateNewExpressionMenuItemClick(ActionEvent event) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGroup.fxml"));
+        Parent root = fxmlLoader.load();
+        Stage stage = new Stage();
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(((MenuItem)event.getTarget()).getParentMenu().getParentPopup().getOwnerWindow());
         stage.setScene(new Scene(root, 783, 440));
         stage.show();
     }

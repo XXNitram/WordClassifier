@@ -24,11 +24,20 @@
         <menus>
           <Menu mnemonicParsing="false" text="Datei">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#onCreateNewMenuItemClick" text="Neu...">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                     </accelerator>
-                  </MenuItem>
+                  <Menu mnemonicParsing="false" text="Neu">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#onCreateNewGroupMenuItemClick" text="Gruppe">
+                           <accelerator>
+                              <KeyCodeCombination alt="DOWN" code="G" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                           </accelerator>
+                        </MenuItem>
+                        <MenuItem mnemonicParsing="false" onAction="#onCreateNewExpressionMenuItemClick" text="Wort">
+                           <accelerator>
+                              <KeyCodeCombination alt="DOWN" code="W" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                           </accelerator>
+                        </MenuItem>
+                    </items>
+                  </Menu>
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="Schließen" />
             </items>

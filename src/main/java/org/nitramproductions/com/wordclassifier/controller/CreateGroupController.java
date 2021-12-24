@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
 import net.synedra.validatorfx.Validator;
+import org.nitramproductions.com.wordclassifier.MainApplication;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
@@ -183,6 +184,7 @@ public class CreateGroupController {
             e.printStackTrace();
         }
 
+        MainApplication.needToReloadData.set(true);
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }
