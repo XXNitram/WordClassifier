@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CreateGroupController {
+public class CreateExpressionController {
 
     @FXML
     private ButtonBar buttonBar;
@@ -28,17 +28,17 @@ public class CreateGroupController {
     private TextField newNameTextField;
 
     @FXML
-    private TableView<Expression> leftTableView;
+    private TableView<Group> leftTableView;
     @FXML
-    private TableColumn<Expression, String> leftTableViewNameColumn;
+    private TableColumn<Group, String> leftTableViewNameColumn;
     @FXML
-    private TableView<Expression> rightTableView;
+    private TableView<Group> rightTableView;
     @FXML
-    private TableColumn<Expression, String> rightTableViewNameColumn;
+    private TableColumn<Group, String> rightTableViewNameColumn;
 
-    private ObservableList<Expression> leftList;
-    private ObservableList<Expression> rightList;
-    private List<Group> groupList;
+    private ObservableList<Group> leftList;
+    private ObservableList<Group> rightList;
+    private List<Expression> expressionList;
 
     private final Validator validator = new Validator();
 
@@ -47,17 +47,17 @@ public class CreateGroupController {
     private final TooltipWrapper<Button> createNewWrapper = new TooltipWrapper<>(
             createNewButton,
             validator.containsErrorsProperty(),
-            Bindings.concat("Gruppe kann nicht erstellt werden:\n", validator.createStringBinding())
+            Bindings.concat("Wort kann nicht erstellt werden:\n", validator.createStringBinding())
     );
 
-    public CreateGroupController() {
+    public CreateExpressionController() {
 
     }
 
     @FXML
     private void initialize() throws SQLException, ClassNotFoundException {
-        groupList = ConnectionManager.getAllGroups();
-        leftList = FXCollections.observableArrayList(ConnectionManager.getAllExpressions());
+        expressionList = ConnectionManager.getAllExpressions();
+        leftList = FXCollections.observableArrayList(ConnectionManager.getAllGroups());
         rightList = FXCollections.observableArrayList();
         leftTableView.setItems(leftList);
         rightTableView.setItems(rightList);
@@ -77,16 +77,16 @@ public class CreateGroupController {
         deselectLeftIfRightSelected();
         deselectRightIfLeftSelected();
 
-        leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
-        rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
+        leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
     }
 
     private void validateNewNameTextField() {
         validator.createCheck()
-                .dependsOn("newGroupName", newNameTextField.textProperty())
+                .dependsOn("newExpressionName", newNameTextField.textProperty())
                 .withMethod(c -> {
-                    String newGroupName = c.get("newGroupName");
-                    if (newGroupName.trim().isEmpty()) {
+                    String newExpressionName = c.get("newExpressionName");
+                    if (newExpressionName.trim().isEmpty()) {
                         c.error("Bitte gib einen Namen ein!");
                     }
                 })
@@ -94,11 +94,11 @@ public class CreateGroupController {
                 .immediate();
 
         validator.createCheck()
-                .dependsOn("newGroupName", newNameTextField.textProperty())
+                .dependsOn("newExpressionName", newNameTextField.textProperty())
                 .withMethod(c -> {
-                    String newGroupName = c.get("newGroupName");
+                    String newExpressionName = c.get("newExpressionName");
                     Pattern pattern = Pattern.compile("[^\\s+a-zA-Z0-9äöüÄÖÜß]");
-                    Matcher matcher = pattern.matcher(newGroupName.trim());
+                    Matcher matcher = pattern.matcher(newExpressionName.trim());
                     if (matcher.find()) {
                         c.error("Es sind keine Sonderzeichen erlaubt!");
                     }
@@ -107,10 +107,10 @@ public class CreateGroupController {
                 .immediate();
 
         validator.createCheck()
-                .dependsOn("newGroupName", newNameTextField.textProperty())
+                .dependsOn("newExpressionName", newNameTextField.textProperty())
                 .withMethod(c -> {
-                    String newGroupName = c.get("newGroupName");
-                    if (newGroupName.trim().length() > 250) {
+                    String newExpressionName = c.get("newExpressionName");
+                    if (newExpressionName.trim().length() > 250) {
                         c.error("Der Name ist zu lang!");
                     }
                 })
@@ -118,13 +118,13 @@ public class CreateGroupController {
                 .immediate();
 
         validator.createCheck()
-                .dependsOn("newGroupName", newNameTextField.textProperty())
+                .dependsOn("newExpressionName", newNameTextField.textProperty())
                 .withMethod(c -> {
-                    String newGroupName = c.get("newGroupName");
-                    if (!groupList.isEmpty()) {
-                        for (Group group : groupList) {
-                            if (newGroupName.trim().equalsIgnoreCase(group.getName())) {
-                                c.error("Diese Gruppe existiert bereits!");
+                    String newExpressionName = c.get("newExpressionName");
+                    if (!expressionList.isEmpty()) {
+                        for (Expression expression : expressionList) {
+                            if (newExpressionName.trim().equalsIgnoreCase(expression.getContent())) {
+                                c.error("Dieses Wort existiert bereits!");
                             }
                         }
                     }
@@ -134,7 +134,7 @@ public class CreateGroupController {
     }
 
     private void deselectRightIfLeftSelected() {
-        leftTableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Expression> change) -> {
+        leftTableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Group> change) -> {
                 if (!leftTableView.getSelectionModel().getSelectedItems().isEmpty()) {
                     rightTableView.getSelectionModel().clearSelection();
                 }
@@ -142,7 +142,7 @@ public class CreateGroupController {
     }
 
     private void deselectLeftIfRightSelected() {
-        rightTableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Expression> change) -> {
+        rightTableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Group> change) -> {
             if (!rightTableView.getSelectionModel().getSelectedItems().isEmpty()) {
                 leftTableView.getSelectionModel().clearSelection();
             }
@@ -151,32 +151,32 @@ public class CreateGroupController {
 
     @FXML
     private void onRightArrowButtonClick() {
-        ObservableList<Expression> selectedExpression = leftTableView.getSelectionModel().getSelectedItems();
-        if (!selectedExpression.isEmpty()) {
-            rightList.addAll(selectedExpression);
-            leftList.removeAll(selectedExpression);
+        ObservableList<Group> selectedGroups = leftTableView.getSelectionModel().getSelectedItems();
+        if (!selectedGroups.isEmpty()) {
+            rightList.addAll(selectedGroups);
+            leftList.removeAll(selectedGroups);
             leftTableView.getSelectionModel().clearSelection();
         }
     }
 
     @FXML
     private void onLeftArrowButtonClick() {
-        ObservableList<Expression> selectedExpression = rightTableView.getSelectionModel().getSelectedItems();
-        if (!selectedExpression.isEmpty()) {
-            leftList.addAll(selectedExpression);
-            rightList.removeAll(selectedExpression);
+        ObservableList<Group> selectedGroups = rightTableView.getSelectionModel().getSelectedItems();
+        if (!selectedGroups.isEmpty()) {
+            leftList.addAll(selectedGroups);
+            rightList.removeAll(selectedGroups);
             rightTableView.getSelectionModel().clearSelection();
         }
     }
 
     private void onCreateNewButtonClick() {
-        String newGroupName = newNameTextField.getText().trim();
-        Group newGroup = new Group(newGroupName);
+        String newExpressionName = newNameTextField.getText().trim();
+        Expression newExpression = new Expression(newExpressionName);
         try {
-            ConnectionManager.addNewGroup(newGroup);
+            ConnectionManager.addNewExpression(newExpression);
             if (!rightList.isEmpty()) {
-                for (Expression expression : rightList) {
-                    ConnectionManager.addNewBelongToRelation(newGroup, expression);
+                for (Group group : rightList) {
+                    ConnectionManager.addNewBelongToRelation(group, newExpression);
                 }
             }
         } catch (SQLException | ClassNotFoundException e) {

@@ -96,6 +96,11 @@ public class ConnectionManager {
         closeConnection();
     }
 
+    public static void addNewExpression(Expression newExpression) throws SQLException, ClassNotFoundException {
+        executeUpdateWithOneParameter("INSERT INTO EXPRESSION (CONTENT) VALUES (?);", newExpression.getContent());
+        closeConnection();
+    }
+
     public static void addNewBelongToRelation(Group group, Expression expression) throws SQLException, ClassNotFoundException {
         executeUpdateWithTwoParameters("INSERT INTO BELONGS_TO (NAME, CONTENT) VALUES (?, ?);", group.getName(), expression.getContent());
         closeConnection();

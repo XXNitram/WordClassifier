@@ -242,7 +242,7 @@ public class MainController {
 
     @FXML
     private void onCreateNewExpressionMenuItemClick(ActionEvent event) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGroup.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createExpression.fxml"));
         Parent root = fxmlLoader.load();
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
