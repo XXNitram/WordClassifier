@@ -23,7 +23,7 @@ public class ConnectionManager {
         InputStream schema = ConnectionManager.class.getResourceAsStream("schema.sql");
         InputStream data = ConnectionManager.class.getResourceAsStream("data.sql");
         executeStatementsFromFile(schema);
-        executeStatementsFromFile(data);
+        // executeStatementsFromFile(data);
     }
 
     public static void executeStatementsFromFile(InputStream inputStream) throws SQLException, ClassNotFoundException {

@@ -63,7 +63,7 @@ jlink {
         name = 'WordClassifier'
     }
     jpackage {
-        //imageOptions = ['--icon', 'src/main/resources/com/example/demo/cinema-icon.ico']
+        imageOptions = ['--icon', 'src/main/resources/org/nitramproductions/com/wordclassifier/book-icon.ico']
         installerOptions = [
                 '--type', 'msi',
                 '--description', 'WordClassifier Windows Software',
