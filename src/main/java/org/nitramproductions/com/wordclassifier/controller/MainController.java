@@ -13,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
@@ -24,6 +25,7 @@ import org.nitramproductions.com.wordclassifier.model.Group;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class MainController {
 
@@ -48,6 +50,11 @@ public class MainController {
     private TextField leftTableViewTextField;
     @FXML
     private TextField rightTableViewTextField;
+
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private CheckMenuItem darkMode;
 
     @FXML
     private ToggleSwitch toggleSwitch;
@@ -239,6 +246,15 @@ public class MainController {
     }
 
     @FXML
+    private void onDarkModeCheckMenuClick() {
+        if (darkMode.isSelected()) {
+            menuBar.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        } else {
+            menuBar.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+    }
+
+    @FXML
     private void onDeleteButtonClick() throws SQLException, ClassNotFoundException {
         if (!leftTableView.getSelectionModel().isEmpty()) {
             Group groupToDelete = leftTableView.getSelectionModel().getSelectedItem();
@@ -267,7 +283,14 @@ public class MainController {
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(((MenuItem)event.getTarget()).getParentMenu().getParentPopup().getOwnerWindow());
-        stage.setScene(new Scene(root, 783, 440));
+        Scene scene = new Scene(root, 783, 440);
+        if (darkMode.isSelected()) {
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        stage.setTitle("Neue Gruppe Erstellen");
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        stage.setResizable(false);
+        stage.setScene(scene);
         stage.show();
     }
 
@@ -280,7 +303,26 @@ public class MainController {
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(((MenuItem)event.getTarget()).getParentMenu().getParentPopup().getOwnerWindow());
-        stage.setScene(new Scene(root, 783, 440));
+        Scene scene = new Scene(root, 783, 440);
+        if (darkMode.isSelected()) {
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        stage.setTitle("Neues Wort Erstellen");
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        stage.setResizable(false);
+        stage.setScene(scene);
         stage.show();
+    }
+
+    @FXML
+    private void onCloseMenuItemClick() {
+        Stage stage = (Stage) menuBar.getScene().getWindow();
+        stage.close();
+    }
+
+    @FXML
+    private void onAboutMenuItemClick() {
+        Stage stage = (Stage) menuBar.getScene().getWindow();
+        stage.close();
     }
 }
