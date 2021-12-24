@@ -321,8 +321,22 @@ public class MainController {
     }
 
     @FXML
-    private void onAboutMenuItemClick() {
-        Stage stage = (Stage) menuBar.getScene().getWindow();
-        stage.close();
+    private void onAboutMenuItemClick(ActionEvent event) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about.fxml"));
+        Parent root = fxmlLoader.load();
+        AboutController aboutController = fxmlLoader.getController();
+        aboutController.setDarkMode(darkMode.isSelected());
+        Stage stage = new Stage();
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(menuBar.getScene().getWindow());
+        Scene scene = new Scene(root, 600, 400);
+        if (darkMode.isSelected()) {
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        stage.setTitle("About");
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
     }
 }
