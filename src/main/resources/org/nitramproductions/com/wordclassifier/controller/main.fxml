@@ -90,8 +90,8 @@
                            </padding>
                         </ToggleSwitch>
                         <Label minWidth="55.0" prefHeight="17.0" text="Wörter" translateX="50.0" />
-                      <Button focusTraversable="false" mnemonicParsing="false" text="Bearbeiten" translateX="-10.0" />
-                        <Button focusTraversable="false" mnemonicParsing="false" text="Löschen" translateX="-10.0" />
+                      <Button fx:id="editButton" focusTraversable="false" mnemonicParsing="false" text="Bearbeiten" translateX="-10.0" />
+                        <Button fx:id="deleteButton" focusTraversable="false" mnemonicParsing="false" onAction="#onDeleteButtonClick" text="Löschen" translateX="-10.0" />
                     </buttons>
                   </ButtonBar>
                   <ChoiceBox fx:id="rightTableViewChoiceBox" focusTraversable="false" prefHeight="28.0" prefWidth="256.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />

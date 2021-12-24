@@ -51,6 +51,10 @@ public class MainController {
 
     @FXML
     private ToggleSwitch toggleSwitch;
+    @FXML
+    private Button editButton;
+    @FXML
+    private Button deleteButton;
 
     private ObservableList<Group> observableGroupList;
     private FilteredList<Group> filteredGroupList;
@@ -230,6 +234,26 @@ public class MainController {
                 observableExpressionList.addAll(ConnectionManager.getAllExpressions());
             } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
+    private void onDeleteButtonClick() throws SQLException, ClassNotFoundException {
+        if (!leftTableView.getSelectionModel().isEmpty()) {
+            Group groupToDelete = leftTableView.getSelectionModel().getSelectedItem();
+            ConnectionManager.deleteGroup(groupToDelete);
+            observableGroupList.remove(groupToDelete);
+            if (!toggleSwitch.isSelected()) {
+                observableExpressionList.clear();
+            }
+        }
+        if (!rightTableView.getSelectionModel().isEmpty()) {
+            Expression expressionToDelete = rightTableView.getSelectionModel().getSelectedItem();
+            ConnectionManager.deleteExpression(expressionToDelete);
+            observableExpressionList.remove(expressionToDelete);
+            if (toggleSwitch.isSelected()) {
+                observableGroupList.clear();
             }
         }
     }

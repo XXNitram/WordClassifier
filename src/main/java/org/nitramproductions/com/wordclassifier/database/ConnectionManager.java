@@ -106,6 +106,16 @@ public class ConnectionManager {
         closeConnection();
     }
 
+    public static void deleteGroup(Group group) throws SQLException, ClassNotFoundException {
+        executeUpdateWithOneParameter("DELETE FROM \"GROUP\" WHERE NAME = ?;", group.getName());
+        closeConnection();
+    }
+
+    public static void deleteExpression(Expression expression) throws SQLException, ClassNotFoundException {
+        executeUpdateWithOneParameter("DELETE FROM EXPRESSION WHERE CONTENT = ?;", expression.getContent());
+        closeConnection();
+    }
+
     public static ResultSet executeQuery(String query) throws SQLException, ClassNotFoundException {
         openConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query);
