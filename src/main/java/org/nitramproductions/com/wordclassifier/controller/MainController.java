@@ -1,5 +1,7 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -50,13 +52,15 @@ public class MainController {
     @FXML
     private ToggleSwitch toggleSwitch;
 
-    ObservableList<Group> observableGroupList;
-    FilteredList<Group> filteredGroupList;
-    SortedList<Group> sortedGroupList;
+    private ObservableList<Group> observableGroupList;
+    private FilteredList<Group> filteredGroupList;
+    private SortedList<Group> sortedGroupList;
 
-    ObservableList<Expression> observableExpressionList;
-    FilteredList<Expression> filteredExpressionList;
-    SortedList<Expression> sortedExpressionList;
+    private ObservableList<Expression> observableExpressionList;
+    private FilteredList<Expression> filteredExpressionList;
+    private SortedList<Expression> sortedExpressionList;
+
+    private BooleanProperty needToReloadData = new SimpleBooleanProperty(false);
 
     public MainController() {
 
@@ -127,9 +131,10 @@ public class MainController {
     }
 
     public void reloadGroupData() {
-        MainApplication.needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
+        needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
             if (newSelection) {
                 updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
+                needToReloadData.set(false);
             }
         });
     }
@@ -233,6 +238,8 @@ public class MainController {
     private void onCreateNewGroupMenuItemClick(ActionEvent event) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGroup.fxml"));
         Parent root = fxmlLoader.load();
+        CreateGroupController createGroupController = fxmlLoader.getController();
+        createGroupController.initializeNeedToReloadDataBooleanProperty(needToReloadData);
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(((MenuItem)event.getTarget()).getParentMenu().getParentPopup().getOwnerWindow());
@@ -244,6 +251,8 @@ public class MainController {
     private void onCreateNewExpressionMenuItemClick(ActionEvent event) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createExpression.fxml"));
         Parent root = fxmlLoader.load();
+        CreateExpressionController createExpressionController = fxmlLoader.getController();
+        createExpressionController.initializeNeedToReloadDataBooleanProperty(needToReloadData);
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(((MenuItem)event.getTarget()).getParentMenu().getParentPopup().getOwnerWindow());

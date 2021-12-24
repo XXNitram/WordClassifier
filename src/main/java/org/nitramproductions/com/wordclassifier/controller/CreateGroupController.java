@@ -1,6 +1,7 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -50,6 +51,8 @@ public class CreateGroupController {
             Bindings.concat("Gruppe kann nicht erstellt werden:\n", validator.createStringBinding())
     );
 
+    private BooleanProperty needToReloadData;
+
     public CreateGroupController() {
 
     }
@@ -79,6 +82,10 @@ public class CreateGroupController {
 
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
+    }
+
+    public void initializeNeedToReloadDataBooleanProperty(BooleanProperty needToReloadData) {
+        this.needToReloadData = needToReloadData;
     }
 
     private void validateNewNameTextField() {
@@ -183,7 +190,7 @@ public class CreateGroupController {
             e.printStackTrace();
         }
 
-        MainApplication.needToReloadData.set(true);
+        needToReloadData.set(true);
         Stage stage = (Stage) createNewButton.getScene().getWindow();
         stage.close();
     }

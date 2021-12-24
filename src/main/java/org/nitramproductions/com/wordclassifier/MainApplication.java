@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 public class MainApplication extends Application {
 
     private final ObservableList<Group> groupData = FXCollections.observableArrayList();
-    public static BooleanProperty needToReloadData = new SimpleBooleanProperty(false);
 
     public void addData() {
         groupData.add(new Group("Gruppe 1", LocalDateTime.of(1999, 2, 21, 22, 12)));

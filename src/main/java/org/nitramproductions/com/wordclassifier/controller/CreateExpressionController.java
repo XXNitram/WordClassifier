@@ -1,6 +1,7 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -50,6 +51,8 @@ public class CreateExpressionController {
             Bindings.concat("Wort kann nicht erstellt werden:\n", validator.createStringBinding())
     );
 
+    private BooleanProperty needToReloadData;
+
     public CreateExpressionController() {
 
     }
@@ -79,6 +82,10 @@ public class CreateExpressionController {
 
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+    }
+
+    public void initializeNeedToReloadDataBooleanProperty(BooleanProperty needToReloadData) {
+        this.needToReloadData = needToReloadData;
     }
 
     private void validateNewNameTextField() {
@@ -183,7 +190,7 @@ public class CreateExpressionController {
             e.printStackTrace();
         }
 
-        MainApplication.needToReloadData.set(true);
+        needToReloadData.set(true);
         Stage stage = (Stage) createNewButton.getScene().getWindow();
         stage.close();
     }
