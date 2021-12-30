@@ -104,10 +104,10 @@ public class CreateExpressionController {
                 .dependsOn("newExpressionName", newNameTextField.textProperty())
                 .withMethod(c -> {
                     String newExpressionName = c.get("newExpressionName");
-                    Pattern pattern = Pattern.compile("[^\\s+a-zA-Z0-9äöüÄÖÜß]");
+                    Pattern pattern = Pattern.compile("[^\\p{P}\\s+a-zA-Z0-9äöüÄÖÜß]");
                     Matcher matcher = pattern.matcher(newExpressionName.trim());
                     if (matcher.find()) {
-                        c.error("Es sind keine Sonderzeichen erlaubt!");
+                        c.error("Es sind keine Sonderzeichen außer !\"#$%&'()*+,-./:;=<>?@[\\]^_`{|}~ erlaubt!");
                     }
                 })
                 .decorates(newNameTextField)
@@ -117,7 +117,7 @@ public class CreateExpressionController {
                 .dependsOn("newExpressionName", newNameTextField.textProperty())
                 .withMethod(c -> {
                     String newExpressionName = c.get("newExpressionName");
-                    if (newExpressionName.trim().length() > 250) {
+                    if (newExpressionName.trim().length() > 511) {
                         c.error("Der Name ist zu lang!");
                     }
                 })

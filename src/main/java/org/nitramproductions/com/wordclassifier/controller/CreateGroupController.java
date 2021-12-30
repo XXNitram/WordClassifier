@@ -104,10 +104,10 @@ public class CreateGroupController {
                 .dependsOn("newGroupName", newNameTextField.textProperty())
                 .withMethod(c -> {
                     String newGroupName = c.get("newGroupName");
-                    Pattern pattern = Pattern.compile("[^\\s+a-zA-Z0-9äöüÄÖÜß]");
+                    Pattern pattern = Pattern.compile("[^\\p{P}\\s+a-zA-Z0-9äöüÄÖÜß]");
                     Matcher matcher = pattern.matcher(newGroupName.trim());
                     if (matcher.find()) {
-                        c.error("Es sind keine Sonderzeichen erlaubt!");
+                        c.error("Es sind keine Sonderzeichen außer !\"#$%&'()*+,-./:;=<>?@[\\]^_`{|}~ erlaubt!");
                     }
                 })
                 .decorates(newNameTextField)
@@ -117,7 +117,7 @@ public class CreateGroupController {
                 .dependsOn("newGroupName", newNameTextField.textProperty())
                 .withMethod(c -> {
                     String newGroupName = c.get("newGroupName");
-                    if (newGroupName.trim().length() > 250) {
+                    if (newGroupName.trim().length() > 511) {
                         c.error("Der Name ist zu lang!");
                     }
                 })

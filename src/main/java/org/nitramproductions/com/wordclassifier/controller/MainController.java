@@ -2,6 +2,7 @@ package org.nitramproductions.com.wordclassifier.controller;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -16,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.controlsfx.control.ToggleSwitch;
 import org.nitramproductions.com.wordclassifier.MainApplication;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
@@ -105,9 +107,16 @@ public class MainController {
 
         reloadGroupData();
 
-        leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        leftTableViewNameColumn.setCellValueFactory(cellData -> {
+            String result = cellData.getValue().nameProperty().get().replaceAll("(.{35})", "$1\n");
+            return new SimpleStringProperty(result);
+        });
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().dateModifiedProperty());
-        rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
+
+        rightTableViewNameColumn.setCellValueFactory(cellData -> {
+            String result = cellData.getValue().contentProperty().get().replaceAll("(.{35})", "$1\n");
+            return new SimpleStringProperty(result);
+        });
         rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().dateModifiedProperty());
     }
 
