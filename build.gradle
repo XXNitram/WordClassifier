@@ -38,7 +38,7 @@ dependencies {
     implementation('com.dlsc.formsfx:formsfx-core:11.3.2') {
         exclude(group: 'org.openjfx')
     }
-    implementation('net.synedra:validatorfx:0.1.13') {
+    implementation('net.synedra:validatorfx:0.2.1') {
         exclude(group: 'org.openjfx')
     }
     implementation('org.kordamp.ikonli:ikonli-javafx:12.2.0')
@@ -63,7 +63,7 @@ jlink {
         name = 'WordClassifier'
     }
     jpackage {
-        //imageOptions = ['--icon', 'src/main/resources/com/example/demo/cinema-icon.ico']
+        imageOptions = ['--icon', 'src/main/resources/org/nitramproductions/com/wordclassifier/book-icon.ico']
         installerOptions = [
                 '--type', 'msi',
                 '--description', 'WordClassifier Windows Software',

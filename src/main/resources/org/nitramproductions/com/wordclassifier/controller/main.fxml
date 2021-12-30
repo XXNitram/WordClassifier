@@ -20,27 +20,36 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="480.0" minWidth="640.0" prefHeight="585.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nitramproductions.com.wordclassifier.controller.MainController">
    <children>
-      <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="2.0">
+      <MenuBar fx:id="menuBar" layoutY="2.0" prefHeight="25.0" prefWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="2.0">
         <menus>
           <Menu mnemonicParsing="false" text="Datei">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#onCreateNewMenuItemClick" text="Neu...">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                     </accelerator>
-                  </MenuItem>
+                  <Menu mnemonicParsing="false" text="Neu">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#onCreateNewGroupMenuItemClick" text="Gruppe">
+                           <accelerator>
+                              <KeyCodeCombination alt="DOWN" code="G" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                           </accelerator>
+                        </MenuItem>
+                        <MenuItem mnemonicParsing="false" onAction="#onCreateNewExpressionMenuItemClick" text="Wort">
+                           <accelerator>
+                              <KeyCodeCombination alt="DOWN" code="W" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                           </accelerator>
+                        </MenuItem>
+                    </items>
+                  </Menu>
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Schließen" />
+                  <MenuItem mnemonicParsing="false" onAction="#onCloseMenuItemClick" text="Schließen" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Ansicht">
             <items>
-                  <CheckMenuItem mnemonicParsing="false" text="Dark Mode" />
+                  <CheckMenuItem fx:id="darkMode" mnemonicParsing="false" onAction="#onDarkModeCheckMenuClick" text="Dark Mode" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Hilfe">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#onAboutMenuItemClick" text="About" />
             </items>
           </Menu>
         </menus>
@@ -75,14 +84,14 @@
                   </TableView>
                   <ButtonBar buttonMinWidth="100.0" layoutX="37.0" layoutY="333.0" prefHeight="40.0" prefWidth="516.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                     <buttons>
-                        <ToggleSwitch fx:id="toggleSwitch" minWidth="68.0" prefHeight="18.0" text="Gruppen" translateX="47.0">
+                        <ToggleSwitch fx:id="toggleSwitch" minWidth="68.0" prefHeight="18.0" styleClass="toggleSwitchStyle" text="Gruppen" translateX="47.0">
                            <padding>
                               <Insets right="5.0" />
                            </padding>
                         </ToggleSwitch>
                         <Label minWidth="55.0" prefHeight="17.0" text="Wörter" translateX="50.0" />
-                      <Button focusTraversable="false" mnemonicParsing="false" text="Bearbeiten" translateX="-10.0" />
-                        <Button focusTraversable="false" mnemonicParsing="false" text="Löschen" translateX="-10.0" />
+                      <Button fx:id="editButton" focusTraversable="false" mnemonicParsing="false" text="Bearbeiten" translateX="-10.0" visible="false" />
+                        <Button fx:id="deleteButton" focusTraversable="false" mnemonicParsing="false" onAction="#onDeleteButtonClick" text="Löschen" translateX="-10.0" />
                     </buttons>
                   </ButtonBar>
                   <ChoiceBox fx:id="rightTableViewChoiceBox" focusTraversable="false" prefHeight="28.0" prefWidth="256.0" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="1.0" />

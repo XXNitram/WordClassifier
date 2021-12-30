@@ -23,7 +23,7 @@ public class ConnectionManager {
         InputStream schema = ConnectionManager.class.getResourceAsStream("schema.sql");
         InputStream data = ConnectionManager.class.getResourceAsStream("data.sql");
         executeStatementsFromFile(schema);
-        executeStatementsFromFile(data);
+        // executeStatementsFromFile(data);
     }
 
     public static void executeStatementsFromFile(InputStream inputStream) throws SQLException, ClassNotFoundException {
@@ -43,7 +43,7 @@ public class ConnectionManager {
         closeConnection();
     }
 
-    public static ObservableList<Expression> getAllExpressions() throws SQLException, ClassNotFoundException {
+    public static List<Expression> getAllExpressions() throws SQLException, ClassNotFoundException {
         ResultSet resultSet = executeQuery("SELECT CONTENT, DATE_MODIFIED FROM EXPRESSION;");
         List<Expression> expressions = new ArrayList<>();
         while (resultSet.next()) {
@@ -52,10 +52,10 @@ public class ConnectionManager {
         }
         resultSet.close();
         closeConnection();
-        return FXCollections.observableArrayList(expressions);
+        return expressions;
     }
 
-    public static ObservableList<Group> getAllGroups() throws SQLException, ClassNotFoundException {
+    public static List<Group> getAllGroups() throws SQLException, ClassNotFoundException {
         ResultSet resultSet = executeQuery("SELECT NAME, DATE_MODIFIED FROM \"GROUP\";");
         List<Group> groups = new ArrayList<>();
         while (resultSet.next()) {
@@ -64,10 +64,10 @@ public class ConnectionManager {
         }
         resultSet.close();
         closeConnection();
-        return FXCollections.observableArrayList(groups);
+        return groups;
     }
 
-    public static ObservableList<Expression> getExpressionsFromGroup(Group group) throws SQLException, ClassNotFoundException {
+    public static List<Expression> getExpressionsFromGroup(Group group) throws SQLException, ClassNotFoundException {
         ResultSet resultSet = executeQueryWithOneParameter("SELECT e.CONTENT, e.DATE_MODIFIED FROM EXPRESSION e, BELONGS_TO b WHERE e.CONTENT = b.CONTENT AND b.NAME = ?;", group.getName());
         List<Expression> expressions = new ArrayList<>();
         while (resultSet.next()) {
@@ -76,10 +76,10 @@ public class ConnectionManager {
         }
         resultSet.close();
         closeConnection();
-        return FXCollections.observableArrayList(expressions);
+        return expressions;
     }
 
-    public static ObservableList<Group> getGroupsFromExpression(Expression expression) throws SQLException, ClassNotFoundException {
+    public static List<Group> getGroupsFromExpression(Expression expression) throws SQLException, ClassNotFoundException {
         ResultSet resultSet = executeQueryWithOneParameter("SELECT g.NAME, g.DATE_MODIFIED FROM \"GROUP\" g, BELONGS_TO b WHERE g.NAME = b.NAME AND b.CONTENT = ?;", expression.getContent());
         List<Group> groups = new ArrayList<>();
         while (resultSet.next()) {
@@ -88,7 +88,32 @@ public class ConnectionManager {
         }
         resultSet.close();
         closeConnection();
-        return FXCollections.observableArrayList(groups);
+        return groups;
+    }
+
+    public static void addNewGroup(Group newGroup) throws SQLException, ClassNotFoundException {
+        executeUpdateWithOneParameter("INSERT INTO \"GROUP\" (NAME) VALUES (?);", newGroup.getName());
+        closeConnection();
+    }
+
+    public static void addNewExpression(Expression newExpression) throws SQLException, ClassNotFoundException {
+        executeUpdateWithOneParameter("INSERT INTO EXPRESSION (CONTENT) VALUES (?);", newExpression.getContent());
+        closeConnection();
+    }
+
+    public static void addNewBelongToRelation(Group group, Expression expression) throws SQLException, ClassNotFoundException {
+        executeUpdateWithTwoParameters("INSERT INTO BELONGS_TO (NAME, CONTENT) VALUES (?, ?);", group.getName(), expression.getContent());
+        closeConnection();
+    }
+
+    public static void deleteGroup(Group group) throws SQLException, ClassNotFoundException {
+        executeUpdateWithOneParameter("DELETE FROM \"GROUP\" WHERE NAME = ?;", group.getName());
+        closeConnection();
+    }
+
+    public static void deleteExpression(Expression expression) throws SQLException, ClassNotFoundException {
+        executeUpdateWithOneParameter("DELETE FROM EXPRESSION WHERE CONTENT = ?;", expression.getContent());
+        closeConnection();
     }
 
     public static ResultSet executeQuery(String query) throws SQLException, ClassNotFoundException {
@@ -106,6 +131,23 @@ public class ConnectionManager {
         preparedStatement.closeOnCompletion();
         preparedStatement.execute();
         return preparedStatement.getResultSet();
+    }
+
+    public static void executeUpdateWithOneParameter(String query, String parameter) throws SQLException, ClassNotFoundException {
+        openConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setObject(1, parameter);
+        preparedStatement.closeOnCompletion();
+        preparedStatement.executeUpdate();
+    }
+
+    public static void executeUpdateWithTwoParameters(String query, String parameter1, String parameter2) throws SQLException, ClassNotFoundException {
+        openConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setObject(1, parameter1);
+        preparedStatement.setObject(2, parameter2);
+        preparedStatement.closeOnCompletion();
+        preparedStatement.executeUpdate();
     }
 
     private static void openConnection() throws SQLException, ClassNotFoundException {

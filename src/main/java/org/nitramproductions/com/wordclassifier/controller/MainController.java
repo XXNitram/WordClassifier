@@ -1,5 +1,8 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -10,9 +13,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
+import org.nitramproductions.com.wordclassifier.MainApplication;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
@@ -20,6 +25,7 @@ import org.nitramproductions.com.wordclassifier.model.Group;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class MainController {
 
@@ -46,15 +52,26 @@ public class MainController {
     private TextField rightTableViewTextField;
 
     @FXML
+    private MenuBar menuBar;
+    @FXML
+    private CheckMenuItem darkMode;
+
+    @FXML
     private ToggleSwitch toggleSwitch;
+    @FXML
+    private Button editButton;
+    @FXML
+    private Button deleteButton;
 
-    ObservableList<Group> observableGroupList;
-    FilteredList<Group> filteredGroupList;
-    SortedList<Group> sortedGroupList;
+    private ObservableList<Group> observableGroupList;
+    private FilteredList<Group> filteredGroupList;
+    private SortedList<Group> sortedGroupList;
 
-    ObservableList<Expression> observableExpressionList;
-    FilteredList<Expression> filteredExpressionList;
-    SortedList<Expression> sortedExpressionList;
+    private ObservableList<Expression> observableExpressionList;
+    private FilteredList<Expression> filteredExpressionList;
+    private SortedList<Expression> sortedExpressionList;
+
+    private BooleanProperty needToReloadData = new SimpleBooleanProperty(false);
 
     public MainController() {
 
@@ -72,11 +89,11 @@ public class MainController {
         leftTableViewTextField.setPromptText("Gib hier ein Suchwort ein!");
         rightTableViewTextField.setPromptText("Gib hier ein Suchwort ein!");
 
-        observableGroupList = ConnectionManager.getAllGroups();
+        observableGroupList = FXCollections.observableArrayList(ConnectionManager.getAllGroups());
         updateGroupLists();
         updateGroupListsIfChange();
 
-        observableExpressionList = ConnectionManager.getAllExpressions();
+        observableExpressionList = FXCollections.observableArrayList(ConnectionManager.getAllExpressions());
         updateExpressionLists();
         updateExpressionListsIfChange();
 
@@ -84,7 +101,9 @@ public class MainController {
         searchRightTableView();
         updateLeftTableViewDependingOnSelectionInRightTableView();
         updateRightTableViewDependingOnSelectionInLeftTableView();
-        updateTableViewDependingOnToggleSwitch();
+        listenToToggleSwitchAndUpdateTableView();
+
+        reloadGroupData();
 
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().dateModifiedProperty());
@@ -118,6 +137,15 @@ public class MainController {
         observableExpressionList.addListener((ListChangeListener<Expression>) change -> {
             if (change.next()) {
                 updateExpressionLists();
+            }
+        });
+    }
+
+    public void reloadGroupData() {
+        needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
+            if (newSelection) {
+                updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
+                needToReloadData.set(false);
             }
         });
     }
@@ -188,39 +216,127 @@ public class MainController {
         });
     }
 
-    public void updateTableViewDependingOnToggleSwitch() {
+    public void listenToToggleSwitchAndUpdateTableView() {
         toggleSwitch.selectedProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            leftTableViewTextField.setText("");
-            rightTableViewTextField.setText("");
-            observableGroupList.clear();
-            leftTableView.getSelectionModel().clearSelection();
-            observableExpressionList.clear();
-            rightTableView.getSelectionModel().clearSelection();
-
-            if (!newSelection) {
-                try {
-                    observableGroupList.addAll(ConnectionManager.getAllGroups());
-                } catch (SQLException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                try {
-                    observableExpressionList.addAll(ConnectionManager.getAllExpressions());
-                } catch (SQLException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
+            updateTableViewDependingOnToggleSwitch(newSelection);
         });
     }
 
+    private void updateTableViewDependingOnToggleSwitch(Boolean expressionIsSwitchedOn) {
+        leftTableViewTextField.setText("");
+        rightTableViewTextField.setText("");
+        observableGroupList.clear();
+        leftTableView.getSelectionModel().clearSelection();
+        observableExpressionList.clear();
+        rightTableView.getSelectionModel().clearSelection();
+
+        if (!expressionIsSwitchedOn) {
+            try {
+                observableGroupList.addAll(ConnectionManager.getAllGroups());
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                observableExpressionList.addAll(ConnectionManager.getAllExpressions());
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @FXML
-    protected void onCreateNewMenuItemClick(ActionEvent event) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("hello-view.fxml"));
+    private void onDarkModeCheckMenuClick() {
+        if (darkMode.isSelected()) {
+            menuBar.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        } else {
+            menuBar.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+    }
+
+    @FXML
+    private void onDeleteButtonClick() throws SQLException, ClassNotFoundException {
+        if (!leftTableView.getSelectionModel().isEmpty()) {
+            Group groupToDelete = leftTableView.getSelectionModel().getSelectedItem();
+            ConnectionManager.deleteGroup(groupToDelete);
+            observableGroupList.remove(groupToDelete);
+            if (!toggleSwitch.isSelected()) {
+                observableExpressionList.clear();
+            }
+        }
+        if (!rightTableView.getSelectionModel().isEmpty()) {
+            Expression expressionToDelete = rightTableView.getSelectionModel().getSelectedItem();
+            ConnectionManager.deleteExpression(expressionToDelete);
+            observableExpressionList.remove(expressionToDelete);
+            if (toggleSwitch.isSelected()) {
+                observableGroupList.clear();
+            }
+        }
+    }
+
+    @FXML
+    private void onCreateNewGroupMenuItemClick(ActionEvent event) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGroup.fxml"));
         Parent root = fxmlLoader.load();
+        CreateGroupController createGroupController = fxmlLoader.getController();
+        createGroupController.initializeNeedToReloadDataBooleanProperty(needToReloadData);
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(((MenuItem)event.getTarget()).getParentPopup().getOwnerWindow());
-        stage.setScene(new Scene(root));
+        stage.initOwner(((MenuItem)event.getTarget()).getParentMenu().getParentPopup().getOwnerWindow());
+        Scene scene = new Scene(root, 783, 440);
+        if (darkMode.isSelected()) {
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        stage.setTitle("Neue Gruppe Erstellen");
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @FXML
+    private void onCreateNewExpressionMenuItemClick(ActionEvent event) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createExpression.fxml"));
+        Parent root = fxmlLoader.load();
+        CreateExpressionController createExpressionController = fxmlLoader.getController();
+        createExpressionController.initializeNeedToReloadDataBooleanProperty(needToReloadData);
+        Stage stage = new Stage();
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(((MenuItem)event.getTarget()).getParentMenu().getParentPopup().getOwnerWindow());
+        Scene scene = new Scene(root, 783, 440);
+        if (darkMode.isSelected()) {
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        stage.setTitle("Neues Wort Erstellen");
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @FXML
+    private void onCloseMenuItemClick() {
+        Stage stage = (Stage) menuBar.getScene().getWindow();
+        stage.close();
+    }
+
+    @FXML
+    private void onAboutMenuItemClick(ActionEvent event) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about.fxml"));
+        Parent root = fxmlLoader.load();
+        AboutController aboutController = fxmlLoader.getController();
+        aboutController.setDarkMode(darkMode.isSelected());
+        Stage stage = new Stage();
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(menuBar.getScene().getWindow());
+        Scene scene = new Scene(root, 600, 400);
+        if (darkMode.isSelected()) {
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        stage.setTitle("About");
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        stage.setResizable(false);
+        stage.setScene(scene);
         stage.show();
     }
 }

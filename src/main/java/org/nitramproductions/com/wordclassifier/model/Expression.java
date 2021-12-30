@@ -16,6 +16,10 @@ public class Expression {
         this(null, null);
     }
 
+    public Expression(String name) {
+        this(name, null);
+    }
+
     public Expression(String content, LocalDateTime dateModified) {
         this.content = new SimpleStringProperty(content);
         this.dateModified = new SimpleObjectProperty<>(dateModified);

@@ -16,6 +16,10 @@ public class Group {
           this(null,null);
      }
 
+     public Group(String name) {
+          this(name, null);
+     }
+
      public Group(String name, LocalDateTime dateModified) {
           this.name = new SimpleStringProperty(name);
           this.dateModified = new SimpleObjectProperty<>(dateModified);
