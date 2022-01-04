@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'org.nitramproductions.com'
-version '1.0.0'
+version '1.0.1'
 
 repositories {
     mavenCentral()
@@ -65,7 +65,7 @@ jlink {
     jpackage {
         imageOptions = [
                 '--icon', 'src/main/resources/org/nitramproductions/com/wordclassifier/book-icon.ico',
-                '--app-version', '1.0.0'
+                '--app-version', '1.0.1'
         ]
         installerOptions = [
                 '--type', 'msi',
