@@ -23,6 +23,14 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+tasks.register('jpackageDistribution', Zip) {
+    archiveFileName = project.name + "-" + project.version + ".zip"
+    destinationDirectory = layout.buildDirectory.dir("distributions")
+    dependsOn(jpackage)
+
+    from layout.buildDirectory.dir("jpackage/WordClassifier")
+}
+
 application {
     mainModule = 'org.nitramproductions.com.wordclassifier'
     mainClass = 'org.nitramproductions.com.wordclassifier.MainApplication'
