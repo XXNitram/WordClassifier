@@ -68,12 +68,12 @@ jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'WordClassifier'
+        name = project.name
     }
     jpackage {
         imageOptions = [
                 '--icon', 'src/main/resources/org/nitramproductions/com/wordclassifier/book-icon.ico',
-                '--app-version', '1.0.1'
+                '--app-version', project.version
         ]
         installerOptions = [
                 '--type', 'msi',
