@@ -2,6 +2,7 @@ package org.nitramproductions.com.wordclassifier.database;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.chart.PieChart;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
 
@@ -19,28 +20,27 @@ public class ConnectionManager {
     private static final String driver = "org.h2.Driver";
     private static Connection connection = null;
 
-    public static void initialize() throws SQLException, ClassNotFoundException {
+    public static void initialize() throws SQLException, IOException {
         InputStream schema = ConnectionManager.class.getResourceAsStream("schema.sql");
         InputStream data = ConnectionManager.class.getResourceAsStream("data.sql");
         executeStatementsFromFile(schema);
         // executeStatementsFromFile(data);
     }
 
-    public static void executeStatementsFromFile(InputStream inputStream) throws SQLException, ClassNotFoundException {
+    public static void executeStatementsFromFile(InputStream inputStream) throws SQLException, IOException {
         if (inputStream != null) {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String currentLine;
-            StringBuilder fullFile = new StringBuilder();
-            try {
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String currentLine;
+                StringBuilder fullFile = new StringBuilder();
                 while ((currentLine = bufferedReader.readLine()) != null) {
                     fullFile.append(currentLine);
                 }
-                executeQuery(fullFile.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
+                try (Connection connection = DataSource.getConnection();
+                     PreparedStatement preparedStatement = connection.prepareStatement(fullFile.toString())) {
+                    preparedStatement.execute();
+                }
             }
         }
-        closeConnection();
     }
 
     public static List<Expression> getAllExpressions() throws SQLException {
