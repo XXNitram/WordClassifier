@@ -124,9 +124,13 @@ public class ConnectionManager {
         }
     }
 
-    public static void addNewExpression(Expression newExpression) throws SQLException, ClassNotFoundException {
-        executeUpdateWithOneParameter("INSERT INTO EXPRESSION (CONTENT) VALUES (?);", newExpression.getContent());
-        closeConnection();
+    public static void addNewExpression(Expression newExpression) throws SQLException {
+        String query = "INSERT INTO EXPRESSION (CONTENT) VALUES (?);";
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setObject(1, newExpression.getContent());
+            preparedStatement.executeUpdate();
+        }
     }
 
     public static void addNewBelongToRelation(Group group, Expression expression) throws SQLException, ClassNotFoundException {
