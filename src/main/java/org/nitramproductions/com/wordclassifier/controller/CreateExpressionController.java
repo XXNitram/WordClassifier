@@ -186,7 +186,7 @@ public class CreateExpressionController {
                     ConnectionManager.addNewBelongToRelation(group, newExpression);
                 }
             }
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 

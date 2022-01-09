@@ -11,6 +11,7 @@ module org.nitramproductions.com.wordclassifier {
     requires eu.hansolo.tilesfx;
     requires java.sql;
     requires com.h2database;
+    requires com.zaxxer.hikari;
 
     opens org.nitramproductions.com.wordclassifier to javafx.fxml;
     exports org.nitramproductions.com.wordclassifier;

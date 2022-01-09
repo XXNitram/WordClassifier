@@ -198,7 +198,7 @@ public class MainController {
                         if ("Name".equals(leftTableViewChoiceBox.getValue())) {
                             filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(rightTableViewTextField.getText().toLowerCase().trim()));
                         }
-                    } catch (SQLException | ClassNotFoundException e) {
+                    } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }
@@ -217,7 +217,7 @@ public class MainController {
                         if ("Name".equals(leftTableViewChoiceBox.getValue())) {
                             filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(leftTableViewTextField.getText().toLowerCase().trim()));
                         }
-                    } catch (SQLException | ClassNotFoundException e) {
+                    } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }
@@ -242,13 +242,13 @@ public class MainController {
         if (!expressionIsSwitchedOn) {
             try {
                 observableGroupList.addAll(ConnectionManager.getAllGroups());
-            } catch (SQLException | ClassNotFoundException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
             try {
                 observableExpressionList.addAll(ConnectionManager.getAllExpressions());
-            } catch (SQLException | ClassNotFoundException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
