@@ -77,15 +77,22 @@ public class ConnectionManager {
         return groups;
     }
 
-    public static List<Expression> getExpressionsFromGroup(Group group) throws SQLException, ClassNotFoundException {
-        ResultSet resultSet = executeQueryWithOneParameter("SELECT e.CONTENT, e.DATE_MODIFIED FROM EXPRESSION e, BELONGS_TO b WHERE e.CONTENT = b.CONTENT AND b.NAME = ?;", group.getName());
-        List<Expression> expressions = new ArrayList<>();
-        while (resultSet.next()) {
-            Expression expression = new Expression(resultSet.getString(1), resultSet.getTimestamp(2).toLocalDateTime());
-            expressions.add(expression);
+    public static List<Expression> getExpressionsFromGroup(Group group) throws SQLException {
+        String query = "SELECT e.CONTENT, e.DATE_MODIFIED FROM EXPRESSION e, BELONGS_TO b WHERE e.CONTENT = b.CONTENT AND b.NAME = ?;";
+        List<Expression> expressions;
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setObject(1, group.getName());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                expressions = new ArrayList<>();
+                while (resultSet.next()) {
+                    Expression expression = new Expression();
+                    expression.setContent(resultSet.getString("CONTENT"));
+                    expression.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
+                    expressions.add(expression);
+                }
+            }
         }
-        resultSet.close();
-        closeConnection();
         return expressions;
     }
 
