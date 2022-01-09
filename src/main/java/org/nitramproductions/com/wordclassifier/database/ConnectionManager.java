@@ -133,9 +133,14 @@ public class ConnectionManager {
         }
     }
 
-    public static void addNewBelongToRelation(Group group, Expression expression) throws SQLException, ClassNotFoundException {
-        executeUpdateWithTwoParameters("INSERT INTO BELONGS_TO (NAME, CONTENT) VALUES (?, ?);", group.getName(), expression.getContent());
-        closeConnection();
+    public static void addNewBelongToRelation(Group group, Expression expression) throws SQLException {
+        String query = "INSERT INTO BELONGS_TO (NAME, CONTENT) VALUES (?, ?);";
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setObject(1, group.getName());
+            preparedStatement.setObject(2, expression.getContent());
+            preparedStatement.executeUpdate();
+        }
     }
 
     public static void deleteGroup(Group group) throws SQLException, ClassNotFoundException {
