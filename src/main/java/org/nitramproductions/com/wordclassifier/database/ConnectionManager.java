@@ -66,13 +66,13 @@ public class ConnectionManager {
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
-                groups = new ArrayList<>();
-                while (resultSet.next()) {
-                    Group group = new Group();
-                    group.setName(resultSet.getString("NAME"));
-                    group.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
-                    groups.add(group);
-                }
+            groups = new ArrayList<>();
+            while (resultSet.next()) {
+                Group group = new Group();
+                group.setName(resultSet.getString("NAME"));
+                group.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
+                groups.add(group);
+            }
         }
         return groups;
     }
