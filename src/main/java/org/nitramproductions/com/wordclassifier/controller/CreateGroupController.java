@@ -186,7 +186,7 @@ public class CreateGroupController {
                     ConnectionManager.addNewBelongToRelation(newGroup, expression);
                 }
             }
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
