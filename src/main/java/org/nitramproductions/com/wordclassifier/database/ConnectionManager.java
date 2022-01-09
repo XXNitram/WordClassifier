@@ -152,9 +152,13 @@ public class ConnectionManager {
         }
     }
 
-    public static void deleteExpression(Expression expression) throws SQLException, ClassNotFoundException {
-        executeUpdateWithOneParameter("DELETE FROM EXPRESSION WHERE CONTENT = ?;", expression.getContent());
-        closeConnection();
+    public static void deleteExpression(Expression expression) throws SQLException {
+        String query = "DELETE FROM EXPRESSION WHERE CONTENT = ?;";
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setObject(1, expression.getContent());
+            preparedStatement.executeUpdate();
+        }
     }
 
     public static ResultSet executeQuery(String query) throws SQLException, ClassNotFoundException {
