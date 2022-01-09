@@ -143,9 +143,13 @@ public class ConnectionManager {
         }
     }
 
-    public static void deleteGroup(Group group) throws SQLException, ClassNotFoundException {
-        executeUpdateWithOneParameter("DELETE FROM \"GROUP\" WHERE NAME = ?;", group.getName());
-        closeConnection();
+    public static void deleteGroup(Group group) throws SQLException {
+        String query = "DELETE FROM \"GROUP\" WHERE NAME = ?;";
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setObject(1, group.getName());
+            preparedStatement.executeUpdate();
+        }
     }
 
     public static void deleteExpression(Expression expression) throws SQLException, ClassNotFoundException {
