@@ -55,7 +55,7 @@ public class ConnectionManager {
         return expressions;
     }
 
-    public static List<Group> getAllGroups() throws SQLException, ClassNotFoundException {
+    public static List<Group> getAllGroups() throws SQLException {
         String query = "SELECT NAME, DATE_MODIFIED FROM \"GROUP\";";
         List<Group> groups;
         try (Connection connection = DataSource.getConnection();
