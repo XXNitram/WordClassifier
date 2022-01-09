@@ -217,7 +217,7 @@ public class MainController {
                         if ("Name".equals(leftTableViewChoiceBox.getValue())) {
                             filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(leftTableViewTextField.getText().toLowerCase().trim()));
                         }
-                    } catch (SQLException | ClassNotFoundException e) {
+                    } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }
