@@ -198,7 +198,7 @@ public class MainController {
                         if ("Name".equals(leftTableViewChoiceBox.getValue())) {
                             filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(rightTableViewTextField.getText().toLowerCase().trim()));
                         }
-                    } catch (SQLException | ClassNotFoundException e) {
+                    } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }
