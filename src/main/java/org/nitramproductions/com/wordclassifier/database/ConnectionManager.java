@@ -43,15 +43,20 @@ public class ConnectionManager {
         closeConnection();
     }
 
-    public static List<Expression> getAllExpressions() throws SQLException, ClassNotFoundException {
-        ResultSet resultSet = executeQuery("SELECT CONTENT, DATE_MODIFIED FROM EXPRESSION;");
-        List<Expression> expressions = new ArrayList<>();
-        while (resultSet.next()) {
-            Expression expression = new Expression(resultSet.getString(1), resultSet.getTimestamp(2).toLocalDateTime());
-            expressions.add(expression);
+    public static List<Expression> getAllExpressions() throws SQLException {
+        String query = "SELECT CONTENT, DATE_MODIFIED FROM EXPRESSION;";
+        List<Expression> expressions;
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            expressions = new ArrayList<>();
+            while (resultSet.next()) {
+                Expression expression = new Expression();
+                expression.setContent(resultSet.getString("CONTENT"));
+                expression.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
+                expressions.add(expression);
+            }
         }
-        resultSet.close();
-        closeConnection();
         return expressions;
     }
 
