@@ -56,14 +56,19 @@ public class ConnectionManager {
     }
 
     public static List<Group> getAllGroups() throws SQLException, ClassNotFoundException {
-        ResultSet resultSet = executeQuery("SELECT NAME, DATE_MODIFIED FROM \"GROUP\";");
-        List<Group> groups = new ArrayList<>();
-        while (resultSet.next()) {
-            Group group = new Group(resultSet.getString(1), resultSet.getTimestamp(2).toLocalDateTime());
-            groups.add(group);
+        String query = "SELECT NAME, DATE_MODIFIED FROM \"GROUP\";";
+        List<Group> groups;
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+                groups = new ArrayList<>();
+                while (resultSet.next()) {
+                    Group group = new Group();
+                    group.setName(resultSet.getString("NAME"));
+                    group.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
+                    groups.add(group);
+                }
         }
-        resultSet.close();
-        closeConnection();
         return groups;
     }
 
