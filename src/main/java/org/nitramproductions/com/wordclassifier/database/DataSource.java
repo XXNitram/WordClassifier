@@ -8,8 +8,8 @@ import java.sql.SQLException;
 
 public class DataSource {
 
-    private static HikariConfig config = new HikariConfig();
-    private static HikariDataSource dataSource;
+    private static final HikariConfig config = new HikariConfig();
+    private static final HikariDataSource dataSource;
 
     static {
         config.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource");
