@@ -115,9 +115,13 @@ public class ConnectionManager {
         return groups;
     }
 
-    public static void addNewGroup(Group newGroup) throws SQLException, ClassNotFoundException {
-        executeUpdateWithOneParameter("INSERT INTO \"GROUP\" (NAME) VALUES (?);", newGroup.getName());
-        closeConnection();
+    public static void addNewGroup(Group newGroup) throws SQLException {
+        String query = "INSERT INTO \"GROUP\" (NAME) VALUES (?);";
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setObject(1, newGroup.getName());
+            preparedStatement.executeUpdate();
+        }
     }
 
     public static void addNewExpression(Expression newExpression) throws SQLException, ClassNotFoundException {
