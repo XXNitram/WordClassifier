@@ -242,13 +242,13 @@ public class MainController {
         if (!expressionIsSwitchedOn) {
             try {
                 observableGroupList.addAll(ConnectionManager.getAllGroups());
-            } catch (SQLException | ClassNotFoundException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
             try {
                 observableExpressionList.addAll(ConnectionManager.getAllExpressions());
-            } catch (SQLException | ClassNotFoundException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
