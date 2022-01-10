@@ -38,23 +38,6 @@ public class ConnectionManager {
         }
     }
 
-    public List<Expression> getAllExpressions() throws SQLException {
-        String query = "SELECT CONTENT, DATE_MODIFIED FROM EXPRESSION;";
-        List<Expression> expressions;
-        try (Connection connection = DataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            expressions = new ArrayList<>();
-            while (resultSet.next()) {
-                Expression expression = new Expression();
-                expression.setContent(resultSet.getString("CONTENT"));
-                expression.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
-                expressions.add(expression);
-            }
-        }
-        return expressions;
-    }
-
     public List<Group> getAllGroups() throws SQLException {
         String query = "SELECT NAME, DATE_MODIFIED FROM \"GROUP\";";
         List<Group> groups;
@@ -70,6 +53,23 @@ public class ConnectionManager {
             }
         }
         return groups;
+    }
+
+    public List<Expression> getAllExpressions() throws SQLException {
+        String query = "SELECT CONTENT, DATE_MODIFIED FROM EXPRESSION;";
+        List<Expression> expressions;
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            expressions = new ArrayList<>();
+            while (resultSet.next()) {
+                Expression expression = new Expression();
+                expression.setContent(resultSet.getString("CONTENT"));
+                expression.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
+                expressions.add(expression);
+            }
+        }
+        return expressions;
     }
 
     public List<Expression> getExpressionsBelongingToGroup(Group group) throws SQLException {
