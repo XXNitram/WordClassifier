@@ -1,8 +1,5 @@
 package org.nitramproductions.com.wordclassifier.database;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.chart.PieChart;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
 
@@ -15,10 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionManager {
-
-    private final String databaseURL = "jdbc:h2:~/Documents/WordClassifier/database/WordClassifier;TIME ZONE=Europe/Berlin";
-    private final String driver = "org.h2.Driver";
-    private Connection connection = null;
 
     public ConnectionManager() {}
 
@@ -160,51 +153,6 @@ public class ConnectionManager {
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setObject(1, expression.getContent());
             preparedStatement.executeUpdate();
-        }
-    }
-
-    public ResultSet executeQuery(String query) throws SQLException, ClassNotFoundException {
-        openConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        preparedStatement.closeOnCompletion();
-        preparedStatement.execute();
-        return preparedStatement.getResultSet();
-    }
-
-    public ResultSet executeQueryWithOneParameter(String query, String parameter) throws SQLException, ClassNotFoundException {
-        openConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        preparedStatement.setObject(1, parameter);
-        preparedStatement.closeOnCompletion();
-        preparedStatement.execute();
-        return preparedStatement.getResultSet();
-    }
-
-    public void executeUpdateWithOneParameter(String query, String parameter) throws SQLException, ClassNotFoundException {
-        openConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        preparedStatement.setObject(1, parameter);
-        preparedStatement.closeOnCompletion();
-        preparedStatement.executeUpdate();
-    }
-
-    public void executeUpdateWithTwoParameters(String query, String parameter1, String parameter2) throws SQLException, ClassNotFoundException {
-        openConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        preparedStatement.setObject(1, parameter1);
-        preparedStatement.setObject(2, parameter2);
-        preparedStatement.closeOnCompletion();
-        preparedStatement.executeUpdate();
-    }
-
-    private void openConnection() throws SQLException, ClassNotFoundException {
-        Class.forName(driver);
-        connection = DriverManager.getConnection(databaseURL);
-    }
-
-    private void closeConnection() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
         }
     }
 }
