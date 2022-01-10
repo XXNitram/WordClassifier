@@ -91,7 +91,7 @@ public class ConnectionManager {
         return expressions;
     }
 
-    public List<Group> getGroupsFromExpression(Expression expression) throws SQLException {
+    public List<Group> getGroupsBelongingToExpression(Expression expression) throws SQLException {
         String query = "SELECT g.NAME, g.DATE_MODIFIED FROM \"GROUP\" g, BELONGS_TO b WHERE g.NAME = b.NAME AND b.CONTENT = ?;";
         List<Group> groups;
         try (Connection connection = DataSource.getConnection();

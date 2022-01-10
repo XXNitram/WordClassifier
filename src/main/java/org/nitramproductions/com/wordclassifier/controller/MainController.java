@@ -212,7 +212,7 @@ public class MainController {
                 if (toggleSwitch.isSelected()) {
                     try {
                         observableGroupList.clear();
-                        observableGroupList.addAll(connectionManager.getGroupsFromExpression(newSelection));
+                        observableGroupList.addAll(connectionManager.getGroupsBelongingToExpression(newSelection));
                         if ("Name".equals(leftTableViewChoiceBox.getValue())) {
                             filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(leftTableViewTextField.getText().toLowerCase().trim()));
                         }
