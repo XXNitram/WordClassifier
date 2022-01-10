@@ -51,6 +51,7 @@ public class CreateGroupController {
             Bindings.concat("Gruppe kann nicht erstellt werden:\n", validator.createStringBinding())
     );
 
+    private final ConnectionManager connectionManager = new ConnectionManager();
     private BooleanProperty needToReloadData;
 
     public CreateGroupController() {
@@ -59,8 +60,8 @@ public class CreateGroupController {
 
     @FXML
     private void initialize() throws SQLException, ClassNotFoundException {
-        groupList = ConnectionManager.getAllGroups();
-        leftList = FXCollections.observableArrayList(ConnectionManager.getAllExpressions());
+        groupList = connectionManager.getAllGroups();
+        leftList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
         rightList = FXCollections.observableArrayList();
         leftTableView.setItems(leftList);
         rightTableView.setItems(rightList);
@@ -180,10 +181,10 @@ public class CreateGroupController {
         String newGroupName = newNameTextField.getText().trim();
         Group newGroup = new Group(newGroupName);
         try {
-            ConnectionManager.addNewGroup(newGroup);
+            connectionManager.addNewGroup(newGroup);
             if (!rightList.isEmpty()) {
                 for (Expression expression : rightList) {
-                    ConnectionManager.addNewBelongToRelation(newGroup, expression);
+                    connectionManager.addNewBelongToRelation(newGroup, expression);
                 }
             }
         } catch (SQLException e) {

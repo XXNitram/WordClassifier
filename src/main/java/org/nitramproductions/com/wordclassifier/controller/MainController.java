@@ -73,10 +73,11 @@ public class MainController {
     private FilteredList<Expression> filteredExpressionList;
     private SortedList<Expression> sortedExpressionList;
 
+    private final ConnectionManager connectionManager = new ConnectionManager();
     private BooleanProperty needToReloadData = new SimpleBooleanProperty(false);
 
-    public MainController() {
-
+    public MainController() throws SQLException, IOException {
+        connectionManager.initialize();
     }
 
     @FXML
@@ -91,11 +92,11 @@ public class MainController {
         leftTableViewTextField.setPromptText("Gib hier ein Suchwort ein!");
         rightTableViewTextField.setPromptText("Gib hier ein Suchwort ein!");
 
-        observableGroupList = FXCollections.observableArrayList(ConnectionManager.getAllGroups());
+        observableGroupList = FXCollections.observableArrayList(connectionManager.getAllGroups());
         updateGroupLists();
         updateGroupListsIfChange();
 
-        observableExpressionList = FXCollections.observableArrayList(ConnectionManager.getAllExpressions());
+        observableExpressionList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
         updateExpressionLists();
         updateExpressionListsIfChange();
 
@@ -194,7 +195,7 @@ public class MainController {
                 if (!toggleSwitch.isSelected()) {
                     try {
                         observableExpressionList.clear();
-                        observableExpressionList.addAll(ConnectionManager.getExpressionsFromGroup(newSelection));
+                        observableExpressionList.addAll(connectionManager.getExpressionsFromGroup(newSelection));
                         if ("Name".equals(leftTableViewChoiceBox.getValue())) {
                             filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(rightTableViewTextField.getText().toLowerCase().trim()));
                         }
@@ -213,7 +214,7 @@ public class MainController {
                 if (toggleSwitch.isSelected()) {
                     try {
                         observableGroupList.clear();
-                        observableGroupList.addAll(ConnectionManager.getGroupsFromExpression(newSelection));
+                        observableGroupList.addAll(connectionManager.getGroupsFromExpression(newSelection));
                         if ("Name".equals(leftTableViewChoiceBox.getValue())) {
                             filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(leftTableViewTextField.getText().toLowerCase().trim()));
                         }
@@ -241,13 +242,13 @@ public class MainController {
 
         if (!expressionIsSwitchedOn) {
             try {
-                observableGroupList.addAll(ConnectionManager.getAllGroups());
+                observableGroupList.addAll(connectionManager.getAllGroups());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                observableExpressionList.addAll(ConnectionManager.getAllExpressions());
+                observableExpressionList.addAll(connectionManager.getAllExpressions());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -267,7 +268,7 @@ public class MainController {
     private void onDeleteButtonClick() throws SQLException, ClassNotFoundException {
         if (!leftTableView.getSelectionModel().isEmpty()) {
             Group groupToDelete = leftTableView.getSelectionModel().getSelectedItem();
-            ConnectionManager.deleteGroup(groupToDelete);
+            connectionManager.deleteGroup(groupToDelete);
             observableGroupList.remove(groupToDelete);
             if (!toggleSwitch.isSelected()) {
                 observableExpressionList.clear();
@@ -275,7 +276,7 @@ public class MainController {
         }
         if (!rightTableView.getSelectionModel().isEmpty()) {
             Expression expressionToDelete = rightTableView.getSelectionModel().getSelectedItem();
-            ConnectionManager.deleteExpression(expressionToDelete);
+            connectionManager.deleteExpression(expressionToDelete);
             observableExpressionList.remove(expressionToDelete);
             if (toggleSwitch.isSelected()) {
                 observableGroupList.clear();

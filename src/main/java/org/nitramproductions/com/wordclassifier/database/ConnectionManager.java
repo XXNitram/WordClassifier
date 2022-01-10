@@ -16,18 +16,20 @@ import java.util.List;
 
 public class ConnectionManager {
 
-    private static final String databaseURL = "jdbc:h2:~/Documents/WordClassifier/database/WordClassifier;TIME ZONE=Europe/Berlin";
-    private static final String driver = "org.h2.Driver";
-    private static Connection connection = null;
+    private final String databaseURL = "jdbc:h2:~/Documents/WordClassifier/database/WordClassifier;TIME ZONE=Europe/Berlin";
+    private final String driver = "org.h2.Driver";
+    private Connection connection = null;
 
-    public static void initialize() throws SQLException, IOException {
-        InputStream schema = ConnectionManager.class.getResourceAsStream("schema.sql");
-        InputStream data = ConnectionManager.class.getResourceAsStream("data.sql");
+    public ConnectionManager() {}
+
+    public void initialize() throws SQLException, IOException {
+        InputStream schema = getClass().getResourceAsStream("schema.sql");
+        InputStream data = getClass().getResourceAsStream("data.sql");
         executeStatementsFromFile(schema);
         // executeStatementsFromFile(data);
     }
 
-    public static void executeStatementsFromFile(InputStream inputStream) throws SQLException, IOException {
+    public void executeStatementsFromFile(InputStream inputStream) throws SQLException, IOException {
         if (inputStream != null) {
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
                 String currentLine;
@@ -43,7 +45,7 @@ public class ConnectionManager {
         }
     }
 
-    public static List<Expression> getAllExpressions() throws SQLException {
+    public List<Expression> getAllExpressions() throws SQLException {
         String query = "SELECT CONTENT, DATE_MODIFIED FROM EXPRESSION;";
         List<Expression> expressions;
         try (Connection connection = DataSource.getConnection();
@@ -60,7 +62,7 @@ public class ConnectionManager {
         return expressions;
     }
 
-    public static List<Group> getAllGroups() throws SQLException {
+    public List<Group> getAllGroups() throws SQLException {
         String query = "SELECT NAME, DATE_MODIFIED FROM \"GROUP\";";
         List<Group> groups;
         try (Connection connection = DataSource.getConnection();
@@ -77,7 +79,7 @@ public class ConnectionManager {
         return groups;
     }
 
-    public static List<Expression> getExpressionsFromGroup(Group group) throws SQLException {
+    public List<Expression> getExpressionsFromGroup(Group group) throws SQLException {
         String query = "SELECT e.CONTENT, e.DATE_MODIFIED FROM EXPRESSION e, BELONGS_TO b WHERE e.CONTENT = b.CONTENT AND b.NAME = ?;";
         List<Expression> expressions;
         try (Connection connection = DataSource.getConnection();
@@ -96,7 +98,7 @@ public class ConnectionManager {
         return expressions;
     }
 
-    public static List<Group> getGroupsFromExpression(Expression expression) throws SQLException {
+    public List<Group> getGroupsFromExpression(Expression expression) throws SQLException {
         String query = "SELECT g.NAME, g.DATE_MODIFIED FROM \"GROUP\" g, BELONGS_TO b WHERE g.NAME = b.NAME AND b.CONTENT = ?;";
         List<Group> groups;
         try (Connection connection = DataSource.getConnection();
@@ -115,7 +117,7 @@ public class ConnectionManager {
         return groups;
     }
 
-    public static void addNewGroup(Group newGroup) throws SQLException {
+    public void addNewGroup(Group newGroup) throws SQLException {
         String query = "INSERT INTO \"GROUP\" (NAME) VALUES (?);";
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -124,7 +126,7 @@ public class ConnectionManager {
         }
     }
 
-    public static void addNewExpression(Expression newExpression) throws SQLException {
+    public void addNewExpression(Expression newExpression) throws SQLException {
         String query = "INSERT INTO EXPRESSION (CONTENT) VALUES (?);";
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -133,7 +135,7 @@ public class ConnectionManager {
         }
     }
 
-    public static void addNewBelongToRelation(Group group, Expression expression) throws SQLException {
+    public void addNewBelongToRelation(Group group, Expression expression) throws SQLException {
         String query = "INSERT INTO BELONGS_TO (NAME, CONTENT) VALUES (?, ?);";
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -143,7 +145,7 @@ public class ConnectionManager {
         }
     }
 
-    public static void deleteGroup(Group group) throws SQLException {
+    public void deleteGroup(Group group) throws SQLException {
         String query = "DELETE FROM \"GROUP\" WHERE NAME = ?;";
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -152,7 +154,7 @@ public class ConnectionManager {
         }
     }
 
-    public static void deleteExpression(Expression expression) throws SQLException {
+    public void deleteExpression(Expression expression) throws SQLException {
         String query = "DELETE FROM EXPRESSION WHERE CONTENT = ?;";
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -161,7 +163,7 @@ public class ConnectionManager {
         }
     }
 
-    public static ResultSet executeQuery(String query) throws SQLException, ClassNotFoundException {
+    public ResultSet executeQuery(String query) throws SQLException, ClassNotFoundException {
         openConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         preparedStatement.closeOnCompletion();
@@ -169,7 +171,7 @@ public class ConnectionManager {
         return preparedStatement.getResultSet();
     }
 
-    public static ResultSet executeQueryWithOneParameter(String query, String parameter) throws SQLException, ClassNotFoundException {
+    public ResultSet executeQueryWithOneParameter(String query, String parameter) throws SQLException, ClassNotFoundException {
         openConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         preparedStatement.setObject(1, parameter);
@@ -178,7 +180,7 @@ public class ConnectionManager {
         return preparedStatement.getResultSet();
     }
 
-    public static void executeUpdateWithOneParameter(String query, String parameter) throws SQLException, ClassNotFoundException {
+    public void executeUpdateWithOneParameter(String query, String parameter) throws SQLException, ClassNotFoundException {
         openConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         preparedStatement.setObject(1, parameter);
@@ -186,7 +188,7 @@ public class ConnectionManager {
         preparedStatement.executeUpdate();
     }
 
-    public static void executeUpdateWithTwoParameters(String query, String parameter1, String parameter2) throws SQLException, ClassNotFoundException {
+    public void executeUpdateWithTwoParameters(String query, String parameter1, String parameter2) throws SQLException, ClassNotFoundException {
         openConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         preparedStatement.setObject(1, parameter1);
@@ -195,12 +197,12 @@ public class ConnectionManager {
         preparedStatement.executeUpdate();
     }
 
-    private static void openConnection() throws SQLException, ClassNotFoundException {
+    private void openConnection() throws SQLException, ClassNotFoundException {
         Class.forName(driver);
         connection = DriverManager.getConnection(databaseURL);
     }
 
-    private static void closeConnection() throws SQLException {
+    private void closeConnection() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
