@@ -51,6 +51,7 @@ public class CreateExpressionController {
             Bindings.concat("Wort kann nicht erstellt werden:\n", validator.createStringBinding())
     );
 
+    private final ConnectionManager connectionManager = new ConnectionManager();
     private BooleanProperty needToReloadData;
 
     public CreateExpressionController() {
@@ -59,8 +60,8 @@ public class CreateExpressionController {
 
     @FXML
     private void initialize() throws SQLException, ClassNotFoundException {
-        expressionList = ConnectionManager.getAllExpressions();
-        leftList = FXCollections.observableArrayList(ConnectionManager.getAllGroups());
+        expressionList = connectionManager.getAllExpressions();
+        leftList = FXCollections.observableArrayList(connectionManager.getAllGroups());
         rightList = FXCollections.observableArrayList();
         leftTableView.setItems(leftList);
         rightTableView.setItems(rightList);
@@ -180,10 +181,10 @@ public class CreateExpressionController {
         String newExpressionName = newNameTextField.getText().trim();
         Expression newExpression = new Expression(newExpressionName);
         try {
-            ConnectionManager.addNewExpression(newExpression);
+            connectionManager.addNewExpression(newExpression);
             if (!rightList.isEmpty()) {
                 for (Group group : rightList) {
-                    ConnectionManager.addNewBelongToRelation(group, newExpression);
+                    connectionManager.addNewBelongToRelation(group, newExpression);
                 }
             }
         } catch (SQLException e) {
