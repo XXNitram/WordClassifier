@@ -17,9 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.controlsfx.control.ToggleSwitch;
-import org.nitramproductions.com.wordclassifier.MainApplication;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
@@ -195,7 +193,7 @@ public class MainController {
                 if (!toggleSwitch.isSelected()) {
                     try {
                         observableExpressionList.clear();
-                        observableExpressionList.addAll(connectionManager.getExpressionsFromGroup(newSelection));
+                        observableExpressionList.addAll(connectionManager.getExpressionsBelongingToGroup(newSelection));
                         if ("Name".equals(leftTableViewChoiceBox.getValue())) {
                             filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(rightTableViewTextField.getText().toLowerCase().trim()));
                         }
@@ -214,7 +212,7 @@ public class MainController {
                 if (toggleSwitch.isSelected()) {
                     try {
                         observableGroupList.clear();
-                        observableGroupList.addAll(connectionManager.getGroupsFromExpression(newSelection));
+                        observableGroupList.addAll(connectionManager.getGroupsBelongingToExpression(newSelection));
                         if ("Name".equals(leftTableViewChoiceBox.getValue())) {
                             filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(leftTableViewTextField.getText().toLowerCase().trim()));
                         }
