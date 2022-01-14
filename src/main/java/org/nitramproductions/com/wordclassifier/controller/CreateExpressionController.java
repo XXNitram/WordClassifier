@@ -91,8 +91,8 @@ public class CreateExpressionController {
         validationHelper.checkIfEmpty(newNameTextField);
         validationHelper.checkIfIncludesSpecialCharacter(newNameTextField);
         validationHelper.checkIfTooLong(newNameTextField);
-        List<Expression> expressionList = connectionManager.getAllExpressions();
-        validationHelper.checkIfExpressionAlreadyExists(newNameTextField, expressionList);
+        List<Expression> expressions = connectionManager.getAllExpressions();
+        validationHelper.checkIfExpressionAlreadyExists(newNameTextField, expressions);
     }
 
     private void deselectListIfAnotherIsSelected() {
