@@ -16,6 +16,10 @@ public class ValidationHelper {
 
     private final Validator validator = new Validator();
 
+    public ValidationHelper() {
+
+    }
+
     public void checkIfEmpty(TextField newNameTextField) {
         validator.createCheck()
                 .dependsOn("newName", newNameTextField.textProperty())
