@@ -17,14 +17,19 @@ public class CreateHelper {
         });
     }
 
-    public <T> void transferSelectedItemsToAnotherList(TableView<T> tableView,
+    public <T, S> void deselectEitherTableViewIfOtherGetsSelected(TableView<T> firstTableView, TableView<S> secondTableView) {
+        addListenerToDeselectTableViewIfOtherGetsSelected(firstTableView, secondTableView);
+        addListenerToDeselectTableViewIfOtherGetsSelected(secondTableView, firstTableView);
+    }
+
+    public <T> void transferSelectedItemsToAnotherList(TableView<T> tableViewOfSourceList,
                                                        ObservableList<T> sourceList,
                                                        ObservableList<T> destinationList) {
-        ObservableList<T> selectedItems = tableView.getSelectionModel().getSelectedItems();
+        ObservableList<T> selectedItems = tableViewOfSourceList.getSelectionModel().getSelectedItems();
         if (!selectedItems.isEmpty()) {
             destinationList.addAll(selectedItems);
             sourceList.removeAll(selectedItems);
-            tableView.getSelectionModel().clearSelection();
+            tableViewOfSourceList.getSelectionModel().clearSelection();
         }
     }
 }
