@@ -99,7 +99,7 @@ public class ValidationHelper {
         return new TooltipWrapper<>(
                 button,
                 validator.containsErrorsProperty(),
-                Bindings.concat(errorMessage + " \n", validator.createStringBinding())
+                Bindings.concat(errorMessage + "\n", validator.createStringBinding())
         );
     }
 }
