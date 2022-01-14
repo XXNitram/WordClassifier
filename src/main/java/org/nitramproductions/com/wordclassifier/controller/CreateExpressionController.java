@@ -11,6 +11,8 @@ import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
 import net.synedra.validatorfx.Validator;
 import org.nitramproductions.com.wordclassifier.MainApplication;
+import org.nitramproductions.com.wordclassifier.controller.helper.CreateHelper;
+import org.nitramproductions.com.wordclassifier.controller.helper.ValidationHelper;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
@@ -39,19 +41,14 @@ public class CreateExpressionController {
 
     private ObservableList<Group> leftList;
     private ObservableList<Group> rightList;
-    private List<Expression> expressionList;
-
-    private final Validator validator = new Validator();
 
     private final Button createNewButton = new Button("Erstellen");
     private final Button cancelButton = new Button("Abbrechen");
-    private final TooltipWrapper<Button> createNewWrapper = new TooltipWrapper<>(
-            createNewButton,
-            validator.containsErrorsProperty(),
-            Bindings.concat("Wort kann nicht erstellt werden:\n", validator.createStringBinding())
-    );
 
     private final ConnectionManager connectionManager = new ConnectionManager();
+    private final CreateHelper createHelper = new CreateHelper();
+    private final ValidationHelper validationHelper = new ValidationHelper();
+
     private BooleanProperty needToReloadData;
 
     public CreateExpressionController() {
@@ -60,7 +57,6 @@ public class CreateExpressionController {
 
     @FXML
     private void initialize() throws SQLException, ClassNotFoundException {
-        expressionList = connectionManager.getAllExpressions();
         leftList = FXCollections.observableArrayList(connectionManager.getAllGroups());
         rightList = FXCollections.observableArrayList();
         leftTableView.setItems(leftList);
@@ -75,11 +71,13 @@ public class CreateExpressionController {
         createNewButton.setDefaultButton(true);
         createNewButton.setOnAction(e -> onCreateNewButtonClick());
         createNewButton.translateXProperty().set(-25);
+
+        TooltipWrapper<Button> createNewWrapper;
+        createNewWrapper = validationHelper.getTooltipWrapper(createNewButton, "Wort kann nicht erstellt werden:");
         buttonBar.getButtons().addAll(createNewWrapper, cancelButton);
 
         validateNewNameTextField();
-        deselectLeftIfRightSelected();
-        deselectRightIfLeftSelected();
+        deselectListIfAnotherIsSelected();
 
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -89,92 +87,26 @@ public class CreateExpressionController {
         this.needToReloadData = needToReloadData;
     }
 
-    private void validateNewNameTextField() {
-        validator.createCheck()
-                .dependsOn("newExpressionName", newNameTextField.textProperty())
-                .withMethod(c -> {
-                    String newExpressionName = c.get("newExpressionName");
-                    if (newExpressionName.trim().isEmpty()) {
-                        c.error("Bitte gib einen Namen ein!");
-                    }
-                })
-                .decorates(newNameTextField)
-                .immediate();
-
-        validator.createCheck()
-                .dependsOn("newExpressionName", newNameTextField.textProperty())
-                .withMethod(c -> {
-                    String newExpressionName = c.get("newExpressionName");
-                    Pattern pattern = Pattern.compile("[^\\p{P}\\s+a-zA-Z0-9äöüÄÖÜß]");
-                    Matcher matcher = pattern.matcher(newExpressionName.trim());
-                    if (matcher.find()) {
-                        c.error("Es sind keine Sonderzeichen außer !\"#$%&'()*+,-./:;=<>?@[\\]^_`{|}~ erlaubt!");
-                    }
-                })
-                .decorates(newNameTextField)
-                .immediate();
-
-        validator.createCheck()
-                .dependsOn("newExpressionName", newNameTextField.textProperty())
-                .withMethod(c -> {
-                    String newExpressionName = c.get("newExpressionName");
-                    if (newExpressionName.trim().length() > 511) {
-                        c.error("Der Name ist zu lang!");
-                    }
-                })
-                .decorates(newNameTextField)
-                .immediate();
-
-        validator.createCheck()
-                .dependsOn("newExpressionName", newNameTextField.textProperty())
-                .withMethod(c -> {
-                    String newExpressionName = c.get("newExpressionName");
-                    if (!expressionList.isEmpty()) {
-                        for (Expression expression : expressionList) {
-                            if (newExpressionName.trim().equalsIgnoreCase(expression.getContent())) {
-                                c.error("Dieses Wort existiert bereits!");
-                            }
-                        }
-                    }
-                })
-                .decorates(newNameTextField)
-                .immediate();
+    private void validateNewNameTextField() throws SQLException {
+        validationHelper.checkIfEmpty(newNameTextField);
+        validationHelper.checkIfIncludesSpecialCharacter(newNameTextField);
+        validationHelper.checkIfTooLong(newNameTextField);
+        List<Expression> expressionList = connectionManager.getAllExpressions();
+        validationHelper.checkIfExpressionAlreadyExists(newNameTextField, expressionList);
     }
 
-    private void deselectRightIfLeftSelected() {
-        leftTableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Group> change) -> {
-                if (!leftTableView.getSelectionModel().getSelectedItems().isEmpty()) {
-                    rightTableView.getSelectionModel().clearSelection();
-                }
-        });
-    }
-
-    private void deselectLeftIfRightSelected() {
-        rightTableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Group> change) -> {
-            if (!rightTableView.getSelectionModel().getSelectedItems().isEmpty()) {
-                leftTableView.getSelectionModel().clearSelection();
-            }
-        });
+    private void deselectListIfAnotherIsSelected() {
+        createHelper.deselectEitherTableViewIfOtherGetsSelected(leftTableView, rightTableView);
     }
 
     @FXML
     private void onRightArrowButtonClick() {
-        ObservableList<Group> selectedGroups = leftTableView.getSelectionModel().getSelectedItems();
-        if (!selectedGroups.isEmpty()) {
-            rightList.addAll(selectedGroups);
-            leftList.removeAll(selectedGroups);
-            leftTableView.getSelectionModel().clearSelection();
-        }
+        createHelper.transferSelectedItemsToAnotherList(leftTableView, leftList, rightList);
     }
 
     @FXML
     private void onLeftArrowButtonClick() {
-        ObservableList<Group> selectedGroups = rightTableView.getSelectionModel().getSelectedItems();
-        if (!selectedGroups.isEmpty()) {
-            leftList.addAll(selectedGroups);
-            rightList.removeAll(selectedGroups);
-            rightTableView.getSelectionModel().clearSelection();
-        }
+        createHelper.transferSelectedItemsToAnotherList(rightTableView, rightList, leftList);
     }
 
     private void onCreateNewButtonClick() {
