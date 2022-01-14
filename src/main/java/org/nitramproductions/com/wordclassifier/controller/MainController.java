@@ -58,10 +58,6 @@ public class MainController {
 
     @FXML
     private ToggleSwitch toggleSwitch;
-    @FXML
-    private Button editButton;
-    @FXML
-    private Button deleteButton;
 
     private ObservableList<Group> observableGroupList;
     private FilteredList<Group> filteredGroupList;
@@ -79,7 +75,7 @@ public class MainController {
     }
 
     @FXML
-    private void initialize() throws SQLException, ClassNotFoundException {
+    private void initialize() throws SQLException {
         leftTableViewChoiceBox.getItems().clear();
         leftTableViewChoiceBox.getItems().addAll("Name");
         leftTableViewChoiceBox.getSelectionModel().select("Name");
@@ -263,7 +259,7 @@ public class MainController {
     }
 
     @FXML
-    private void onDeleteButtonClick() throws SQLException, ClassNotFoundException {
+    private void onDeleteButtonClick() throws SQLException {
         if (!leftTableView.getSelectionModel().isEmpty()) {
             Group groupToDelete = leftTableView.getSelectionModel().getSelectedItem();
             connectionManager.deleteGroup(groupToDelete);
@@ -336,7 +332,7 @@ public class MainController {
         aboutController.setDarkMode(darkMode.isSelected());
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(menuBar.getScene().getWindow());
+        stage.initOwner(((MenuItem)event.getTarget()).getParentPopup().getOwnerWindow());
         Scene scene = new Scene(root, 600, 400);
         if (darkMode.isSelected()) {
             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
