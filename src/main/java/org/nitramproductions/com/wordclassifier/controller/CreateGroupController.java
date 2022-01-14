@@ -1,16 +1,12 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
-import net.synedra.validatorfx.Validator;
-import org.nitramproductions.com.wordclassifier.MainApplication;
 import org.nitramproductions.com.wordclassifier.controller.helper.CreateHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.ValidationHelper;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
@@ -19,17 +15,13 @@ import org.nitramproductions.com.wordclassifier.model.Group;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CreateGroupController {
 
     @FXML
     private ButtonBar buttonBar;
-
     @FXML
     private TextField newNameTextField;
-
     @FXML
     private TableView<Expression> leftTableView;
     @FXML
@@ -56,34 +48,43 @@ public class CreateGroupController {
     }
 
     @FXML
-    private void initialize() throws SQLException, ClassNotFoundException {
-        leftList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
-        rightList = FXCollections.observableArrayList();
-        leftTableView.setItems(leftList);
-        rightTableView.setItems(rightList);
-
-        leftTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        rightTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        cancelButton.setCancelButton(true);
-        cancelButton.setOnAction(e -> onCancelButtonClick());
-        cancelButton.translateXProperty().set(-20);
-        createNewButton.setDefaultButton(true);
-        createNewButton.setOnAction(e -> onCreateNewButtonClick());
-        createNewButton.translateXProperty().set(-25);
-        TooltipWrapper<Button> createNewWrapper;
-        createNewWrapper = validationHelper.getTooltipWrapper(createNewButton, "Wort kann nicht erstellt werden:");
-        buttonBar.getButtons().addAll(createNewWrapper, cancelButton);
-
+    private void initialize() throws SQLException {
+        initializeLists();
+        initializeTableViews();
+        initializeButtons();
         validateNewNameTextField();
         deselectListIfAnotherIsSelected();
+    }
 
+    private void initializeLists() throws SQLException {
+        leftList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
+        rightList = FXCollections.observableArrayList();
+    }
+
+    private void initializeTableViews() {
+        leftTableView.setItems(leftList);
+        rightTableView.setItems(rightList);
+        leftTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        rightTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        initializeTableViewColumns();
+    }
+
+    private void initializeTableViewColumns() {
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
     }
 
-    public void initializeNeedToReloadDataBooleanProperty(BooleanProperty needToReloadData) {
-        this.needToReloadData = needToReloadData;
+    private void initializeButtons() {
+        cancelButton.setCancelButton(true);
+        createNewButton.setDefaultButton(true);
+        cancelButton.translateXProperty().set(-20);
+        createNewButton.translateXProperty().set(-25);
+        cancelButton.setOnAction(e -> onCancelButtonClick());
+        createNewButton.setOnAction(e -> onCreateNewButtonClick());
+
+        TooltipWrapper<Button> createNewWrapper;
+        createNewWrapper = validationHelper.getTooltipWrapper(createNewButton, "Gruppe kann nicht erstellt werden:");
+        buttonBar.getButtons().addAll(createNewWrapper, cancelButton);
     }
 
     private void validateNewNameTextField() throws SQLException {
@@ -132,4 +133,7 @@ public class CreateGroupController {
         stage.close();
     }
 
+    public void initializeNeedToReloadDataBooleanProperty(BooleanProperty needToReloadData) {
+        this.needToReloadData = needToReloadData;
+    }
 }
