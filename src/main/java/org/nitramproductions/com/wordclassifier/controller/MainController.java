@@ -4,20 +4,19 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
-import javafx.fxml.*;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
+import org.nitramproductions.com.wordclassifier.controller.helper.SearchHelper;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
@@ -61,13 +60,12 @@ public class MainController {
 
     private ObservableList<Group> observableGroupList;
     private FilteredList<Group> filteredGroupList;
-    private SortedList<Group> sortedGroupList;
 
     private ObservableList<Expression> observableExpressionList;
     private FilteredList<Expression> filteredExpressionList;
-    private SortedList<Expression> sortedExpressionList;
 
     private final ConnectionManager connectionManager = new ConnectionManager();
+    private final SearchHelper searchHelper = new SearchHelper();
     private BooleanProperty needToReloadData = new SimpleBooleanProperty(false);
 
     public MainController() throws SQLException, IOException {
@@ -76,10 +74,8 @@ public class MainController {
 
     @FXML
     private void initialize() throws SQLException {
-        leftTableViewChoiceBox.getItems().clear();
         leftTableViewChoiceBox.getItems().addAll("Name");
         leftTableViewChoiceBox.getSelectionModel().select("Name");
-        rightTableViewChoiceBox.getItems().clear();
         rightTableViewChoiceBox.getItems().addAll("Name");
         rightTableViewChoiceBox.getSelectionModel().select("Name");
 
@@ -88,11 +84,9 @@ public class MainController {
 
         observableGroupList = FXCollections.observableArrayList(connectionManager.getAllGroups());
         updateGroupLists();
-        updateGroupListsIfChange();
 
         observableExpressionList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
         updateExpressionLists();
-        updateExpressionListsIfChange();
 
         searchLeftTableView();
         searchRightTableView();
@@ -116,83 +110,30 @@ public class MainController {
     }
 
     public void updateGroupLists() {
-        filteredGroupList = new FilteredList<>(observableGroupList, group -> true);
-        sortedGroupList = new SortedList<>(filteredGroupList);
-        sortedGroupList.comparatorProperty().bind(leftTableView.comparatorProperty());
-        leftTableView.setItems(sortedGroupList);
+        filteredGroupList = searchHelper.transformListsAndSetTableView(observableGroupList, leftTableView);
     }
 
     public void updateExpressionLists() {
-        filteredExpressionList = new FilteredList<>(observableExpressionList, expression -> true);
-        sortedExpressionList = new SortedList<>(filteredExpressionList);
-        sortedExpressionList.comparatorProperty().bind(rightTableView.comparatorProperty());
-        rightTableView.setItems(sortedExpressionList);
-    }
-
-    public void updateGroupListsIfChange() {
-        observableGroupList.addListener((ListChangeListener<Group>) change -> {
-            if (change.next()) {
-                updateGroupLists();
-            }
-        });
-    }
-
-    public void updateExpressionListsIfChange() {
-        observableExpressionList.addListener((ListChangeListener<Expression>) change -> {
-            if (change.next()) {
-                updateExpressionLists();
-            }
-        });
-    }
-
-    public void reloadGroupData() {
-        needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection) {
-                updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
-                needToReloadData.set(false);
-            }
-        });
+        filteredExpressionList = searchHelper.transformListsAndSetTableView(observableExpressionList, rightTableView);
     }
 
     public void searchLeftTableView() {
-        leftTableViewTextField.textProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            if ("Name".equals(leftTableViewChoiceBox.getValue())) {
-                filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(newSelection.toLowerCase().trim()));
-            }
-        });
-
-        leftTableViewChoiceBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                leftTableViewTextField.setText("");
-            }
-        });
+        searchHelper.searchFilteredGroupListDependingOnChoiceBox(leftTableViewTextField, leftTableViewChoiceBox, filteredGroupList);
+        searchHelper.clearTextFieldIfChoiceBoxChanged(leftTableViewChoiceBox, leftTableViewTextField);
     }
 
     public void searchRightTableView() {
-        rightTableViewTextField.textProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            if ("Name".equals(rightTableViewChoiceBox.getValue())) {
-                filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(newSelection.toLowerCase().trim()));
-            }
-        });
-
-        rightTableViewChoiceBox.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                rightTableViewTextField.setText("");
-            }
-        });
+        searchHelper.searchFilteredExpressionListDependingOnChoiceBox(rightTableViewTextField, rightTableViewChoiceBox, filteredExpressionList);
+        searchHelper.clearTextFieldIfChoiceBoxChanged(rightTableViewChoiceBox, rightTableViewTextField);
     }
 
     public void updateRightTableViewDependingOnSelectionInLeftTableView() {
         leftTableView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                rightTableView.getSelectionModel().clearSelection();
                 if (!toggleSwitch.isSelected()) {
                     try {
                         observableExpressionList.clear();
                         observableExpressionList.addAll(connectionManager.getExpressionsBelongingToGroup(newSelection));
-                        if ("Name".equals(leftTableViewChoiceBox.getValue())) {
-                            filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(rightTableViewTextField.getText().toLowerCase().trim()));
-                        }
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -204,14 +145,10 @@ public class MainController {
     public void updateLeftTableViewDependingOnSelectionInRightTableView() {
         rightTableView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                leftTableView.getSelectionModel().clearSelection();
                 if (toggleSwitch.isSelected()) {
                     try {
                         observableGroupList.clear();
                         observableGroupList.addAll(connectionManager.getGroupsBelongingToExpression(newSelection));
-                        if ("Name".equals(leftTableViewChoiceBox.getValue())) {
-                            filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(leftTableViewTextField.getText().toLowerCase().trim()));
-                        }
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -247,6 +184,15 @@ public class MainController {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void reloadGroupData() {
+        needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
+            if (newSelection) {
+                updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
+                needToReloadData.set(false);
+            }
+        });
     }
 
     @FXML
