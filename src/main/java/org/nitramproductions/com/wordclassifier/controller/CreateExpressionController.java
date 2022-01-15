@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
-import org.nitramproductions.com.wordclassifier.controller.helper.CreateHelper;
+import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.ValidationHelper;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
@@ -38,7 +38,7 @@ public class CreateExpressionController {
     private final Button cancelButton = new Button("Abbrechen");
 
     private final ConnectionManager connectionManager = new ConnectionManager();
-    private final CreateHelper createHelper = new CreateHelper();
+    private final SelectionHelper selectionHelper = new SelectionHelper();
     private final ValidationHelper validationHelper = new ValidationHelper();
 
     private BooleanProperty needToReloadData;
@@ -96,17 +96,17 @@ public class CreateExpressionController {
     }
 
     private void deselectListIfAnotherIsSelected() {
-        createHelper.deselectEitherTableViewIfOtherGetsSelected(leftTableView, rightTableView);
+        selectionHelper.deselectEitherTableViewIfOtherGetsSelected(leftTableView, rightTableView);
     }
 
     @FXML
     private void onRightArrowButtonClick() {
-        createHelper.transferSelectedItemsToAnotherList(leftTableView, leftList, rightList);
+        selectionHelper.transferSelectedItemsToAnotherList(leftTableView, leftList, rightList);
     }
 
     @FXML
     private void onLeftArrowButtonClick() {
-        createHelper.transferSelectedItemsToAnotherList(rightTableView, rightList, leftList);
+        selectionHelper.transferSelectedItemsToAnotherList(rightTableView, rightList, leftList);
     }
 
     private void onCreateNewButtonClick() {

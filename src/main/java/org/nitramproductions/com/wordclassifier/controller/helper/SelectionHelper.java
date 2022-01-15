@@ -3,9 +3,9 @@ package org.nitramproductions.com.wordclassifier.controller.helper;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 
-public class CreateHelper {
+public class SelectionHelper {
 
-    public CreateHelper() {
+    public SelectionHelper() {
 
     }
 

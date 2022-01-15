@@ -15,7 +15,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
-import org.nitramproductions.com.wordclassifier.controller.helper.CreateHelper;
+import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.SearchHelper;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
@@ -62,7 +62,7 @@ public class MainController {
 
     private final ConnectionManager connectionManager = new ConnectionManager();
     private final SearchHelper searchHelper = new SearchHelper();
-    private final CreateHelper createHelper = new CreateHelper();
+    private final SelectionHelper selectionHelper = new SelectionHelper();
     private final BooleanProperty needToReloadData = new SimpleBooleanProperty(false);
 
     public MainController() throws SQLException, IOException {
@@ -134,7 +134,7 @@ public class MainController {
     }
 
     private void deselectListIfAnotherIsSelected() {
-        createHelper.deselectEitherTableViewIfOtherGetsSelected(leftTableView, rightTableView);
+        selectionHelper.deselectEitherTableViewIfOtherGetsSelected(leftTableView, rightTableView);
     }
 
     private void updateRightTableViewDependingOnSelectionInLeftTableView() {
