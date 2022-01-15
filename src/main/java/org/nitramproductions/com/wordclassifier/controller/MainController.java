@@ -172,6 +172,15 @@ public class MainController {
                 updateTableViewDependingOnToggleSwitch(newSelection));
     }
 
+    private void reloadGroupData() {
+        needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
+            if (newSelection) {
+                updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
+                needToReloadData.set(false);
+            }
+        });
+    }
+
     private void updateTableViewDependingOnToggleSwitch(Boolean expressionIsSwitchedOn) {
         clearAll();
         if (!expressionIsSwitchedOn) {
@@ -196,15 +205,6 @@ public class MainController {
         leftTableView.getSelectionModel().clearSelection();
         observableExpressionList.clear();
         rightTableView.getSelectionModel().clearSelection();
-    }
-
-    private void reloadGroupData() {
-        needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection) {
-                updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
-                needToReloadData.set(false);
-            }
-        });
     }
 
     @FXML
