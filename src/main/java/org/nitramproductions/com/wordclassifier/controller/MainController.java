@@ -267,8 +267,6 @@ public class MainController {
     private void onAboutMenuItemClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about.fxml"));
         Parent root = fxmlLoader.load();
-        AboutController aboutController = fxmlLoader.getController();
-        aboutController.setDarkMode(darkMode.isSelected());
         createNewStage(root, "About", 600, 400);
     }
 
