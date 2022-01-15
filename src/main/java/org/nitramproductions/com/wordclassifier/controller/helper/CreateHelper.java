@@ -1,17 +1,17 @@
 package org.nitramproductions.com.wordclassifier.controller.helper;
 
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 
 public class CreateHelper {
 
     public CreateHelper() {
+
     }
 
     public <T, S> void addListenerToDeselectTableViewIfOtherGetsSelected(TableView<T> tableViewSelected, TableView<S> tableViewToDeselect) {
-        tableViewSelected.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends T> change) -> {
-            if (!tableViewSelected.getSelectionModel().getSelectedItems().isEmpty()) {
+        tableViewSelected.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
+            if (newSelection != null) {
                 tableViewToDeselect.getSelectionModel().clearSelection();
             }
         });
