@@ -6,6 +6,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class Expression {
 
@@ -47,5 +49,11 @@ public class Expression {
 
     public void setDateModified(LocalDateTime dateModified) {
         this.dateModified.set(dateModified);
+    }
+
+    public StringProperty localDatePropertyToString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm", Locale.GERMAN);
+        String newFormat = getDateModified().format(formatter);
+        return new SimpleStringProperty(newFormat);
     }
 }
