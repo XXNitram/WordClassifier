@@ -15,15 +15,14 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
-import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.SearchHelper;
+import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class MainController {
@@ -33,13 +32,13 @@ public class MainController {
     @FXML
     private TableColumn<Group, String> leftTableViewNameColumn;
     @FXML
-    private TableColumn<Group, LocalDateTime> leftTableViewDateModifiedColumn;
+    private TableColumn<Group, String> leftTableViewDateModifiedColumn;
     @FXML
     private TableView<Expression> rightTableView;
     @FXML
     private TableColumn<Expression, String> rightTableViewNameColumn;
     @FXML
-    private TableColumn<Expression, LocalDateTime> rightTableViewDateModifiedColumn;
+    private TableColumn<Expression, String> rightTableViewDateModifiedColumn;
     @FXML
     private ChoiceBox<String> leftTableViewChoiceBox;
     @FXML
@@ -102,19 +101,19 @@ public class MainController {
             String result = cellData.getValue().nameProperty().get().replaceAll("(.{35})", "$1\n");
             return new SimpleStringProperty(result);
         });
-        leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().dateModifiedProperty());
+        leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
 
         rightTableViewNameColumn.setCellValueFactory(cellData -> {
             String result = cellData.getValue().contentProperty().get().replaceAll("(.{35})", "$1\n");
             return new SimpleStringProperty(result);
         });
-        rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().dateModifiedProperty());
+        rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
     }
 
     private void initializeChoiceBoxes() {
-        leftTableViewChoiceBox.getItems().addAll("Name");
+        leftTableViewChoiceBox.getItems().addAll("Name", "Änderungsdatum");
         leftTableViewChoiceBox.getSelectionModel().select("Name");
-        rightTableViewChoiceBox.getItems().addAll("Name");
+        rightTableViewChoiceBox.getItems().addAll("Name", "Änderungsdatum");
         rightTableViewChoiceBox.getSelectionModel().select("Name");
     }
 

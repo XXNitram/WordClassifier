@@ -31,6 +31,9 @@ public class SearchHelper {
             if ("Name".equals(choiceBox.getValue())) {
                 filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(newSelection.toLowerCase().trim()));
             }
+            if ("Änderungsdatum".equals(choiceBox.getValue())) {
+                filteredExpressionList.setPredicate(expression -> expression.getFormattedDateModified().toLowerCase().contains(newSelection.toLowerCase().trim()));
+            }
         });
     }
 
@@ -40,6 +43,9 @@ public class SearchHelper {
         textField.textProperty().addListener((observableValue, oldSelection, newSelection) -> {
             if ("Name".equals(choiceBox.getValue())) {
                 filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(newSelection.toLowerCase().trim()));
+            }
+            if ("Änderungsdatum".equals(choiceBox.getValue())) {
+                filteredGroupList.setPredicate(group -> group.getFormattedDateModified().toLowerCase().contains(newSelection.toLowerCase().trim()));
             }
         });
     }
