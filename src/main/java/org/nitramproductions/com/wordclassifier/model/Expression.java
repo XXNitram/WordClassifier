@@ -13,6 +13,7 @@ public class Expression {
 
     private final StringProperty content;
     private final ObjectProperty<LocalDateTime> dateModified;
+    private StringProperty formattedDateModified;
 
     public Expression() {
         this(null, null);
@@ -25,6 +26,7 @@ public class Expression {
     public Expression(String content, LocalDateTime dateModified) {
         this.content = new SimpleStringProperty(content);
         this.dateModified = new SimpleObjectProperty<>(dateModified);
+        localDatePropertyToStringProperty(dateModified);
     }
 
     public String getContent() {
@@ -49,11 +51,22 @@ public class Expression {
 
     public void setDateModified(LocalDateTime dateModified) {
         this.dateModified.set(dateModified);
+        localDatePropertyToStringProperty(dateModified);
     }
 
-    public StringProperty localDatePropertyToString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm", Locale.GERMAN);
-        String newFormat = getDateModified().format(formatter);
-        return new SimpleStringProperty(newFormat);
+    public String getFormattedDateModified() {
+        return formattedDateModified.get();
+    }
+
+    public StringProperty formattedDateModifiedProperty() {
+        return formattedDateModified;
+    }
+
+    private void localDatePropertyToStringProperty(LocalDateTime localDateTime) {
+        if (localDateTime != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm", Locale.GERMAN);
+            String newFormat = localDateTime.format(formatter);
+            formattedDateModified = new SimpleStringProperty(newFormat);
+        }
     }
 }

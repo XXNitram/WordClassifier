@@ -101,13 +101,13 @@ public class MainController {
             String result = cellData.getValue().nameProperty().get().replaceAll("(.{35})", "$1\n");
             return new SimpleStringProperty(result);
         });
-        leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().localDatePropertyToString());
+        leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
 
         rightTableViewNameColumn.setCellValueFactory(cellData -> {
             String result = cellData.getValue().contentProperty().get().replaceAll("(.{35})", "$1\n");
             return new SimpleStringProperty(result);
         });
-        rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().localDatePropertyToString());
+        rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
     }
 
     private void initializeChoiceBoxes() {
