@@ -111,9 +111,9 @@ public class MainController {
     }
 
     private void initializeChoiceBoxes() {
-        leftTableViewChoiceBox.getItems().addAll("Name");
+        leftTableViewChoiceBox.getItems().addAll("Name", "Änderungsdatum");
         leftTableViewChoiceBox.getSelectionModel().select("Name");
-        rightTableViewChoiceBox.getItems().addAll("Name");
+        rightTableViewChoiceBox.getItems().addAll("Name", "Änderungsdatum");
         rightTableViewChoiceBox.getSelectionModel().select("Name");
     }
 
