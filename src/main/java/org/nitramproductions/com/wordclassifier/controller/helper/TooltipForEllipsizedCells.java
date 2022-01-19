@@ -5,7 +5,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.Tooltip;
 import javafx.scene.text.Text;
 
 public class TooltipForEllipsizedCells<T> extends TableCell<T, String> {
@@ -30,7 +29,7 @@ public class TooltipForEllipsizedCells<T> extends TableCell<T, String> {
                 .when(Bindings
                         .and(itemTextLongerThanColumnWidthProperty, Bindings
                                 .or(emptyProperty().not(), itemProperty().isNotNull())))
-                .then(new Tooltip(item))
-                .otherwise((Tooltip) null));
+                .then(new CustomTooltip(item))
+                .otherwise((CustomTooltip) null));
     }
 }
