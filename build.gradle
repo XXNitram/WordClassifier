@@ -23,6 +23,16 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+task createProperties(dependsOn: processResources) {
+    doLast {
+        new File("src/main/resources/org/nitramproductions/com/wordclassifier/controller/properties/version.properties").withWriter { writer ->
+            Properties properties = new Properties()
+            properties['version'] = project.version.toString()
+            properties.store writer, null
+        }
+    }
+}
+
 tasks.register('jpackageDistribution', Zip) {
     archiveFileName = project.name + "-" + project.version + ".zip"
     destinationDirectory = layout.buildDirectory.dir("distributions")
@@ -41,6 +51,10 @@ javafx {
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
 }
 
+classes {
+    dependsOn createProperties
+}
+
 dependencies {
     implementation('org.controlsfx:controlsfx:11.1.0')
     implementation('com.dlsc.formsfx:formsfx-core:11.3.2') {
@@ -56,6 +70,7 @@ dependencies {
     }
     implementation 'com.h2database:h2:2.0.202'
     implementation 'com.zaxxer:HikariCP:5.0.0'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.1'
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
