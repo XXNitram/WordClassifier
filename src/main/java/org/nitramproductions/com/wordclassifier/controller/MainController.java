@@ -2,7 +2,6 @@ package org.nitramproductions.com.wordclassifier.controller;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -17,6 +16,7 @@ import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
 import org.nitramproductions.com.wordclassifier.controller.helper.SearchHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
+import org.nitramproductions.com.wordclassifier.controller.helper.TooltipForEllipsizedCells;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
@@ -97,17 +97,15 @@ public class MainController {
     }
 
     private void initializeTableViewColumns() {
-        leftTableViewNameColumn.setCellValueFactory(cellData -> {
-            String result = cellData.getValue().nameProperty().get().replaceAll("(.{35})", "$1\n");
-            return new SimpleStringProperty(result);
-        });
+        leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        leftTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
+        leftTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
 
-        rightTableViewNameColumn.setCellValueFactory(cellData -> {
-            String result = cellData.getValue().contentProperty().get().replaceAll("(.{35})", "$1\n");
-            return new SimpleStringProperty(result);
-        });
+        rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
+        rightTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
+        rightTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
     }
 
     private void initializeChoiceBoxes() {

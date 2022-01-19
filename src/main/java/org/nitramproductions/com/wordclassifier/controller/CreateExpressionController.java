@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
 import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
+import org.nitramproductions.com.wordclassifier.controller.helper.TooltipForEllipsizedCells;
 import org.nitramproductions.com.wordclassifier.controller.helper.ValidationHelper;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
@@ -71,7 +72,9 @@ public class CreateExpressionController {
 
     private void initializeTableViewColumns() {
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        leftTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        rightTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
     }
 
     private void initializeButtons() {
