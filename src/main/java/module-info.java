@@ -11,6 +11,7 @@ module org.nitramproductions.com.wordclassifier {
     requires eu.hansolo.tilesfx;
     requires java.net.http;
     requires java.sql;
+    requires java.desktop;
     requires com.h2database;
     requires com.zaxxer.hikari;
     requires com.fasterxml.jackson.databind;

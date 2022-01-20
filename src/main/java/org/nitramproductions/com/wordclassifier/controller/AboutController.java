@@ -1,18 +1,19 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.animation.FadeTransition;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.util.Duration;
+import org.nitramproductions.com.wordclassifier.controller.helper.AnimationHelper;
+import org.nitramproductions.com.wordclassifier.controller.helper.NetworkHelper;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -20,44 +21,87 @@ public class AboutController {
 
     @FXML
     private ImageView imageView;
+    @FXML
+    private Label updateInfo;
+    @FXML
+    private Hyperlink download;
 
-    public AboutController() {
+    private final URI latestReleaseGithubAPI;
+    private final URI latestReleaseGithub;
+    private String latestVersion;
+    private String currentVersion;
+    private boolean updateAvailable;
 
+    private final NetworkHelper networkHelper = new NetworkHelper();
+    private final AnimationHelper animationHelper = new AnimationHelper();
+
+    public AboutController() throws URISyntaxException, IOException {
+        latestReleaseGithubAPI = new URI("https://api.github.com/repos/atom/atom/releases/latest");
+        latestReleaseGithub = new URI("https://github.com/atom/atom/releases/latest");
+        getProjectVersion();
     }
 
     @FXML
     private void initialize() {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("slow-zoom-nod.gif")));
         imageView.setImage(image);
+        updateInfo.setVisible(false);
+        download.setVisible(false);
     }
 
-    private boolean updateAvailable() throws IOException, URISyntaxException, InterruptedException {
-        return !getProjectVersion().equals(getLatestRelease());
+    @FXML
+    private void onCheckForUpdatesClick() {
+        handleCheckForUpdates();
     }
 
-    private String getProjectVersion() throws IOException {
+    @FXML
+    private void onDownloadClick() throws IOException {
+        networkHelper.openLinkInDefaultBrowser(latestReleaseGithub);
+    }
+
+    private void handleCheckForUpdates() {
+        Task<String> task = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                return networkHelper.getLatestGithubReleaseVersion(latestReleaseGithubAPI);
+            }
+        };
+        task.setOnSucceeded(event -> {
+            latestVersion = task.getValue();
+            updateAvailable = !currentVersion.equals(latestVersion);
+            showLabelDependingOnUpdateAvailable();
+        });
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void showLabelDependingOnUpdateAvailable() {
+        FadeTransition fadeInTransitionLabel = animationHelper.setUpFadeInTransition(updateInfo, Duration.millis(2000));
+        FadeTransition fadeInTransitionDownload = animationHelper.setUpFadeInTransition(download, Duration.millis(2000));
+        if (updateAvailable) {
+            updateInfo.setText("Eine neue Version steht zur Verfügung: " + latestVersion);
+        } else {
+            updateInfo.setText("Die Version ist auf dem aktuellsten Stand: " + currentVersion);
+        }
+        if (!updateInfo.isVisible()) {
+            updateInfo.setVisible(true);
+            fadeInTransitionLabel.playFromStart();
+            if (updateAvailable) {
+                download.setVisible(true);
+                fadeInTransitionDownload.playFromStart();
+            }
+        }
+        if (download.isVisible() && !updateAvailable) {
+            FadeTransition fadeOutTransitionDownload = animationHelper.setUpFadeOutTransition(download, Duration.millis(2000));
+            fadeOutTransitionDownload.setOnFinished(event -> download.setVisible(false));
+            fadeOutTransitionDownload.playFromStart();
+        }
+    }
+
+    private void getProjectVersion() throws IOException {
         Properties properties = new Properties();
         properties.load(getClass().getResourceAsStream("properties/version.properties"));
-        return properties.getProperty("version");
-    }
-
-    private String getLatestRelease() throws IOException, URISyntaxException, InterruptedException {
-        // test-repo for testing because actual repo is still private
-        URI uri = new URI("https://api.github.com/repos/atom/atom/releases/latest");
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .header("Accept", "application/vnd.github.v3+json")
-                .build();
-
-        HttpResponse<String> response = HttpClient
-                .newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .build()
-                .send(request, HttpResponse.BodyHandlers.ofString());
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> map = objectMapper.readValue(response.body(), new TypeReference<>() {});
-
-        return map.get("name").toString();
+        currentVersion = properties.getProperty("version");
     }
 }
