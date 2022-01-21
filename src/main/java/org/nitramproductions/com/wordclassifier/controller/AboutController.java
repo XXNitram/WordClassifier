@@ -5,6 +5,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -24,7 +25,9 @@ public class AboutController {
     @FXML
     private Label updateInfo;
     @FXML
-    private Hyperlink download;
+    private Hyperlink downloadLink;
+    @FXML
+    private ProgressIndicator checkForUpdatesLoadingIndicator;
 
     private final URI latestReleaseGithubAPI;
     private final URI latestReleaseGithub;
@@ -46,11 +49,15 @@ public class AboutController {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("slow-zoom-nod.gif")));
         imageView.setImage(image);
         updateInfo.setVisible(false);
-        download.setVisible(false);
+        downloadLink.setVisible(false);
+        checkForUpdatesLoadingIndicator.setVisible(false);
     }
 
     @FXML
     private void onCheckForUpdatesClick() {
+        checkForUpdatesLoadingIndicator.setVisible(true);
+        checkForUpdatesLoadingIndicator.setLayoutY(26);
+        checkForUpdatesLoadingIndicator.setProgress(-1);
         handleCheckForUpdates();
     }
 
@@ -62,11 +69,18 @@ public class AboutController {
     private void handleCheckForUpdates() {
         Task<String> task = new Task<>() {
             @Override
-            protected String call() throws Exception {
-                return networkHelper.getLatestGithubReleaseVersion(latestReleaseGithubAPI);
+            protected String call() {
+                try {
+                    return networkHelper.getLatestGithubReleaseVersion(latestReleaseGithubAPI);
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
         };
         task.setOnSucceeded(event -> {
+            checkForUpdatesLoadingIndicator.setLayoutY(39);
+            checkForUpdatesLoadingIndicator.setProgress(1);
             latestVersion = task.getValue();
             updateAvailable = !currentVersion.equals(latestVersion);
             showLabelDependingOnUpdateAvailable();
@@ -78,7 +92,15 @@ public class AboutController {
 
     private void showLabelDependingOnUpdateAvailable() {
         FadeTransition fadeInTransitionLabel = animationHelper.setUpFadeInTransition(updateInfo, Duration.millis(2000));
-        FadeTransition fadeInTransitionDownload = animationHelper.setUpFadeInTransition(download, Duration.millis(2000));
+        FadeTransition fadeInTransitionDownload = animationHelper.setUpFadeInTransition(downloadLink, Duration.millis(2000));
+        if (latestVersion == null) {
+            updateInfo.setText("Verbindung kann nicht aufgebaut werden!");
+            if (!updateInfo.isVisible()) {
+                updateInfo.setVisible(true);
+                fadeInTransitionLabel.playFromStart();
+            }
+            return;
+        }
         if (updateAvailable) {
             updateInfo.setText("Eine neue Version steht zur Verfügung: " + latestVersion);
         } else {
@@ -88,13 +110,13 @@ public class AboutController {
             updateInfo.setVisible(true);
             fadeInTransitionLabel.playFromStart();
             if (updateAvailable) {
-                download.setVisible(true);
+                downloadLink.setVisible(true);
                 fadeInTransitionDownload.playFromStart();
             }
         }
-        if (download.isVisible() && !updateAvailable) {
-            FadeTransition fadeOutTransitionDownload = animationHelper.setUpFadeOutTransition(download, Duration.millis(2000));
-            fadeOutTransitionDownload.setOnFinished(event -> download.setVisible(false));
+        if (downloadLink.isVisible() && !updateAvailable) {
+            FadeTransition fadeOutTransitionDownload = animationHelper.setUpFadeOutTransition(downloadLink, Duration.millis(2000));
+            fadeOutTransitionDownload.setOnFinished(event -> downloadLink.setVisible(false));
             fadeOutTransitionDownload.playFromStart();
         }
     }
