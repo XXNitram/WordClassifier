@@ -9,9 +9,12 @@ module org.nitramproductions.com.wordclassifier {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
+    requires java.net.http;
     requires java.sql;
+    requires java.desktop;
     requires com.h2database;
     requires com.zaxxer.hikari;
+    requires com.fasterxml.jackson.databind;
 
     opens org.nitramproductions.com.wordclassifier to javafx.fxml;
     exports org.nitramproductions.com.wordclassifier;
