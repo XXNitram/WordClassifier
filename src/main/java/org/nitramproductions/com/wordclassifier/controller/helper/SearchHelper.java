@@ -24,6 +24,12 @@ public class SearchHelper {
         return filteredList;
     }
 
+    public void searchFilteredExpressionListForNameOnly(TextField textField,
+                                                        FilteredList<Expression> filteredExpressionList) {
+        textField.textProperty().addListener((observableValue, oldSelection, newSelection) ->
+                filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(newSelection.toLowerCase().trim())));
+    }
+
     public void searchFilteredExpressionListDependingOnChoiceBox(TextField textField,
                                                                  ChoiceBox<String> choiceBox,
                                                                  FilteredList<Expression> filteredExpressionList) {

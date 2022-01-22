@@ -3,10 +3,12 @@ package org.nitramproductions.com.wordclassifier.controller;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
+import org.nitramproductions.com.wordclassifier.controller.helper.SearchHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.TooltipForEllipsizedCells;
 import org.nitramproductions.com.wordclassifier.controller.helper.ValidationHelper;
@@ -37,7 +39,9 @@ public class CreateGroupController {
     private TableColumn<Expression, String> rightTableViewNameColumn;
 
     private ObservableList<Expression> leftList;
+    private FilteredList<Expression> filteredLeftList;
     private ObservableList<Expression> rightList;
+    private FilteredList<Expression> filteredRightList;
 
     private final Button createNewButton = new Button("Erstellen");
     private final Button cancelButton = new Button("Abbrechen");
@@ -45,6 +49,7 @@ public class CreateGroupController {
     private final ConnectionManager connectionManager = new ConnectionManager();
     private final SelectionHelper selectionHelper = new SelectionHelper();
     private final ValidationHelper validationHelper = new ValidationHelper();
+    private final SearchHelper searchHelper = new SearchHelper();
 
     private BooleanProperty needToReloadData;
 
@@ -56,22 +61,23 @@ public class CreateGroupController {
     private void initialize() throws SQLException {
         initializeLists();
         initializeTableViews();
+        initializeTableViewColumns();
         initializeButtons();
+        searchTableViews();
         validateNewNameTextField();
         deselectListIfAnotherIsSelected();
     }
 
     private void initializeLists() throws SQLException {
         leftList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
+        filteredLeftList = searchHelper.transformListsAndSetTableView(leftList, leftTableView);
         rightList = FXCollections.observableArrayList();
+        filteredRightList = searchHelper.transformListsAndSetTableView(rightList, rightTableView);
     }
 
     private void initializeTableViews() {
-        leftTableView.setItems(leftList);
-        rightTableView.setItems(rightList);
         leftTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         rightTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        initializeTableViewColumns();
     }
 
     private void initializeTableViewColumns() {
@@ -92,6 +98,11 @@ public class CreateGroupController {
         TooltipWrapper<Button> createNewWrapper;
         createNewWrapper = validationHelper.getTooltipWrapper(createNewButton, "Gruppe kann nicht erstellt werden:");
         buttonBar.getButtons().addAll(createNewWrapper, cancelButton);
+    }
+
+    private void searchTableViews() {
+        searchHelper.searchFilteredExpressionListForNameOnly(leftTableViewSearchTextField, filteredLeftList);
+        searchHelper.searchFilteredExpressionListForNameOnly(rightTableViewSearchTextField, filteredRightList);
     }
 
     private void validateNewNameTextField() throws SQLException {
