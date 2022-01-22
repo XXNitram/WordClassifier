@@ -3,10 +3,12 @@ package org.nitramproductions.com.wordclassifier.controller;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
+import org.nitramproductions.com.wordclassifier.controller.helper.SearchHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.TooltipForEllipsizedCells;
 import org.nitramproductions.com.wordclassifier.controller.helper.ValidationHelper;
@@ -24,6 +26,10 @@ public class CreateExpressionController {
     @FXML
     private TextField newNameTextField;
     @FXML
+    private TextField leftTableViewSearchTextField;
+    @FXML
+    private TextField rightTableViewSearchTextField;
+    @FXML
     private TableView<Group> leftTableView;
     @FXML
     private TableColumn<Group, String> leftTableViewNameColumn;
@@ -33,7 +39,9 @@ public class CreateExpressionController {
     private TableColumn<Group, String> rightTableViewNameColumn;
 
     private ObservableList<Group> leftList;
+    private FilteredList<Group> filteredLeftList;
     private ObservableList<Group> rightList;
+    private FilteredList<Group> filteredRightList;
 
     private final Button createNewButton = new Button("Erstellen");
     private final Button cancelButton = new Button("Abbrechen");
@@ -41,6 +49,7 @@ public class CreateExpressionController {
     private final ConnectionManager connectionManager = new ConnectionManager();
     private final SelectionHelper selectionHelper = new SelectionHelper();
     private final ValidationHelper validationHelper = new ValidationHelper();
+    private final SearchHelper searchHelper = new SearchHelper();
 
     private BooleanProperty needToReloadData;
 
@@ -52,22 +61,23 @@ public class CreateExpressionController {
     private void initialize() throws SQLException {
         initializeLists();
         initializeTableViews();
+        initializeTableViewColumns();
         initializeButtons();
+        searchTableViews();
         validateNewNameTextField();
         deselectListIfAnotherIsSelected();
     }
 
     private void initializeLists() throws SQLException {
         leftList = FXCollections.observableArrayList(connectionManager.getAllGroups());
+        filteredLeftList = searchHelper.transformListsAndSetTableView(leftList, leftTableView);
         rightList = FXCollections.observableArrayList();
+        filteredRightList = searchHelper.transformListsAndSetTableView(rightList, rightTableView);
     }
 
     private void initializeTableViews() {
-        leftTableView.setItems(leftList);
-        rightTableView.setItems(rightList);
         leftTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         rightTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        initializeTableViewColumns();
     }
 
     private void initializeTableViewColumns() {
@@ -88,6 +98,11 @@ public class CreateExpressionController {
         TooltipWrapper<Button> createNewWrapper;
         createNewWrapper = validationHelper.getTooltipWrapper(createNewButton, "Wort kann nicht erstellt werden:");
         buttonBar.getButtons().addAll(createNewWrapper, cancelButton);
+    }
+
+    private void searchTableViews() {
+        searchHelper.searchFilteredGroupListForNameOnly(leftTableViewSearchTextField, filteredLeftList);
+        searchHelper.searchFilteredGroupListForNameOnly(rightTableViewSearchTextField, filteredRightList);
     }
 
     private void validateNewNameTextField() throws SQLException {
