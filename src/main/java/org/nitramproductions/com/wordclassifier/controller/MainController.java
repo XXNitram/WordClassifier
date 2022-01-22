@@ -71,7 +71,6 @@ public class MainController {
     @FXML
     private void initialize() throws SQLException {
         initializeChoiceBoxes();
-        initializeTextFields();
         initializeGroupLists();
         initializeExpressionLists();
         initializeTableViewColumns();
@@ -113,11 +112,6 @@ public class MainController {
         leftTableViewChoiceBox.getSelectionModel().select("Name");
         rightTableViewChoiceBox.getItems().addAll("Name", "Änderungsdatum");
         rightTableViewChoiceBox.getSelectionModel().select("Name");
-    }
-
-    private void initializeTextFields() {
-        leftTableViewTextField.setPromptText("Gib hier ein Suchwort ein!");
-        rightTableViewTextField.setPromptText("Gib hier ein Suchwort ein!");
     }
 
     private void searchLeftTableView() {
