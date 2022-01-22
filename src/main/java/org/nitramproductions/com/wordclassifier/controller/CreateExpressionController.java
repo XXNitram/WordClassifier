@@ -24,6 +24,10 @@ public class CreateExpressionController {
     @FXML
     private TextField newNameTextField;
     @FXML
+    private TextField leftTableViewSearchTextField;
+    @FXML
+    private TextField rightTableViewSearchTextField;
+    @FXML
     private TableView<Group> leftTableView;
     @FXML
     private TableColumn<Group, String> leftTableViewNameColumn;
