@@ -99,6 +99,11 @@ public class AboutController {
                 updateInfo.setVisible(true);
                 fadeInTransitionLabel.playFromStart();
             }
+            if (downloadLink.isVisible()) {
+                FadeTransition fadeOutTransitionDownload = animationHelper.setUpFadeOutTransition(downloadLink, Duration.millis(2000));
+                fadeOutTransitionDownload.setOnFinished(event -> downloadLink.setVisible(false));
+                fadeOutTransitionDownload.playFromStart();
+            }
             return;
         }
         if (updateAvailable) {
