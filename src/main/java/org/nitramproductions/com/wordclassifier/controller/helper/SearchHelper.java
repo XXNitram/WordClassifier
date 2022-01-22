@@ -30,6 +30,12 @@ public class SearchHelper {
                 filteredExpressionList.setPredicate(expression -> expression.getContent().toLowerCase().contains(newSelection.toLowerCase().trim())));
     }
 
+    public void searchFilteredGroupListForNameOnly(TextField textField,
+                                                   FilteredList<Group> filteredGroupList) {
+        textField.textProperty().addListener((observableValue, oldSelection, newSelection) ->
+                filteredGroupList.setPredicate(group -> group.getName().toLowerCase().contains(newSelection.toLowerCase().trim())));
+    }
+
     public void searchFilteredExpressionListDependingOnChoiceBox(TextField textField,
                                                                  ChoiceBox<String> choiceBox,
                                                                  FilteredList<Expression> filteredExpressionList) {

@@ -44,9 +44,9 @@ public class MainController {
     @FXML
     private ChoiceBox<String> rightTableViewChoiceBox;
     @FXML
-    private TextField leftTableViewTextField;
+    private TextField leftTableViewSearchTextField;
     @FXML
-    private TextField rightTableViewTextField;
+    private TextField rightTableViewSearchTextField;
     @FXML
     private MenuBar menuBar;
     @FXML
@@ -115,13 +115,13 @@ public class MainController {
     }
 
     private void searchLeftTableView() {
-        searchHelper.searchFilteredGroupListDependingOnChoiceBox(leftTableViewTextField, leftTableViewChoiceBox, filteredGroupList);
-        searchHelper.clearTextFieldIfChoiceBoxChanged(leftTableViewChoiceBox, leftTableViewTextField);
+        searchHelper.searchFilteredGroupListDependingOnChoiceBox(leftTableViewSearchTextField, leftTableViewChoiceBox, filteredGroupList);
+        searchHelper.clearTextFieldIfChoiceBoxChanged(leftTableViewChoiceBox, leftTableViewSearchTextField);
     }
 
     private void searchRightTableView() {
-        searchHelper.searchFilteredExpressionListDependingOnChoiceBox(rightTableViewTextField, rightTableViewChoiceBox, filteredExpressionList);
-        searchHelper.clearTextFieldIfChoiceBoxChanged(rightTableViewChoiceBox, rightTableViewTextField);
+        searchHelper.searchFilteredExpressionListDependingOnChoiceBox(rightTableViewSearchTextField, rightTableViewChoiceBox, filteredExpressionList);
+        searchHelper.clearTextFieldIfChoiceBoxChanged(rightTableViewChoiceBox, rightTableViewSearchTextField);
     }
 
     private void deselectListIfAnotherIsSelected() {
@@ -190,8 +190,8 @@ public class MainController {
     }
 
     private void clearAll() {
-        leftTableViewTextField.setText("");
-        rightTableViewTextField.setText("");
+        leftTableViewSearchTextField.setText("");
+        rightTableViewSearchTextField.setText("");
         observableGroupList.clear();
         leftTableView.getSelectionModel().clearSelection();
         observableExpressionList.clear();
