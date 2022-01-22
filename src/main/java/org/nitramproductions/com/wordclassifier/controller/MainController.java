@@ -130,14 +130,12 @@ public class MainController {
 
     private void updateRightTableViewDependingOnSelectionInLeftTableView() {
         leftTableView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                if (!toggleSwitch.isSelected()) {
-                    try {
-                        observableExpressionList.clear();
-                        observableExpressionList.addAll(connectionManager.getExpressionsBelongingToGroup(newSelection));
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+            if (newSelection != null && !toggleSwitch.isSelected()) {
+                try {
+                    observableExpressionList.clear();
+                    observableExpressionList.addAll(connectionManager.getExpressionsBelongingToGroup(newSelection));
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -145,14 +143,12 @@ public class MainController {
 
     private void updateLeftTableViewDependingOnSelectionInRightTableView() {
         rightTableView.getSelectionModel().selectedItemProperty().addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                if (toggleSwitch.isSelected()) {
-                    try {
-                        observableGroupList.clear();
-                        observableGroupList.addAll(connectionManager.getGroupsBelongingToExpression(newSelection));
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+            if (newSelection != null && toggleSwitch.isSelected()) {
+                try {
+                    observableGroupList.clear();
+                    observableGroupList.addAll(connectionManager.getGroupsBelongingToExpression(newSelection));
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
         });
