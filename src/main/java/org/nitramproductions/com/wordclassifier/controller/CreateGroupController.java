@@ -24,6 +24,10 @@ public class CreateGroupController {
     @FXML
     private TextField newNameTextField;
     @FXML
+    private TextField leftTableViewSearchTextField;
+    @FXML
+    private TextField rightTableViewSearchTextField;
+    @FXML
     private TableView<Expression> leftTableView;
     @FXML
     private TableColumn<Expression, String> leftTableViewNameColumn;
