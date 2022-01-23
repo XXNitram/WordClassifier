@@ -18,6 +18,7 @@ import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EditGroupController {
@@ -57,6 +58,7 @@ public class EditGroupController {
     private final SearchHelper searchHelper = new SearchHelper();
 
     private Group groupToEdit;
+    private List<Expression> expressionsBelongingToGroupList;
     private BooleanProperty needToReloadData;
 
     public EditGroupController(Group groupToEdit, BooleanProperty needToReloadData) {
@@ -66,6 +68,7 @@ public class EditGroupController {
 
     @FXML
     private void initialize() throws SQLException {
+        expressionsBelongingToGroupList = connectionManager.getExpressionsBelongingToGroup(groupToEdit);
         initializeLists();
         initializeTableViews();
         initializeTableViewColumns();
@@ -78,7 +81,6 @@ public class EditGroupController {
     }
 
     private void initializeLists() throws SQLException {
-        List<Expression> expressionsBelongingToGroupList = connectionManager.getExpressionsBelongingToGroup(groupToEdit);
         leftList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
         leftList.removeAll(expressionsBelongingToGroupList);
         filteredLeftList = searchHelper.transformListsAndSetTableView(leftList, leftTableView);
@@ -149,6 +151,30 @@ public class EditGroupController {
     }
 
     private void onCreateNewButtonClick() {
+        String newGroupName = nameTextField.getText().trim();
+        List<Expression> expressionsBelongingToGroupListCopy = new ArrayList<>(expressionsBelongingToGroupList);
+        expressionsBelongingToGroupList.removeAll(rightList);
+        rightList.removeAll(expressionsBelongingToGroupListCopy);
+        if (!rightList.isEmpty()) {
+            for (Expression expression : rightList) {
+                try {
+                    connectionManager.addNewBelongToRelation(groupToEdit, expression);
+                    connectionManager.updateExpressionModificationDate(expression);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (!expressionsBelongingToGroupList.isEmpty()) {
+            for (Expression expression : expressionsBelongingToGroupList) {
+                try {
+                    connectionManager.deleteBelongToRelation(groupToEdit, expression);
+                    connectionManager.updateExpressionModificationDate(expression);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         needToReloadData.set(true);
         Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.close();
