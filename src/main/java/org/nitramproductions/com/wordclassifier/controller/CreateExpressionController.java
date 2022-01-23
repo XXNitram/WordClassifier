@@ -152,7 +152,7 @@ public class CreateExpressionController {
         stage.close();
     }
 
-    public void initializeNeedToReloadDataBooleanProperty(BooleanProperty needToReloadData) {
+    public void setNeedToReloadDataBooleanProperty(BooleanProperty needToReloadData) {
         this.needToReloadData = needToReloadData;
     }
 }

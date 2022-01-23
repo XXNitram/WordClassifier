@@ -195,6 +195,17 @@ public class MainController {
     }
 
     @FXML
+    private void onEditButtonClick() throws IOException {
+        if (!leftTableView.getSelectionModel().isEmpty()) {
+            Group groupToEdit = leftTableView.getSelectionModel().getSelectedItem();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editGroup.fxml"));
+            fxmlLoader.setControllerFactory(controller -> new EditGroupController(groupToEdit, needToReloadData));
+            Parent root = fxmlLoader.load();
+            createNewStage(root, "Gruppe bearbeiten", 783, 440);
+        }
+    }
+
+    @FXML
     private void onDeleteButtonClick() throws SQLException {
         if (!leftTableView.getSelectionModel().isEmpty()) {
             deleteSelectedGroup();
@@ -237,7 +248,7 @@ public class MainController {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGroup.fxml"));
         Parent root = fxmlLoader.load();
         CreateGroupController createGroupController = fxmlLoader.getController();
-        createGroupController.initializeNeedToReloadDataBooleanProperty(needToReloadData);
+        createGroupController.setNeedToReloadDataBooleanProperty(needToReloadData);
         createNewStage(root, "Neue Gruppe Erstellen", 783, 440);
     }
 
@@ -246,7 +257,7 @@ public class MainController {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createExpression.fxml"));
         Parent root = fxmlLoader.load();
         CreateExpressionController createExpressionController = fxmlLoader.getController();
-        createExpressionController.initializeNeedToReloadDataBooleanProperty(needToReloadData);
+        createExpressionController.setNeedToReloadDataBooleanProperty(needToReloadData);
         createNewStage(root, "Neues Wort Erstellen", 783, 440);
     }
 

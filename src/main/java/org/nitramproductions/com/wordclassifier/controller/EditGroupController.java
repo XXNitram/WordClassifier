@@ -1,5 +1,6 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,12 +20,16 @@ import org.nitramproductions.com.wordclassifier.model.Group;
 import java.sql.SQLException;
 import java.util.List;
 
-public class CreateGroupController {
+public class EditGroupController {
 
     @FXML
     private ButtonBar buttonBar;
     @FXML
-    private TextField newNameTextField;
+    private TextField nameTextField;
+    @FXML
+    private Label creationDateLabel;
+    @FXML
+    private Label modificationDateLabel;
     @FXML
     private TextField leftTableViewSearchTextField;
     @FXML
@@ -43,7 +48,7 @@ public class CreateGroupController {
     private ObservableList<Expression> rightList;
     private FilteredList<Expression> filteredRightList;
 
-    private final Button createNewButton = new Button("Erstellen");
+    private final Button saveButton = new Button("Speichern");
     private final Button cancelButton = new Button("Abbrechen");
 
     private final ConnectionManager connectionManager = new ConnectionManager();
@@ -51,10 +56,12 @@ public class CreateGroupController {
     private final ValidationHelper validationHelper = new ValidationHelper();
     private final SearchHelper searchHelper = new SearchHelper();
 
+    private Group groupToEdit;
     private BooleanProperty needToReloadData;
 
-    public CreateGroupController() {
-
+    public EditGroupController(Group groupToEdit, BooleanProperty needToReloadData) {
+        this.groupToEdit = groupToEdit;
+        this.needToReloadData = needToReloadData;
     }
 
     @FXML
@@ -63,15 +70,19 @@ public class CreateGroupController {
         initializeTableViews();
         initializeTableViewColumns();
         initializeButtons();
+        initializeNameField();
+        initializeDateLabels();
         searchTableViews();
         validateNewNameTextField();
         deselectListIfAnotherIsSelected();
     }
 
     private void initializeLists() throws SQLException {
+        List<Expression> expressionsBelongingToGroupList = connectionManager.getExpressionsBelongingToGroup(groupToEdit);
         leftList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
+        leftList.removeAll(expressionsBelongingToGroupList);
         filteredLeftList = searchHelper.transformListsAndSetTableView(leftList, leftTableView);
-        rightList = FXCollections.observableArrayList();
+        rightList = FXCollections.observableArrayList(expressionsBelongingToGroupList);
         filteredRightList = searchHelper.transformListsAndSetTableView(rightList, rightTableView);
     }
 
@@ -89,15 +100,24 @@ public class CreateGroupController {
 
     private void initializeButtons() {
         cancelButton.setCancelButton(true);
-        createNewButton.setDefaultButton(true);
+        saveButton.setDefaultButton(true);
         cancelButton.translateXProperty().set(-20);
-        createNewButton.translateXProperty().set(-25);
+        saveButton.translateXProperty().set(-25);
         cancelButton.setOnAction(e -> onCancelButtonClick());
-        createNewButton.setOnAction(e -> onCreateNewButtonClick());
+        saveButton.setOnAction(e -> onCreateNewButtonClick());
 
         TooltipWrapper<Button> createNewWrapper;
-        createNewWrapper = validationHelper.getTooltipWrapper(createNewButton, "Gruppe kann nicht erstellt werden:");
+        createNewWrapper = validationHelper.getTooltipWrapper(saveButton, "Gruppe kann nicht gespeichert werden:");
         buttonBar.getButtons().addAll(createNewWrapper, cancelButton);
+    }
+
+    private void initializeNameField() {
+        nameTextField.setText(groupToEdit.getName());
+        Platform.runLater(() -> nameTextField.getParent().requestFocus());
+    }
+
+    private void initializeDateLabels() {
+        modificationDateLabel.setText(groupToEdit.getFormattedDateModified());
     }
 
     private void searchTableViews() {
@@ -106,11 +126,11 @@ public class CreateGroupController {
     }
 
     private void validateNewNameTextField() throws SQLException {
-        validationHelper.checkIfEmpty(newNameTextField);
-        validationHelper.checkIfIncludesSpecialCharacter(newNameTextField);
-        validationHelper.checkIfTooLong(newNameTextField);
+        validationHelper.checkIfEmpty(nameTextField);
+        validationHelper.checkIfIncludesSpecialCharacter(nameTextField);
+        validationHelper.checkIfTooLong(nameTextField);
         List<Group> groups = connectionManager.getAllGroups();
-        validationHelper.checkIfGroupAlreadyExists(newNameTextField, groups);
+        validationHelper.checkIfGroupAlreadyExists(nameTextField, groups);
     }
 
     private void deselectListIfAnotherIsSelected() {
@@ -128,31 +148,13 @@ public class CreateGroupController {
     }
 
     private void onCreateNewButtonClick() {
-        String newGroupName = newNameTextField.getText().trim();
-        Group newGroup = new Group(newGroupName);
-        try {
-            connectionManager.addNewGroup(newGroup);
-            if (!rightList.isEmpty()) {
-                for (Expression expression : rightList) {
-                    connectionManager.addNewBelongToRelation(newGroup, expression);
-                    connectionManager.updateExpressionModificationDate(expression);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
         needToReloadData.set(true);
-        Stage stage = (Stage) createNewButton.getScene().getWindow();
+        Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.close();
     }
 
     private void onCancelButtonClick() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
-    }
-
-    public void setNeedToReloadDataBooleanProperty(BooleanProperty needToReloadData) {
-        this.needToReloadData = needToReloadData;
     }
 }

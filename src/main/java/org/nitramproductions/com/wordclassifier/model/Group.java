@@ -8,6 +8,7 @@ import javafx.beans.property.StringProperty;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 
 public class Group {
 
@@ -68,5 +69,18 @@ public class Group {
             String newFormat = localDateTime.format(formatter);
             formattedDateModified = new SimpleStringProperty(newFormat);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return Objects.equals(getName(), group.getName()) && Objects.equals(getDateModified(), group.getDateModified()) && Objects.equals(getFormattedDateModified(), group.getFormattedDateModified());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getDateModified(), getFormattedDateModified());
     }
 }

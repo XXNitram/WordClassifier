@@ -8,6 +8,7 @@ import javafx.beans.property.StringProperty;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 
 public class Expression {
 
@@ -68,5 +69,18 @@ public class Expression {
             String newFormat = localDateTime.format(formatter);
             formattedDateModified = new SimpleStringProperty(newFormat);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Expression that = (Expression) o;
+        return Objects.equals(getContent(), that.getContent()) && Objects.equals(getDateModified(), that.getDateModified()) && Objects.equals(getFormattedDateModified(), that.getFormattedDateModified());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getContent(), getDateModified(), getFormattedDateModified());
     }
 }
