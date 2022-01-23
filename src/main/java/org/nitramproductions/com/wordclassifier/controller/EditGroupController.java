@@ -106,7 +106,13 @@ public class EditGroupController {
         cancelButton.translateXProperty().set(-20);
         saveButton.translateXProperty().set(-25);
         cancelButton.setOnAction(e -> onCancelButtonClick());
-        saveButton.setOnAction(e -> onCreateNewButtonClick());
+        saveButton.setOnAction(e -> {
+            try {
+                onSaveButtonClick();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         TooltipWrapper<Button> createNewWrapper;
         createNewWrapper = validationHelper.getTooltipWrapper(saveButton, "Gruppe kann nicht gespeichert werden:");
@@ -150,31 +156,34 @@ public class EditGroupController {
         selectionHelper.transferSelectedItemsToAnotherList(rightTableView, rightList, leftList);
     }
 
-    private void onCreateNewButtonClick() {
+    private void onSaveButtonClick() throws SQLException {
         String newGroupName = nameTextField.getText().trim();
         List<Expression> expressionsBelongingToGroupListCopy = new ArrayList<>(expressionsBelongingToGroupList);
         expressionsBelongingToGroupList.removeAll(rightList);
         rightList.removeAll(expressionsBelongingToGroupListCopy);
-        if (!rightList.isEmpty()) {
-            for (Expression expression : rightList) {
-                try {
-                    connectionManager.addNewBelongToRelation(groupToEdit, expression);
-                    connectionManager.updateExpressionModificationDate(expression);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (newGroupName.equals(groupToEdit.getName()) && rightList.isEmpty() && expressionsBelongingToGroupList.isEmpty()) {
+            Stage stage = (Stage) saveButton.getScene().getWindow();
+            stage.close();
+            return;
+        }
+        if (!newGroupName.equals(groupToEdit.getName())) {
+            connectionManager.updateGroupName(groupToEdit, newGroupName);
+            groupToEdit.setName(newGroupName);
         }
         if (!expressionsBelongingToGroupList.isEmpty()) {
             for (Expression expression : expressionsBelongingToGroupList) {
-                try {
-                    connectionManager.deleteBelongToRelation(groupToEdit, expression);
-                    connectionManager.updateExpressionModificationDate(expression);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                connectionManager.deleteBelongToRelation(groupToEdit, expression);
+                connectionManager.updateExpressionModificationDate(expression);
             }
         }
+        if (!rightList.isEmpty()) {
+            for (Expression expression : rightList) {
+                connectionManager.addNewBelongToRelation(groupToEdit, expression);
+                connectionManager.updateExpressionModificationDate(expression);
+
+            }
+        }
+        connectionManager.updateGroupModificationDate(groupToEdit);
         needToReloadData.set(true);
         Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.close();
