@@ -158,10 +158,12 @@ public class EditGroupController {
 
     private void onSaveButtonClick() throws SQLException {
         String newGroupName = nameTextField.getText().trim();
-        List<Expression> expressionsBelongingToGroupListCopy = new ArrayList<>(expressionsBelongingToGroupList);
-        expressionsBelongingToGroupList.removeAll(rightList);
-        rightList.removeAll(expressionsBelongingToGroupListCopy);
-        if (newGroupName.equals(groupToEdit.getName()) && rightList.isEmpty() && expressionsBelongingToGroupList.isEmpty()) {
+        List<Expression> belongingExpressionsToDelete = new ArrayList<>(expressionsBelongingToGroupList);
+        List<Expression> belongingExpressionsToAdd = new ArrayList<>(rightList);
+
+        belongingExpressionsToDelete.removeAll(rightList);
+        belongingExpressionsToAdd.removeAll(expressionsBelongingToGroupList);
+        if (newGroupName.equals(groupToEdit.getName()) && belongingExpressionsToAdd.isEmpty() && belongingExpressionsToDelete.isEmpty()) {
             Stage stage = (Stage) saveButton.getScene().getWindow();
             stage.close();
             return;
@@ -170,17 +172,16 @@ public class EditGroupController {
             connectionManager.updateGroupName(groupToEdit, newGroupName);
             groupToEdit.setName(newGroupName);
         }
-        if (!expressionsBelongingToGroupList.isEmpty()) {
-            for (Expression expression : expressionsBelongingToGroupList) {
+        if (!belongingExpressionsToDelete.isEmpty()) {
+            for (Expression expression : belongingExpressionsToDelete) {
                 connectionManager.deleteBelongToRelation(groupToEdit, expression);
                 connectionManager.updateExpressionModificationDate(expression);
             }
         }
-        if (!rightList.isEmpty()) {
-            for (Expression expression : rightList) {
+        if (!belongingExpressionsToAdd.isEmpty()) {
+            for (Expression expression : belongingExpressionsToAdd) {
                 connectionManager.addNewBelongToRelation(groupToEdit, expression);
                 connectionManager.updateExpressionModificationDate(expression);
-
             }
         }
         connectionManager.updateGroupModificationDate(groupToEdit);
