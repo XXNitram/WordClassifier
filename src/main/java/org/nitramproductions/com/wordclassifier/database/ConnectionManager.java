@@ -11,12 +11,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionManager {
 
     public ConnectionManager() {
+
     }
 
     public void initialize() throws SQLException, IOException {
@@ -92,32 +94,37 @@ public class ConnectionManager {
 
     public void addNewGroup(Group newGroup) throws SQLException {
         String query = "INSERT INTO \"GROUP\" (NAME) VALUES (?);";
-        executeUpdateWithOneParameter(query, newGroup.getName());
+        executeUpdateWithOneStringParameter(query, newGroup.getName());
     }
 
     public void addNewExpression(Expression newExpression) throws SQLException {
         String query = "INSERT INTO EXPRESSION (CONTENT) VALUES (?);";
-        executeUpdateWithOneParameter(query, newExpression.getContent());
+        executeUpdateWithOneStringParameter(query, newExpression.getContent());
     }
 
     public void addNewBelongToRelation(Group group, Expression expression) throws SQLException {
         String query = "INSERT INTO BELONGS_TO (NAME, CONTENT) VALUES (?, ?);";
-        try (Connection connection = DataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setObject(1, group.getName());
-            preparedStatement.setObject(2, expression.getContent());
-            preparedStatement.executeUpdate();
-        }
+        executeUpdateWithTwoStringParameters(query, group.getName(), expression.getContent());
+    }
+
+    public void updateGroupModificationDate(Group group) throws SQLException {
+        String query = "UPDATE \"GROUP\" SET DATE_MODIFIED = ? WHERE NAME = ?;";
+        executeUpdateWithStringAndDateParameters(query, LocalDateTime.now(), group.getName());
+    }
+
+    public void updateExpressionModificationDate(Expression expression) throws SQLException {
+        String query = "UPDATE EXPRESSION SET DATE_MODIFIED = ? WHERE CONTENT = ?;";
+        executeUpdateWithStringAndDateParameters(query, LocalDateTime.now(), expression.getContent());
     }
 
     public void deleteGroup(Group group) throws SQLException {
         String query = "DELETE FROM \"GROUP\" WHERE NAME = ?;";
-        executeUpdateWithOneParameter(query, group.getName());
+        executeUpdateWithOneStringParameter(query, group.getName());
     }
 
     public void deleteExpression(Expression expression) throws SQLException {
         String query = "DELETE FROM EXPRESSION WHERE CONTENT = ?;";
-        executeUpdateWithOneParameter(query, expression.getContent());
+        executeUpdateWithOneStringParameter(query, expression.getContent());
     }
 
     private List<Group> getGroupsFromResultSet(ResultSet resultSet) throws SQLException {
@@ -142,10 +149,28 @@ public class ConnectionManager {
         return expressions;
     }
 
-    private void executeUpdateWithOneParameter(String query, String parameter) throws SQLException {
+    private void executeUpdateWithOneStringParameter(String query, String parameter) throws SQLException {
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setObject(1, parameter);
+            preparedStatement.executeUpdate();
+        }
+    }
+
+    private void executeUpdateWithTwoStringParameters(String query, String firstParameter, String secondParameter) throws SQLException {
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setObject(1, firstParameter);
+            preparedStatement.setObject(2, secondParameter);
+            preparedStatement.executeUpdate();
+        }
+    }
+
+    private void executeUpdateWithStringAndDateParameters(String query, LocalDateTime firstParameter, String secondParameter) throws SQLException {
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setObject(1, firstParameter);
+            preparedStatement.setObject(2, secondParameter);
             preparedStatement.executeUpdate();
         }
     }

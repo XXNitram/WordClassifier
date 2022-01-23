@@ -135,6 +135,7 @@ public class CreateExpressionController {
             if (!rightList.isEmpty()) {
                 for (Group group : rightList) {
                     connectionManager.addNewBelongToRelation(group, newExpression);
+                    connectionManager.updateGroupModificationDate(group);
                 }
             }
         } catch (SQLException e) {
