@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditGroupController {
+public class EditExpressionController {
 
     @FXML
     private ButtonBar buttonBar;
@@ -36,18 +36,18 @@ public class EditGroupController {
     @FXML
     private TextField rightTableViewSearchTextField;
     @FXML
-    private TableView<Expression> leftTableView;
+    private TableView<Group> leftTableView;
     @FXML
-    private TableColumn<Expression, String> leftTableViewNameColumn;
+    private TableColumn<Group, String> leftTableViewNameColumn;
     @FXML
-    private TableView<Expression> rightTableView;
+    private TableView<Group> rightTableView;
     @FXML
-    private TableColumn<Expression, String> rightTableViewNameColumn;
+    private TableColumn<Group, String> rightTableViewNameColumn;
 
-    private ObservableList<Expression> leftList;
-    private FilteredList<Expression> filteredLeftList;
-    private ObservableList<Expression> rightList;
-    private FilteredList<Expression> filteredRightList;
+    private ObservableList<Group> leftList;
+    private FilteredList<Group> filteredLeftList;
+    private ObservableList<Group> rightList;
+    private FilteredList<Group> filteredRightList;
 
     private final Button saveButton = new Button("Speichern");
     private final Button cancelButton = new Button("Abbrechen");
@@ -57,18 +57,18 @@ public class EditGroupController {
     private final ValidationHelper validationHelper = new ValidationHelper();
     private final SearchHelper searchHelper = new SearchHelper();
 
-    private final Group groupToEdit;
+    private final Expression expressionToEdit;
     private final BooleanProperty needToReloadData;
-    private List<Expression> expressionsBelongingToGroupList;
+    private List<Group> groupsBelongingToExpressionList;
 
-    public EditGroupController(Group groupToEdit, BooleanProperty needToReloadData) {
-        this.groupToEdit = groupToEdit;
+    public EditExpressionController(Expression expressionToEdit, BooleanProperty needToReloadData) {
+        this.expressionToEdit = expressionToEdit;
         this.needToReloadData = needToReloadData;
     }
 
     @FXML
     private void initialize() throws SQLException {
-        expressionsBelongingToGroupList = connectionManager.getExpressionsBelongingToGroup(groupToEdit);
+        groupsBelongingToExpressionList = connectionManager.getGroupsBelongingToExpression(expressionToEdit);
         initializeLists();
         initializeTableViews();
         initializeTableViewColumns();
@@ -81,10 +81,10 @@ public class EditGroupController {
     }
 
     private void initializeLists() throws SQLException {
-        leftList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
-        leftList.removeAll(expressionsBelongingToGroupList);
+        leftList = FXCollections.observableArrayList(connectionManager.getAllGroups());
+        leftList.removeAll(groupsBelongingToExpressionList);
         filteredLeftList = searchHelper.transformListsAndSetTableView(leftList, leftTableView);
-        rightList = FXCollections.observableArrayList(expressionsBelongingToGroupList);
+        rightList = FXCollections.observableArrayList(groupsBelongingToExpressionList);
         filteredRightList = searchHelper.transformListsAndSetTableView(rightList, rightTableView);
     }
 
@@ -94,9 +94,9 @@ public class EditGroupController {
     }
 
     private void initializeTableViewColumns() {
-        leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
+        leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         leftTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
-        rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
+        rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         rightTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
     }
 
@@ -115,31 +115,31 @@ public class EditGroupController {
         });
 
         TooltipWrapper<Button> createNewWrapper;
-        createNewWrapper = validationHelper.getTooltipWrapper(saveButton, "Gruppe kann nicht gespeichert werden:");
+        createNewWrapper = validationHelper.getTooltipWrapper(saveButton, "Wort kann nicht gespeichert werden:");
         buttonBar.getButtons().addAll(createNewWrapper, cancelButton);
     }
 
     private void initializeNameField() {
-        nameTextField.setText(groupToEdit.getName());
+        nameTextField.setText(expressionToEdit.getContent());
         Platform.runLater(() -> nameTextField.getParent().requestFocus());
     }
 
     private void initializeDateLabels() {
-        modificationDateLabel.setText(groupToEdit.getFormattedDateModified());
+        modificationDateLabel.setText(expressionToEdit.getFormattedDateModified());
     }
 
     private void searchTableViews() {
-        searchHelper.searchFilteredExpressionListForNameOnly(leftTableViewSearchTextField, filteredLeftList);
-        searchHelper.searchFilteredExpressionListForNameOnly(rightTableViewSearchTextField, filteredRightList);
+        searchHelper.searchFilteredGroupListForNameOnly(leftTableViewSearchTextField, filteredLeftList);
+        searchHelper.searchFilteredGroupListForNameOnly(rightTableViewSearchTextField, filteredRightList);
     }
 
     private void validateNewNameTextField() throws SQLException {
         validationHelper.checkIfEmpty(nameTextField);
         validationHelper.checkIfIncludesSpecialCharacter(nameTextField);
         validationHelper.checkIfTooLong(nameTextField);
-        List<Group> groups = connectionManager.getAllGroups();
-        groups.remove(groupToEdit);
-        validationHelper.checkIfGroupAlreadyExists(nameTextField, groups);
+        List<Expression> expressions = connectionManager.getAllExpressions();
+        expressions.remove(expressionToEdit);
+        validationHelper.checkIfExpressionAlreadyExists(nameTextField, expressions);
     }
 
     private void deselectListIfAnotherIsSelected() {
@@ -157,34 +157,34 @@ public class EditGroupController {
     }
 
     private void onSaveButtonClick() throws SQLException {
-        String newGroupName = nameTextField.getText().trim();
-        List<Expression> belongingExpressionsToDelete = new ArrayList<>(expressionsBelongingToGroupList);
-        List<Expression> belongingExpressionsToAdd = new ArrayList<>(rightList);
-        belongingExpressionsToDelete.removeAll(rightList);
-        belongingExpressionsToAdd.removeAll(expressionsBelongingToGroupList);
+        String newExpressionName = nameTextField.getText().trim();
+        List<Group> belongingGroupsToDelete = new ArrayList<>(groupsBelongingToExpressionList);
+        List<Group> belongingGroupsToAdd = new ArrayList<>(rightList);
+        belongingGroupsToDelete.removeAll(rightList);
+        belongingGroupsToAdd.removeAll(groupsBelongingToExpressionList);
 
-        if (newGroupName.equals(groupToEdit.getName()) && belongingExpressionsToAdd.isEmpty() && belongingExpressionsToDelete.isEmpty()) {
+        if (newExpressionName.equals(expressionToEdit.getContent()) && belongingGroupsToAdd.isEmpty() && belongingGroupsToDelete.isEmpty()) {
             Stage stage = (Stage) saveButton.getScene().getWindow();
             stage.close();
             return;
         }
-        if (!newGroupName.equals(groupToEdit.getName())) {
-            connectionManager.updateGroupName(groupToEdit, newGroupName);
-            groupToEdit.setName(newGroupName);
+        if (!newExpressionName.equals(expressionToEdit.getContent())) {
+            connectionManager.updateExpressionName(expressionToEdit, newExpressionName);
+            expressionToEdit.setContent(newExpressionName);
         }
-        if (!belongingExpressionsToDelete.isEmpty()) {
-            for (Expression expression : belongingExpressionsToDelete) {
-                connectionManager.deleteBelongToRelation(groupToEdit, expression);
-                connectionManager.updateExpressionModificationDate(expression);
+        if (!belongingGroupsToDelete.isEmpty()) {
+            for (Group group : belongingGroupsToDelete) {
+                connectionManager.deleteBelongToRelation(group, expressionToEdit);
+                connectionManager.updateGroupModificationDate(group);
             }
         }
-        if (!belongingExpressionsToAdd.isEmpty()) {
-            for (Expression expression : belongingExpressionsToAdd) {
-                connectionManager.addNewBelongToRelation(groupToEdit, expression);
-                connectionManager.updateExpressionModificationDate(expression);
+        if (!belongingGroupsToAdd.isEmpty()) {
+            for (Group group : belongingGroupsToAdd) {
+                connectionManager.addNewBelongToRelation(group, expressionToEdit);
+                connectionManager.updateGroupModificationDate(group);
             }
         }
-        connectionManager.updateGroupModificationDate(groupToEdit);
+        connectionManager.updateExpressionModificationDate(expressionToEdit);
         needToReloadData.set(true);
         Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.close();
