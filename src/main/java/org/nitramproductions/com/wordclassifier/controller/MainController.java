@@ -203,6 +203,13 @@ public class MainController {
             Parent root = fxmlLoader.load();
             createNewStage(root, "Gruppe bearbeiten", 783, 440);
         }
+        if (!rightTableView.getSelectionModel().isEmpty()) {
+            Expression expressionToEdit = rightTableView.getSelectionModel().getSelectedItem();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editExpression.fxml"));
+            fxmlLoader.setControllerFactory(controller -> new EditExpressionController(expressionToEdit, needToReloadData));
+            Parent root = fxmlLoader.load();
+            createNewStage(root, "Wort bearbeiten", 783, 440);
+        }
     }
 
     @FXML
