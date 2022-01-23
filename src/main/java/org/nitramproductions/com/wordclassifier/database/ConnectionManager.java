@@ -127,6 +127,11 @@ public class ConnectionManager {
         executeUpdateWithOneStringParameter(query, expression.getContent());
     }
 
+    public void deleteBelongToRelation(Group group, Expression expression) throws SQLException {
+        String query = "DELETE FROM BELONGS_TO WHERE NAME = ? AND CONTENT = ?;";
+        executeUpdateWithTwoStringParameters(query, group.getName(), expression.getContent());
+    }
+
     private List<Group> getGroupsFromResultSet(ResultSet resultSet) throws SQLException {
         List<Group> groups = new ArrayList<>();
         while (resultSet.next()) {
