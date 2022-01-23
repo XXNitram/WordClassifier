@@ -57,9 +57,9 @@ public class EditGroupController {
     private final ValidationHelper validationHelper = new ValidationHelper();
     private final SearchHelper searchHelper = new SearchHelper();
 
-    private Group groupToEdit;
+    private final Group groupToEdit;
+    private final BooleanProperty needToReloadData;
     private List<Expression> expressionsBelongingToGroupList;
-    private BooleanProperty needToReloadData;
 
     public EditGroupController(Group groupToEdit, BooleanProperty needToReloadData) {
         this.groupToEdit = groupToEdit;
