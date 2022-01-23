@@ -130,6 +130,7 @@ public class EditGroupController {
         validationHelper.checkIfIncludesSpecialCharacter(nameTextField);
         validationHelper.checkIfTooLong(nameTextField);
         List<Group> groups = connectionManager.getAllGroups();
+        groups.remove(groupToEdit);
         validationHelper.checkIfGroupAlreadyExists(nameTextField, groups);
     }
 
