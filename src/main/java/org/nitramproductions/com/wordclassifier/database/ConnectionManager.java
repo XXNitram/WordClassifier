@@ -107,6 +107,11 @@ public class ConnectionManager {
         executeUpdateWithTwoStringParameters(query, group.getName(), expression.getContent());
     }
 
+    public void updateGroupName(Group group, String newGroupName) throws SQLException {
+        String query = "UPDATE \"GROUP\" SET NAME = ? WHERE NAME = ?;";
+        executeUpdateWithTwoStringParameters(query, newGroupName, group.getName());
+    }
+
     public void updateGroupModificationDate(Group group) throws SQLException {
         String query = "UPDATE \"GROUP\" SET DATE_MODIFIED = ? WHERE NAME = ?;";
         executeUpdateWithStringAndDateParameters(query, LocalDateTime.now(), group.getName());
