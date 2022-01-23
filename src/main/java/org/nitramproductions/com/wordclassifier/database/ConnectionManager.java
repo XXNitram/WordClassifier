@@ -112,6 +112,11 @@ public class ConnectionManager {
         executeUpdateWithStringAndDateParameters(query, LocalDateTime.now(), group.getName());
     }
 
+    public void updateExpressionModificationDate(Expression expression) throws SQLException {
+        String query = "UPDATE EXPRESSION SET DATE_MODIFIED = ? WHERE CONTENT = ?;";
+        executeUpdateWithStringAndDateParameters(query, LocalDateTime.now(), expression.getContent());
+    }
+
     public void deleteGroup(Group group) throws SQLException {
         String query = "DELETE FROM \"GROUP\" WHERE NAME = ?;";
         executeUpdateWithOneStringParameter(query, group.getName());
