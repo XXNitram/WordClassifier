@@ -126,6 +126,7 @@ public class EditExpressionController {
 
     private void initializeDateLabels() {
         modificationDateLabel.setText(expressionToEdit.getFormattedDateModified());
+        creationDateLabel.setText(expressionToEdit.getFormattedCreationDate());
     }
 
     private void searchTableViews() {

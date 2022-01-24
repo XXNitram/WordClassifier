@@ -56,7 +56,7 @@ public class ConnectionManager {
     }
 
     public List<Expression> getAllExpressions() throws SQLException {
-        String query = "SELECT CONTENT, DATE_MODIFIED FROM EXPRESSION;";
+        String query = "SELECT CONTENT, DATE_MODIFIED, CREATION_DATE FROM EXPRESSION;";
         List<Expression> expressions;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -67,7 +67,7 @@ public class ConnectionManager {
     }
 
     public List<Group> getGroupsBelongingToExpression(Expression expression) throws SQLException {
-        String query = "SELECT g.NAME, g.DATE_MODIFIED FROM \"GROUP\" g, BELONGS_TO b WHERE g.NAME = b.NAME AND b.CONTENT = ?;";
+        String query = "SELECT g.NAME, g.DATE_MODIFIED, g.CREATION_DATE FROM \"GROUP\" g, BELONGS_TO b WHERE g.NAME = b.NAME AND b.CONTENT = ?;";
         List<Group> groups;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -80,7 +80,7 @@ public class ConnectionManager {
     }
 
     public List<Expression> getExpressionsBelongingToGroup(Group group) throws SQLException {
-        String query = "SELECT e.CONTENT, e.DATE_MODIFIED FROM EXPRESSION e, BELONGS_TO b WHERE e.CONTENT = b.CONTENT AND b.NAME = ?;";
+        String query = "SELECT e.CONTENT, e.DATE_MODIFIED, e.CREATION_DATE FROM EXPRESSION e, BELONGS_TO b WHERE e.CONTENT = b.CONTENT AND b.NAME = ?;";
         List<Expression> expressions;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -160,6 +160,7 @@ public class ConnectionManager {
             Expression expression = new Expression();
             expression.setContent(resultSet.getString("CONTENT"));
             expression.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
+            expression.setCreationDate(resultSet.getTimestamp("CREATION_DATE").toLocalDateTime());
             expressions.add(expression);
         }
         return expressions;
