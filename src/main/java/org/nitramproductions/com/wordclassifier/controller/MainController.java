@@ -73,6 +73,7 @@ public class MainController {
         initializeChoiceBoxes();
         initializeGroupLists();
         initializeExpressionLists();
+        initializeTableViews();
         initializeTableViewColumns();
 
         searchLeftTableView();
@@ -93,6 +94,35 @@ public class MainController {
     private void initializeExpressionLists() throws SQLException {
         observableExpressionList = FXCollections.observableArrayList(connectionManager.getAllExpressions());
         filteredExpressionList = searchHelper.transformListsAndSetTableView(observableExpressionList, rightTableView);
+    }
+
+    private void initializeTableViews() {
+        leftTableView.setRowFactory(tableView -> {
+            TableRow<Group> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty()) ) {
+                    try {
+                        openEditGroupView();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return row ;
+        });
+        rightTableView.setRowFactory(tableView -> {
+            TableRow<Expression> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty()) ) {
+                    try {
+                        openEditExpressionView();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return row;
+        });
     }
 
     private void initializeTableViewColumns() {
@@ -197,19 +227,27 @@ public class MainController {
     @FXML
     private void onEditButtonClick() throws IOException {
         if (!leftTableView.getSelectionModel().isEmpty()) {
-            Group groupToEdit = leftTableView.getSelectionModel().getSelectedItem();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editGroup.fxml"));
-            fxmlLoader.setControllerFactory(controller -> new EditGroupController(groupToEdit, needToReloadData));
-            Parent root = fxmlLoader.load();
-            createNewStage(root, "Gruppe bearbeiten", 783, 440);
+            openEditGroupView();
         }
         if (!rightTableView.getSelectionModel().isEmpty()) {
-            Expression expressionToEdit = rightTableView.getSelectionModel().getSelectedItem();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editExpression.fxml"));
-            fxmlLoader.setControllerFactory(controller -> new EditExpressionController(expressionToEdit, needToReloadData));
-            Parent root = fxmlLoader.load();
-            createNewStage(root, "Wort bearbeiten", 783, 440);
+            openEditExpressionView();
         }
+    }
+
+    private void openEditGroupView() throws IOException {
+        Group groupToEdit = leftTableView.getSelectionModel().getSelectedItem();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editGroup.fxml"));
+        fxmlLoader.setControllerFactory(controller -> new EditGroupController(groupToEdit, needToReloadData));
+        Parent root = fxmlLoader.load();
+        createNewStage(root, "Gruppe bearbeiten", 783, 440);
+    }
+
+    private void openEditExpressionView() throws IOException {
+        Expression expressionToEdit = rightTableView.getSelectionModel().getSelectedItem();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editExpression.fxml"));
+        fxmlLoader.setControllerFactory(controller -> new EditExpressionController(expressionToEdit, needToReloadData));
+        Parent root = fxmlLoader.load();
+        createNewStage(root, "Wort bearbeiten", 783, 440);
     }
 
     @FXML
