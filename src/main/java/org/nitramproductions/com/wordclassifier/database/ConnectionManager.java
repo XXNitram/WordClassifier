@@ -45,7 +45,7 @@ public class ConnectionManager {
     }
 
     public List<Group> getAllGroups() throws SQLException {
-        String query = "SELECT NAME, DATE_MODIFIED FROM \"GROUP\";";
+        String query = "SELECT NAME, DATE_MODIFIED, CREATION_DATE FROM \"GROUP\";";
         List<Group> groups;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -148,6 +148,7 @@ public class ConnectionManager {
             Group group = new Group();
             group.setName(resultSet.getString("NAME"));
             group.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
+            group.setCreationDate(resultSet.getTimestamp("CREATION_DATE").toLocalDateTime());
             groups.add(group);
         }
         return groups;

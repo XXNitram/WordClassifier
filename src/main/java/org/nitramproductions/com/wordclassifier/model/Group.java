@@ -14,20 +14,24 @@ public class Group {
 
     private final StringProperty name;
     private final ObjectProperty<LocalDateTime> dateModified;
+    private final ObjectProperty<LocalDateTime> creationDate;
     private StringProperty formattedDateModified;
+    private StringProperty formattedCreationDate;
 
     public Group() {
-        this(null, null);
+        this(null, null, null);
     }
 
     public Group(String name) {
-        this(name, null);
+        this(name, null, null);
     }
 
-    public Group(String name, LocalDateTime dateModified) {
+    public Group(String name, LocalDateTime dateModified, LocalDateTime creationDate) {
         this.name = new SimpleStringProperty(name);
         this.dateModified = new SimpleObjectProperty<>(dateModified);
-        localDatePropertyToStringProperty(dateModified);
+        setFormattedDateModified(dateModified);
+        this.creationDate = new SimpleObjectProperty<>(creationDate);
+        setFormattedCreationDate(creationDate);
     }
 
     public String getName() {
@@ -52,7 +56,20 @@ public class Group {
 
     public void setDateModified(LocalDateTime dateModified) {
         this.dateModified.set(dateModified);
-        localDatePropertyToStringProperty(dateModified);
+        setFormattedDateModified(dateModified);
+    }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate.get();
+    }
+
+    public ObjectProperty<LocalDateTime> creationDateProperty() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate.set(creationDate);
+        setFormattedCreationDate(creationDate);
     }
 
     public String getFormattedDateModified() {
@@ -63,12 +80,29 @@ public class Group {
         return formattedDateModified;
     }
 
-    private void localDatePropertyToStringProperty(LocalDateTime localDateTime) {
+    public String getFormattedCreationDate() {
+        return formattedCreationDate.get();
+    }
+
+    public StringProperty formattedCreationDateProperty() {
+        return formattedCreationDate;
+    }
+
+    private void setFormattedDateModified(LocalDateTime localDateTime) {
         if (localDateTime != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm", Locale.GERMAN);
-            String newFormat = localDateTime.format(formatter);
-            formattedDateModified = new SimpleStringProperty(newFormat);
+            formattedDateModified = new SimpleStringProperty(formatLocalDateTime(localDateTime));
         }
+    }
+
+    private void setFormattedCreationDate(LocalDateTime creationDate) {
+        if (creationDate != null) {
+            formattedCreationDate = new SimpleStringProperty(formatLocalDateTime(creationDate));
+        }
+    }
+
+    private String formatLocalDateTime(LocalDateTime localDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm", Locale.GERMAN);
+        return localDateTime.format(formatter);
     }
 
     @Override

@@ -126,6 +126,7 @@ public class EditGroupController {
 
     private void initializeDateLabels() {
         modificationDateLabel.setText(groupToEdit.getFormattedDateModified());
+        creationDateLabel.setText(groupToEdit.getFormattedCreationDate());
     }
 
     private void searchTableViews() {
