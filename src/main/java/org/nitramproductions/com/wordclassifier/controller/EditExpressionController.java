@@ -1,5 +1,6 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,14 +18,19 @@ import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
-public class CreateExpressionController {
+public class EditExpressionController {
 
     @FXML
     private ButtonBar buttonBar;
     @FXML
-    private TextField newNameTextField;
+    private TextField nameTextField;
+    @FXML
+    private Label creationDateLabel;
+    @FXML
+    private Label modificationDateLabel;
     @FXML
     private TextField leftTableViewSearchTextField;
     @FXML
@@ -43,7 +49,7 @@ public class CreateExpressionController {
     private ObservableList<Group> rightList;
     private FilteredList<Group> filteredRightList;
 
-    private final Button createNewButton = new Button("Erstellen");
+    private final Button saveButton = new Button("Speichern");
     private final Button cancelButton = new Button("Abbrechen");
 
     private final ConnectionManager connectionManager = new ConnectionManager();
@@ -51,18 +57,24 @@ public class CreateExpressionController {
     private final ValidationHelper validationHelper = new ValidationHelper();
     private final SearchHelper searchHelper = new SearchHelper();
 
-    private BooleanProperty needToReloadData;
+    private final Expression expressionToEdit;
+    private final BooleanProperty needToReloadData;
+    private List<Group> groupsBelongingToExpressionList;
 
-    public CreateExpressionController() {
-
+    public EditExpressionController(Expression expressionToEdit, BooleanProperty needToReloadData) {
+        this.expressionToEdit = expressionToEdit;
+        this.needToReloadData = needToReloadData;
     }
 
     @FXML
     private void initialize() throws SQLException {
+        groupsBelongingToExpressionList = connectionManager.getGroupsBelongingToExpression(expressionToEdit);
         initializeLists();
         initializeTableViews();
         initializeTableViewColumns();
         initializeButtons();
+        initializeNameField();
+        initializeDateLabels();
         searchTableViews();
         validateNewNameTextField();
         deselectListIfAnotherIsSelected();
@@ -70,8 +82,9 @@ public class CreateExpressionController {
 
     private void initializeLists() throws SQLException {
         leftList = FXCollections.observableArrayList(connectionManager.getAllGroups());
+        leftList.removeAll(groupsBelongingToExpressionList);
         filteredLeftList = searchHelper.transformListsAndSetTableView(leftList, leftTableView);
-        rightList = FXCollections.observableArrayList();
+        rightList = FXCollections.observableArrayList(groupsBelongingToExpressionList);
         filteredRightList = searchHelper.transformListsAndSetTableView(rightList, rightTableView);
     }
 
@@ -89,15 +102,31 @@ public class CreateExpressionController {
 
     private void initializeButtons() {
         cancelButton.setCancelButton(true);
-        createNewButton.setDefaultButton(true);
+        saveButton.setDefaultButton(true);
         cancelButton.translateXProperty().set(-20);
-        createNewButton.translateXProperty().set(-25);
+        saveButton.translateXProperty().set(-25);
         cancelButton.setOnAction(e -> onCancelButtonClick());
-        createNewButton.setOnAction(e -> onCreateNewButtonClick());
+        saveButton.setOnAction(e -> {
+            try {
+                onSaveButtonClick();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         TooltipWrapper<Button> createNewWrapper;
-        createNewWrapper = validationHelper.getTooltipWrapper(createNewButton, "Wort kann nicht erstellt werden:");
+        createNewWrapper = validationHelper.getTooltipWrapper(saveButton, "Wort kann nicht gespeichert werden:");
         buttonBar.getButtons().addAll(createNewWrapper, cancelButton);
+    }
+
+    private void initializeNameField() {
+        nameTextField.setText(expressionToEdit.getContent());
+        Platform.runLater(() -> nameTextField.getParent().requestFocus());
+    }
+
+    private void initializeDateLabels() {
+        modificationDateLabel.setText(expressionToEdit.getFormattedDateModified());
+        creationDateLabel.setText(expressionToEdit.getFormattedCreationDate());
     }
 
     private void searchTableViews() {
@@ -106,11 +135,12 @@ public class CreateExpressionController {
     }
 
     private void validateNewNameTextField() throws SQLException {
-        validationHelper.checkIfEmpty(newNameTextField);
-        validationHelper.checkIfIncludesSpecialCharacter(newNameTextField);
-        validationHelper.checkIfTooLong(newNameTextField);
+        validationHelper.checkIfEmpty(nameTextField);
+        validationHelper.checkIfIncludesSpecialCharacter(nameTextField);
+        validationHelper.checkIfTooLong(nameTextField);
         List<Expression> expressions = connectionManager.getAllExpressions();
-        validationHelper.checkIfExpressionAlreadyExists(newNameTextField, expressions);
+        expressions.remove(expressionToEdit);
+        validationHelper.checkIfExpressionAlreadyExists(nameTextField, expressions);
     }
 
     private void deselectListIfAnotherIsSelected() {
@@ -127,32 +157,42 @@ public class CreateExpressionController {
         selectionHelper.transferSelectedItemsToAnotherList(rightTableView, rightList, leftList);
     }
 
-    private void onCreateNewButtonClick() {
-        String newExpressionName = newNameTextField.getText().trim();
-        Expression newExpression = new Expression(newExpressionName);
-        try {
-            connectionManager.addNewExpression(newExpression);
-            if (!rightList.isEmpty()) {
-                for (Group group : rightList) {
-                    connectionManager.addNewBelongToRelation(group, newExpression);
-                    connectionManager.updateGroupModificationDate(group);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private void onSaveButtonClick() throws SQLException {
+        String newExpressionName = nameTextField.getText().trim();
+        List<Group> belongingGroupsToDelete = new ArrayList<>(groupsBelongingToExpressionList);
+        List<Group> belongingGroupsToAdd = new ArrayList<>(rightList);
+        belongingGroupsToDelete.removeAll(rightList);
+        belongingGroupsToAdd.removeAll(groupsBelongingToExpressionList);
 
+        if (newExpressionName.equals(expressionToEdit.getContent()) && belongingGroupsToAdd.isEmpty() && belongingGroupsToDelete.isEmpty()) {
+            Stage stage = (Stage) saveButton.getScene().getWindow();
+            stage.close();
+            return;
+        }
+        if (!newExpressionName.equals(expressionToEdit.getContent())) {
+            connectionManager.updateExpressionName(expressionToEdit, newExpressionName);
+            expressionToEdit.setContent(newExpressionName);
+        }
+        if (!belongingGroupsToDelete.isEmpty()) {
+            for (Group group : belongingGroupsToDelete) {
+                connectionManager.deleteBelongToRelation(group, expressionToEdit);
+                connectionManager.updateGroupModificationDate(group);
+            }
+        }
+        if (!belongingGroupsToAdd.isEmpty()) {
+            for (Group group : belongingGroupsToAdd) {
+                connectionManager.addNewBelongToRelation(group, expressionToEdit);
+                connectionManager.updateGroupModificationDate(group);
+            }
+        }
+        connectionManager.updateExpressionModificationDate(expressionToEdit);
         needToReloadData.set(true);
-        Stage stage = (Stage) createNewButton.getScene().getWindow();
+        Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.close();
     }
 
     private void onCancelButtonClick() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
-    }
-
-    public void setNeedToReloadDataBooleanProperty(BooleanProperty needToReloadData) {
-        this.needToReloadData = needToReloadData;
     }
 }

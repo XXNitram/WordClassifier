@@ -91,7 +91,7 @@
                            </padding>
                         </ToggleSwitch>
                         <Label layoutX="278.0" layoutY="11.0" minWidth="55.0" prefHeight="17.0" text="Wörter" AnchorPane.bottomAnchor="11.0" AnchorPane.rightAnchor="183.0" />
-                      <Button focusTraversable="false" layoutX="351.0" layoutY="7.0" mnemonicParsing="false" text="Bearbeiten" visible="false" AnchorPane.bottomAnchor="7.0" AnchorPane.rightAnchor="92.0" />
+                      <Button focusTraversable="false" layoutX="351.0" layoutY="7.0" mnemonicParsing="false" onAction="#onEditButtonClick" text="Bearbeiten" AnchorPane.bottomAnchor="7.0" AnchorPane.rightAnchor="92.0" />
                         <Button focusTraversable="false" layoutX="442.0" layoutY="7.0" mnemonicParsing="false" onAction="#onDeleteButtonClick" text="Löschen" AnchorPane.bottomAnchor="7.0" AnchorPane.rightAnchor="14.0" />
                      </children>
                   </AnchorPane>

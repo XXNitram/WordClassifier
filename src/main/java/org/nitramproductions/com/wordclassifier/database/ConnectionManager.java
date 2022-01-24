@@ -45,7 +45,7 @@ public class ConnectionManager {
     }
 
     public List<Group> getAllGroups() throws SQLException {
-        String query = "SELECT NAME, DATE_MODIFIED FROM \"GROUP\";";
+        String query = "SELECT NAME, DATE_MODIFIED, CREATION_DATE FROM \"GROUP\";";
         List<Group> groups;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -56,7 +56,7 @@ public class ConnectionManager {
     }
 
     public List<Expression> getAllExpressions() throws SQLException {
-        String query = "SELECT CONTENT, DATE_MODIFIED FROM EXPRESSION;";
+        String query = "SELECT CONTENT, DATE_MODIFIED, CREATION_DATE FROM EXPRESSION;";
         List<Expression> expressions;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -67,7 +67,7 @@ public class ConnectionManager {
     }
 
     public List<Group> getGroupsBelongingToExpression(Expression expression) throws SQLException {
-        String query = "SELECT g.NAME, g.DATE_MODIFIED FROM \"GROUP\" g, BELONGS_TO b WHERE g.NAME = b.NAME AND b.CONTENT = ?;";
+        String query = "SELECT g.NAME, g.DATE_MODIFIED, g.CREATION_DATE FROM \"GROUP\" g, BELONGS_TO b WHERE g.NAME = b.NAME AND b.CONTENT = ?;";
         List<Group> groups;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -80,7 +80,7 @@ public class ConnectionManager {
     }
 
     public List<Expression> getExpressionsBelongingToGroup(Group group) throws SQLException {
-        String query = "SELECT e.CONTENT, e.DATE_MODIFIED FROM EXPRESSION e, BELONGS_TO b WHERE e.CONTENT = b.CONTENT AND b.NAME = ?;";
+        String query = "SELECT e.CONTENT, e.DATE_MODIFIED, e.CREATION_DATE FROM EXPRESSION e, BELONGS_TO b WHERE e.CONTENT = b.CONTENT AND b.NAME = ?;";
         List<Expression> expressions;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -107,6 +107,16 @@ public class ConnectionManager {
         executeUpdateWithTwoStringParameters(query, group.getName(), expression.getContent());
     }
 
+    public void updateGroupName(Group group, String newGroupName) throws SQLException {
+        String query = "UPDATE \"GROUP\" SET NAME = ? WHERE NAME = ?;";
+        executeUpdateWithTwoStringParameters(query, newGroupName, group.getName());
+    }
+
+    public void updateExpressionName(Expression expression, String newExpressionName) throws SQLException {
+        String query = "UPDATE EXPRESSION SET CONTENT = ? WHERE CONTENT = ?;";
+        executeUpdateWithTwoStringParameters(query, newExpressionName, expression.getContent());
+    }
+
     public void updateGroupModificationDate(Group group) throws SQLException {
         String query = "UPDATE \"GROUP\" SET DATE_MODIFIED = ? WHERE NAME = ?;";
         executeUpdateWithStringAndDateParameters(query, LocalDateTime.now(), group.getName());
@@ -127,12 +137,18 @@ public class ConnectionManager {
         executeUpdateWithOneStringParameter(query, expression.getContent());
     }
 
+    public void deleteBelongToRelation(Group group, Expression expression) throws SQLException {
+        String query = "DELETE FROM BELONGS_TO WHERE NAME = ? AND CONTENT = ?;";
+        executeUpdateWithTwoStringParameters(query, group.getName(), expression.getContent());
+    }
+
     private List<Group> getGroupsFromResultSet(ResultSet resultSet) throws SQLException {
         List<Group> groups = new ArrayList<>();
         while (resultSet.next()) {
             Group group = new Group();
             group.setName(resultSet.getString("NAME"));
             group.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
+            group.setCreationDate(resultSet.getTimestamp("CREATION_DATE").toLocalDateTime());
             groups.add(group);
         }
         return groups;
@@ -144,6 +160,7 @@ public class ConnectionManager {
             Expression expression = new Expression();
             expression.setContent(resultSet.getString("CONTENT"));
             expression.setDateModified(resultSet.getTimestamp("DATE_MODIFIED").toLocalDateTime());
+            expression.setCreationDate(resultSet.getTimestamp("CREATION_DATE").toLocalDateTime());
             expressions.add(expression);
         }
         return expressions;
