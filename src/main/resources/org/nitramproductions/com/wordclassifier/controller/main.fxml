@@ -27,18 +27,21 @@
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#onCreateNewGroupMenuItemClick" text="Gruppe">
                            <accelerator>
-                              <KeyCodeCombination alt="DOWN" code="G" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                              <KeyCodeCombination alt="DOWN" code="G" control="UP" meta="UP" shift="UP" shortcut="UP" />
                            </accelerator>
                         </MenuItem>
                         <MenuItem mnemonicParsing="false" onAction="#onCreateNewExpressionMenuItemClick" text="Wort">
                            <accelerator>
-                              <KeyCodeCombination alt="DOWN" code="W" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                              <KeyCodeCombination alt="DOWN" code="W" control="UP" meta="UP" shift="UP" shortcut="UP" />
                            </accelerator>
                         </MenuItem>
                     </items>
                   </Menu>
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" onAction="#onCloseMenuItemClick" text="Schließen" />
+                  <MenuItem mnemonicParsing="false" onAction="#onCloseMenuItemClick" text="Schließen">
+                     <accelerator>
+                        <KeyCodeCombination alt="DOWN" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Ansicht">

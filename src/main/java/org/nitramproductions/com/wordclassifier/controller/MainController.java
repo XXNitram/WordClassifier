@@ -11,6 +11,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
@@ -70,10 +73,12 @@ public class MainController {
 
     @FXML
     private void initialize() throws SQLException {
-        initializeChoiceBoxes();
         initializeGroupLists();
         initializeExpressionLists();
+        initializeTableViews();
         initializeTableViewColumns();
+        initializeChoiceBoxes();
+        initializeKeyboardShortcuts();
 
         searchLeftTableView();
         searchRightTableView();
@@ -95,6 +100,35 @@ public class MainController {
         filteredExpressionList = searchHelper.transformListsAndSetTableView(observableExpressionList, rightTableView);
     }
 
+    private void initializeTableViews() {
+        leftTableView.setRowFactory(tableView -> {
+            TableRow<Group> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty()) ) {
+                    try {
+                        openEditGroupView();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return row ;
+        });
+        rightTableView.setRowFactory(tableView -> {
+            TableRow<Expression> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty()) ) {
+                    try {
+                        openEditExpressionView();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return row;
+        });
+    }
+
     private void initializeTableViewColumns() {
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         leftTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
@@ -112,6 +146,29 @@ public class MainController {
         leftTableViewChoiceBox.getSelectionModel().select("Name");
         rightTableViewChoiceBox.getItems().addAll("Name", "Änderungsdatum");
         rightTableViewChoiceBox.getSelectionModel().select("Name");
+    }
+
+    private void initializeKeyboardShortcuts() {
+        KeyCombination keyCombinationEdit = new KeyCodeCombination(KeyCode.E, KeyCombination.ALT_DOWN);
+        KeyCombination keyCombinationDelete = new KeyCodeCombination(KeyCode.DELETE);
+        Runnable runnableEdit = () -> {
+            try {
+                onEditButtonClick();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+        Runnable runnableDelete = () -> {
+            try {
+                onDeleteButtonClick();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        };
+        menuBar.sceneProperty().addListener((observableValue, oldSelection, newSelection) -> {
+            menuBar.getScene().getAccelerators().put(keyCombinationEdit, runnableEdit);
+            menuBar.getScene().getAccelerators().put(keyCombinationDelete, runnableDelete);
+        });
     }
 
     private void searchLeftTableView() {
@@ -197,19 +254,27 @@ public class MainController {
     @FXML
     private void onEditButtonClick() throws IOException {
         if (!leftTableView.getSelectionModel().isEmpty()) {
-            Group groupToEdit = leftTableView.getSelectionModel().getSelectedItem();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editGroup.fxml"));
-            fxmlLoader.setControllerFactory(controller -> new EditGroupController(groupToEdit, needToReloadData));
-            Parent root = fxmlLoader.load();
-            createNewStage(root, "Gruppe bearbeiten", 783, 440);
+            openEditGroupView();
         }
         if (!rightTableView.getSelectionModel().isEmpty()) {
-            Expression expressionToEdit = rightTableView.getSelectionModel().getSelectedItem();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editExpression.fxml"));
-            fxmlLoader.setControllerFactory(controller -> new EditExpressionController(expressionToEdit, needToReloadData));
-            Parent root = fxmlLoader.load();
-            createNewStage(root, "Wort bearbeiten", 783, 440);
+            openEditExpressionView();
         }
+    }
+
+    private void openEditGroupView() throws IOException {
+        Group groupToEdit = leftTableView.getSelectionModel().getSelectedItem();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editGroup.fxml"));
+        fxmlLoader.setControllerFactory(controller -> new EditGroupController(groupToEdit, needToReloadData));
+        Parent root = fxmlLoader.load();
+        createNewStage(root, "Gruppe bearbeiten", 783, 440);
+    }
+
+    private void openEditExpressionView() throws IOException {
+        Expression expressionToEdit = rightTableView.getSelectionModel().getSelectedItem();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editExpression.fxml"));
+        fxmlLoader.setControllerFactory(controller -> new EditExpressionController(expressionToEdit, needToReloadData));
+        Parent root = fxmlLoader.load();
+        createNewStage(root, "Wort bearbeiten", 783, 440);
     }
 
     @FXML
