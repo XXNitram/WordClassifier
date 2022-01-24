@@ -11,6 +11,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
@@ -70,11 +73,12 @@ public class MainController {
 
     @FXML
     private void initialize() throws SQLException {
-        initializeChoiceBoxes();
         initializeGroupLists();
         initializeExpressionLists();
         initializeTableViews();
         initializeTableViewColumns();
+        initializeChoiceBoxes();
+        initializeKeyboardShortcuts();
 
         searchLeftTableView();
         searchRightTableView();
@@ -142,6 +146,29 @@ public class MainController {
         leftTableViewChoiceBox.getSelectionModel().select("Name");
         rightTableViewChoiceBox.getItems().addAll("Name", "Änderungsdatum");
         rightTableViewChoiceBox.getSelectionModel().select("Name");
+    }
+
+    private void initializeKeyboardShortcuts() {
+        KeyCombination keyCombinationEdit = new KeyCodeCombination(KeyCode.E, KeyCombination.ALT_DOWN);
+        KeyCombination keyCombinationDelete = new KeyCodeCombination(KeyCode.DELETE);
+        Runnable runnableEdit = () -> {
+            try {
+                onEditButtonClick();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+        Runnable runnableDelete = () -> {
+            try {
+                onDeleteButtonClick();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        };
+        menuBar.sceneProperty().addListener((observableValue, oldSelection, newSelection) -> {
+            menuBar.getScene().getAccelerators().put(keyCombinationEdit, runnableEdit);
+            menuBar.getScene().getAccelerators().put(keyCombinationDelete, runnableDelete);
+        });
     }
 
     private void searchLeftTableView() {
