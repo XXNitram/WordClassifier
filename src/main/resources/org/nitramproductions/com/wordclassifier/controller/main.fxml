@@ -27,12 +27,12 @@
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#onCreateNewGroupMenuItemClick" text="Gruppe">
                            <accelerator>
-                              <KeyCodeCombination alt="DOWN" code="G" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                              <KeyCodeCombination alt="DOWN" code="G" control="UP" meta="UP" shift="UP" shortcut="UP" />
                            </accelerator>
                         </MenuItem>
                         <MenuItem mnemonicParsing="false" onAction="#onCreateNewExpressionMenuItemClick" text="Wort">
                            <accelerator>
-                              <KeyCodeCombination alt="DOWN" code="W" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                              <KeyCodeCombination alt="DOWN" code="W" control="UP" meta="UP" shift="UP" shortcut="UP" />
                            </accelerator>
                         </MenuItem>
                     </items>
