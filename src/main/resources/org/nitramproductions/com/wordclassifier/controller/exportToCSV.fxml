@@ -17,18 +17,18 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <CheckBox layoutX="14.0" layoutY="39.0" mnemonicParsing="false" text="Name" />
-                        <CheckBox layoutX="14.0" layoutY="62.0" mnemonicParsing="false" text="Änderungsdatum" />
-                        <CheckBox layoutX="14.0" layoutY="85.0" mnemonicParsing="false" text="Erstelldatum" />
-                        <TextField disable="true" editable="false" layoutX="143.0" layoutY="113.0" prefHeight="25.0" prefWidth="191.0" promptText="Speicherpfad..." />
+                        <CheckBox fx:id="groupNameCheckBox" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" text="Name" />
+                        <CheckBox fx:id="groupDateModifiedCheckBox" layoutX="14.0" layoutY="62.0" mnemonicParsing="false" text="Änderungsdatum" />
+                        <CheckBox fx:id="groupCreationDateCheckBox" layoutX="14.0" layoutY="85.0" mnemonicParsing="false" text="Erstelldatum" />
+                        <TextField fx:id="groupSaveDestinationTextField" disable="true" editable="false" layoutX="143.0" layoutY="113.0" prefHeight="25.0" prefWidth="191.0" promptText="Speicherpfad..." />
                         <Label layoutX="14.0" layoutY="14.0" text="Zu exportierende Spalten:">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Label>
-                        <Button layoutX="14.0" layoutY="113.0" mnemonicParsing="false" text="Speicherort festlegen" />
-                        <Button cancelButton="true" layoutX="260.0" layoutY="161.0" mnemonicParsing="false" text="Abbrechen" />
-                        <Button defaultButton="true" layoutX="173.0" layoutY="161.0" mnemonicParsing="false" text="Exportieren" />
+                        <Button fx:id="groupSelectSaveDestinationButton" layoutX="14.0" layoutY="113.0" mnemonicParsing="false" text="Speicherort festlegen" />
+                        <Button cancelButton="true" layoutX="260.0" layoutY="161.0" mnemonicParsing="false" onAction="#onCancelButtonClick" text="Abbrechen" />
+                        <Button defaultButton="true" layoutX="173.0" layoutY="161.0" mnemonicParsing="false" onAction="#onGroupExportButtonClick" text="Exportieren" />
                      </children>
                   </AnchorPane>
             </content>
