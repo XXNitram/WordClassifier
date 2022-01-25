@@ -334,6 +334,13 @@ public class MainController {
     }
 
     @FXML
+    private void onExportCSVMenuItemClick() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("exportToCSV.fxml"));
+        Parent root = fxmlLoader.load();
+        createNewStage(root, "Exportieren", 350, 230);
+    }
+
+    @FXML
     private void onAboutMenuItemClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about.fxml"));
         Parent root = fxmlLoader.load();
