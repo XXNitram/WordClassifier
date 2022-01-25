@@ -5,11 +5,13 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
 import org.nitramproductions.com.wordclassifier.database.helper.Columns;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +25,11 @@ public class ExportToCSVController {
     @FXML
     private CheckBox groupCreationDateCheckBox;
     @FXML
-    private Button groupSelectSaveDestinationButton;
-    @FXML
-    private TextField groupSaveDestinationTextField;
+    private Label groupSaveLocationLabel;
     @FXML
     private Button groupExportButton;
 
+    private String groupSaveLocation;
     private final CSVManager csvManager = new CSVManager();
 
     public ExportToCSVController() {
@@ -38,6 +39,18 @@ public class ExportToCSVController {
     @FXML
     private void initialize() {
 
+    }
+
+    @FXML
+    private void onGroupSelectSaveLocationButtonClick(ActionEvent event) {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedDirectory = directoryChooser.showDialog(stage);
+        if (selectedDirectory != null) {
+            groupSaveLocation = selectedDirectory.getAbsolutePath();
+            groupSaveLocationLabel.setText(groupSaveLocation);
+        }
     }
 
     @FXML
