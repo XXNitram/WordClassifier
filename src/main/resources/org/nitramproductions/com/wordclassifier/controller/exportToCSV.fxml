@@ -28,7 +28,7 @@
                         </Label>
                         <Button fx:id="groupSelectSaveDestinationButton" layoutX="14.0" layoutY="113.0" mnemonicParsing="false" text="Speicherort festlegen" />
                         <Button cancelButton="true" layoutX="260.0" layoutY="161.0" mnemonicParsing="false" onAction="#onCancelButtonClick" text="Abbrechen" />
-                        <Button defaultButton="true" layoutX="173.0" layoutY="161.0" mnemonicParsing="false" onAction="#onGroupExportButtonClick" text="Exportieren" />
+                        <Button fx:id="groupExportButton" defaultButton="true" layoutX="173.0" layoutY="161.0" mnemonicParsing="false" onAction="#onGroupExportButtonClick" text="Exportieren" />
                      </children>
                   </AnchorPane>
             </content>
