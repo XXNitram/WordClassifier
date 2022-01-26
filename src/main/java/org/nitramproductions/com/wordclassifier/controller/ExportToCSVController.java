@@ -26,9 +26,23 @@ public class ExportToCSVController {
     @FXML
     private Label groupSaveLocationLabel;
     @FXML
-    private Button groupExportButton;
+    private CheckBox expressionContentCheckBox;
+    @FXML
+    private CheckBox expressionDateModifiedCheckBox;
+    @FXML
+    private CheckBox expressionCreationDateCheckBox;
+    @FXML
+    private Label expressionSaveLocationLabel;
+    @FXML
+    private CheckBox belongToNameCheckBox;
+    @FXML
+    private CheckBox belongToContentCheckBox;
+    @FXML
+    private Label belongToSaveLocationLabel;
 
     private String groupSaveLocation;
+    private String expressionSaveLocation;
+    private String belongToSaveLocation;
     private final CSVManager csvManager = new CSVManager();
 
     public ExportToCSVController() {
@@ -55,19 +69,35 @@ public class ExportToCSVController {
     }
 
     @FXML
-    private void onGroupExportButtonClick() throws SQLException {
-        List<Columns> groupColumns = new ArrayList<>();
-        Stage stage = (Stage) groupExportButton.getScene().getWindow();
+    private void onExpressionSelectSaveLocationButtonClick(ActionEvent event) {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("wörter");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Dateien", "*.csv"));
+        File selectedFile = fileChooser.showSaveDialog(stage);
+        if (selectedFile != null) {
+            expressionSaveLocation = selectedFile.getAbsolutePath();
+            expressionSaveLocationLabel.setText(expressionSaveLocation);
+        }
+    }
+
+    @FXML
+    private void onBelongsToSelectSaveLocationButtonClick(ActionEvent event) {
+
+    }
+
+    @FXML
+    private void onGroupExportButtonClick(ActionEvent event) throws SQLException {
         if (!groupNameCheckBox.isSelected() && !groupDateModifiedCheckBox.isSelected() && !groupCreationDateCheckBox.isSelected()) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
             alert.showAndWait();
             return;
         }
-        if (groupSaveLocation == null || groupSaveLocation.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
-            alert.showAndWait();
+        if (alertIfNoFileLocationIsSpecified(groupSaveLocation)) {
             return;
         }
+        List<Columns> groupColumns = new ArrayList<>();
         if (groupNameCheckBox.isSelected()) {
             groupColumns.add(Columns.NAME);
         }
@@ -78,7 +108,40 @@ public class ExportToCSVController {
             groupColumns.add(Columns.CREATION_DATE);
         }
         csvManager.writeSpecificGroupColumnsToCSV(groupColumns, groupSaveLocation);
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void onExpressionExportButtonClick(ActionEvent event) throws SQLException {
+        if (!expressionContentCheckBox.isSelected() && !expressionDateModifiedCheckBox.isSelected() && !expressionCreationDateCheckBox.isSelected()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
+            alert.showAndWait();
+            return;
+        }
+        if (alertIfNoFileLocationIsSpecified(expressionSaveLocation)) {
+            return;
+        }
+        List<Columns> expressionColumns = new ArrayList<>();
+        if (expressionContentCheckBox.isSelected()) {
+            expressionColumns.add(Columns.CONTENT);
+        }
+        if (expressionDateModifiedCheckBox.isSelected()) {
+            expressionColumns.add(Columns.DATE_MODIFIED);
+        }
+        if (expressionCreationDateCheckBox.isSelected()) {
+            expressionColumns.add(Columns.CREATION_DATE);
+        }
+        csvManager.writeSpecificExpressionColumnsToCSV(expressionColumns, expressionSaveLocation);
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
+        stage.close();
+    }
+
+    @FXML
+    private void onBelongsToExportButtonClick(ActionEvent event) {
+
     }
 
     @FXML
@@ -86,5 +149,14 @@ public class ExportToCSVController {
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
+    }
+
+    private boolean alertIfNoFileLocationIsSpecified(String saveLocation) {
+        if (saveLocation == null || saveLocation.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
+            alert.showAndWait();
+            return true;
+        }
+        return false;
     }
 }
