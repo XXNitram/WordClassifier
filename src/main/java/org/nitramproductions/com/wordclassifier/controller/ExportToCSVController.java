@@ -45,6 +45,7 @@ public class ExportToCSVController {
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("gruppen");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Dateien", "*.csv"));
         File selectedFile = fileChooser.showSaveDialog(stage);
         if (selectedFile != null) {
