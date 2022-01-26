@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
 import org.nitramproductions.com.wordclassifier.database.helper.Columns;
@@ -43,10 +44,11 @@ public class ExportToCSVController {
     private void onGroupSelectSaveLocationButtonClick(ActionEvent event) {
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        File selectedDirectory = directoryChooser.showDialog(stage);
-        if (selectedDirectory != null) {
-            groupSaveLocation = selectedDirectory.getAbsolutePath();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Dateien", "*.csv"));
+        File selectedFile = fileChooser.showSaveDialog(stage);
+        if (selectedFile != null) {
+            groupSaveLocation = selectedFile.getAbsolutePath();
             groupSaveLocationLabel.setText(groupSaveLocation);
         }
     }
@@ -74,7 +76,7 @@ public class ExportToCSVController {
         if (groupCreationDateCheckBox.isSelected()) {
             groupColumns.add(Columns.CREATION_DATE);
         }
-        csvManager.writeSpecificGroupColumnsToCSV(groupColumns);
+        csvManager.writeSpecificGroupColumnsToCSV(groupColumns, groupSaveLocation);
         stage.close();
     }
 

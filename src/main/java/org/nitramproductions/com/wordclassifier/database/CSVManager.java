@@ -16,24 +16,24 @@ public class CSVManager {
 
     }
 
-    public void writeSpecificGroupColumnsToCSV(List<Columns> columns) throws SQLException {
+    public void writeSpecificGroupColumnsToCSV(List<Columns> columns, String filePath) throws SQLException {
         String query = queryHelper.getSpecificGroupColumnsQuery(columns);
         try (Connection connection = DataSource.getConnection()) {
-            new Csv().write(connection, "C:\\Users\\matti\\Documents\\Privat\\test.csv", query, null);
+            new Csv().write(connection, filePath, query, null);
         }
     }
 
-    public void writeSpecificExpressionColumnsToCSV(List<Columns> columns) throws SQLException {
+    public void writeSpecificExpressionColumnsToCSV(List<Columns> columns, String filePath) throws SQLException {
         String query = queryHelper.getSpecificExpressionColumnsQuery(columns);
         try (Connection connection = DataSource.getConnection()) {
-            new Csv().write(connection, "C:\\Users\\matti\\Documents\\Privat\\test.csv", query, null);
+            new Csv().write(connection, filePath, query, null);
         }
     }
 
-    public void writeSpecificBelongToColumnsToCSV(List<Columns> columns) throws SQLException {
+    public void writeSpecificBelongToColumnsToCSV(List<Columns> columns, String filePath) throws SQLException {
         String query = queryHelper.getSpecificBelongsToColumnsQuery(columns);
         try (Connection connection = DataSource.getConnection()) {
-            new Csv().write(connection, "C:\\Users\\matti\\Documents\\Privat\\test.csv", query, null);
+            new Csv().write(connection, filePath, query, null);
         }
     }
 }
