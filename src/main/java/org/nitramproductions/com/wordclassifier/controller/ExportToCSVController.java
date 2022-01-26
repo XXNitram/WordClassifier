@@ -3,9 +3,7 @@ package org.nitramproductions.com.wordclassifier.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
@@ -56,6 +54,17 @@ public class ExportToCSVController {
     @FXML
     private void onGroupExportButtonClick() throws SQLException {
         List<Columns> groupColumns = new ArrayList<>();
+        Stage stage = (Stage) groupExportButton.getScene().getWindow();
+        if (!groupNameCheckBox.isSelected() && !groupDateModifiedCheckBox.isSelected() && !groupCreationDateCheckBox.isSelected()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
+            alert.showAndWait();
+            return;
+        }
+        if (groupSaveLocation == null || groupSaveLocation.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
+            alert.showAndWait();
+            return;
+        }
         if (groupNameCheckBox.isSelected()) {
             groupColumns.add(Columns.NAME);
         }
@@ -66,7 +75,6 @@ public class ExportToCSVController {
             groupColumns.add(Columns.CREATION_DATE);
         }
         csvManager.writeSpecificGroupColumnsToCSV(groupColumns);
-        Stage stage = (Stage) groupExportButton.getScene().getWindow();
         stage.close();
     }
 
