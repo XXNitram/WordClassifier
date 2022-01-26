@@ -3,8 +3,9 @@ package org.nitramproductions.com.wordclassifier.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.stage.DirectoryChooser;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
@@ -84,7 +85,16 @@ public class ExportToCSVController {
 
     @FXML
     private void onBelongsToSelectSaveLocationButtonClick(ActionEvent event) {
-
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("zugehörigkeiten");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Dateien", "*.csv"));
+        File selectedFile = fileChooser.showSaveDialog(stage);
+        if (selectedFile != null) {
+            belongToSaveLocation = selectedFile.getAbsolutePath();
+            belongToSaveLocationLabel.setText(belongToSaveLocation);
+        }
     }
 
     @FXML
@@ -140,8 +150,26 @@ public class ExportToCSVController {
     }
 
     @FXML
-    private void onBelongsToExportButtonClick(ActionEvent event) {
-
+    private void onBelongsToExportButtonClick(ActionEvent event) throws SQLException {
+        if (!belongToNameCheckBox.isSelected() && !belongToContentCheckBox.isSelected()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
+            alert.showAndWait();
+            return;
+        }
+        if (alertIfNoFileLocationIsSpecified(belongToSaveLocation)) {
+            return;
+        }
+        List<Columns> belongToColumns = new ArrayList<>();
+        if (belongToNameCheckBox.isSelected()) {
+            belongToColumns.add(Columns.NAME);
+        }
+        if (belongToContentCheckBox.isSelected()) {
+            belongToColumns.add(Columns.CONTENT);
+        }
+        csvManager.writeSpecificBelongToColumnsToCSV(belongToColumns, belongToSaveLocation);
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
