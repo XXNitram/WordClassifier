@@ -117,6 +117,6 @@ public class CSVManager {
     }
 
     private ResultSet readFromCSV(String filePath) throws SQLException {
-        return new Csv().read(filePath, null, null);
+        return new Csv().read(filePath, null, "UTF-8");
     }
 }
