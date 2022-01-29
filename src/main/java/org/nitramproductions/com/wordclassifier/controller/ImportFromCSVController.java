@@ -75,7 +75,7 @@ public class ImportFromCSVController {
             return;
         }
         if (toggleGroup.getSelectedToggle() == groupRadioButton) {
-            csvManager.readGroupsFromCSV(fileLocation);
+            csvManager.readAndInsertGroupsFromCSV(fileLocation);
         } else if (toggleGroup.getSelectedToggle() == expressionRadioButton) {
             System.out.println("expression");
         } else if (toggleGroup.getSelectedToggle() == belongToRadioButton) {

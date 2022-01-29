@@ -39,7 +39,7 @@ public class CSVManager {
         }
     }
 
-    public void readGroupsFromCSV(String filePath) throws SQLException {
+    public void readAndInsertGroupsFromCSV(String filePath) throws SQLException {
         ResultSet resultSet = readFromCSV(filePath);
         if (!resultSet.next()) {
             throw new IllegalStateException();
