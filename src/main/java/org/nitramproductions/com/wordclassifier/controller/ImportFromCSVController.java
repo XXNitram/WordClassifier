@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
 
 import java.io.File;
+import java.sql.SQLException;
 
 public class ImportFromCSVController {
 
@@ -59,8 +61,27 @@ public class ImportFromCSVController {
     }
 
     @FXML
-    private void onImportButtonClick() {
-
+    private void onImportButtonClick(ActionEvent event) throws SQLException {
+        if (toggleGroup.getSelectedToggle() == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte eine Tabelle auswählen!");
+            alert.showAndWait();
+            return;
+        }
+        if (fileLocation == null || fileLocation.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
+            alert.showAndWait();
+            return;
+        }
+        if (toggleGroup.getSelectedToggle() == groupRadioButton) {
+            csvManager.readGroupsFromCSV(fileLocation);
+        } else if (toggleGroup.getSelectedToggle() == expressionRadioButton) {
+            System.out.println("expression");
+        } else if (toggleGroup.getSelectedToggle() == belongToRadioButton) {
+            System.out.println("belongTo");
+        }
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
