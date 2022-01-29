@@ -45,15 +45,23 @@ public class CSVManager {
             throw new IllegalStateException();
         }
         String query = "INSERT INTO \"GROUP\" VALUES (?, COALESCE(?, CURRENT_TIMESTAMP()), COALESCE(?, CURRENT_TIMESTAMP()))";
-        try (Connection connection = DataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            do {
-                preparedStatement.setObject(1, resultSet.getString("NAME"));
-                preparedStatement.setObject(2, resultSet.getString("DATE_MODIFIED"));
-                preparedStatement.setObject(3, resultSet.getString("CREATION_DATE"));
-                preparedStatement.addBatch();
-            } while (resultSet.next());
-            preparedStatement.executeBatch();
+        try (Connection connection = DataSource.getConnection()) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                do {
+                    preparedStatement.setObject(1, resultSet.getString("NAME"));
+                    preparedStatement.setObject(2, resultSet.getString("DATE_MODIFIED"));
+                    preparedStatement.setObject(3, resultSet.getString("CREATION_DATE"));
+                    preparedStatement.addBatch();
+                } while (resultSet.next());
+                preparedStatement.executeBatch();
+                connection.commit();
+            } catch (SQLException exception) {
+                connection.rollback();
+                throw exception;
+            } finally {
+                connection.setAutoCommit(true);
+            }
         }
     }
 
