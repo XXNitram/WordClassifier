@@ -1,5 +1,7 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -9,7 +11,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
 
 public class ImportFromCSVController {
@@ -36,6 +37,7 @@ public class ImportFromCSVController {
         groupRadioButton.setToggleGroup(toggleGroup);
         expressionRadioButton.setToggleGroup(toggleGroup);
         belongToRadioButton.setToggleGroup(toggleGroup);
+        Platform.runLater(() -> fileLocationLabel.getParent().requestFocus());
     }
 
     @FXML
@@ -62,7 +64,9 @@ public class ImportFromCSVController {
     }
 
     @FXML
-    private void onCancelButtonClick() {
-
+    private void onCancelButtonClick(ActionEvent event) {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
+        stage.close();
     }
 }

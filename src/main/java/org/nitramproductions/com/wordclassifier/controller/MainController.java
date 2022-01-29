@@ -334,6 +334,13 @@ public class MainController {
     }
 
     @FXML
+    private void onImportCSVMenuItemClick() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("importFromCSV.fxml"));
+        Parent root = fxmlLoader.load();
+        createNewStage(root, "Importieren", 350, 200);
+    }
+
+    @FXML
     private void onExportCSVMenuItemClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("exportToCSV.fxml"));
         Parent root = fxmlLoader.load();

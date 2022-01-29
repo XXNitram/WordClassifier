@@ -38,6 +38,11 @@
                     </items>
                   </Menu>
                   <SeparatorMenuItem mnemonicParsing="false" />
+                  <Menu mnemonicParsing="false" text="Importieren">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#onImportCSVMenuItemClick" text="CSV" />
+                    </items>
+                  </Menu>
                   <Menu mnemonicParsing="false" text="Exportieren">
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#onExportCSVMenuItemClick" text="CSV" />
