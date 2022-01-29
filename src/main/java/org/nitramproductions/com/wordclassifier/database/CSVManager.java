@@ -40,7 +40,7 @@ public class CSVManager {
     }
 
     public void readGroupsFromCSV(String filePath) throws SQLException {
-        ResultSet resultSet = new Csv().read(filePath, null, null);
+        ResultSet resultSet = readFromCSV(filePath);
         if (!resultSet.next()) {
             throw new IllegalStateException();
         }
@@ -55,5 +55,9 @@ public class CSVManager {
             } while (resultSet.next());
             preparedStatement.executeBatch();
         }
+    }
+
+    private ResultSet readFromCSV(String filePath) throws SQLException {
+        return new Csv().read(filePath, null, null);
     }
 }
