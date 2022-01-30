@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="230.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nitramproductions.com.wordclassifier.controller.ExportToCSVController">
+   <children>
+      <TabPane layoutX="271.0" layoutY="109.0" prefHeight="230.0" prefWidth="350.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <tabs>
+          <Tab closable="false" text="Gruppen">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <CheckBox fx:id="groupNameCheckBox" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" text="Name" />
+                        <CheckBox fx:id="groupDateModifiedCheckBox" layoutX="14.0" layoutY="62.0" mnemonicParsing="false" text="Änderungsdatum" />
+                        <CheckBox fx:id="groupCreationDateCheckBox" layoutX="14.0" layoutY="85.0" mnemonicParsing="false" text="Erstelldatum" />
+                        <Label layoutX="14.0" layoutY="14.0" text="Zu exportierende Spalten:">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <Button layoutX="14.0" layoutY="113.0" mnemonicParsing="false" onAction="#onGroupSelectSaveLocationButtonClick" text="Speicherort festlegen" />
+                        <Label fx:id="groupSaveLocationLabel" disable="true" layoutX="151.0" layoutY="117.0" prefHeight="17.0" prefWidth="183.0" text="Speicherpfad..." />
+                        <Button cancelButton="true" layoutX="260.0" layoutY="161.0" mnemonicParsing="false" onAction="#onCancelButtonClick" text="Abbrechen" />
+                        <Button defaultButton="true" layoutX="173.0" layoutY="161.0" mnemonicParsing="false" onAction="#onGroupExportButtonClick" text="Exportieren" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab closable="false" text="Wörter">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <CheckBox fx:id="expressionContentCheckBox" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" text="Name" />
+                        <CheckBox fx:id="expressionDateModifiedCheckBox" layoutX="14.0" layoutY="62.0" mnemonicParsing="false" text="Änderungsdatum" />
+                        <CheckBox fx:id="expressionCreationDateCheckBox" layoutX="14.0" layoutY="85.0" mnemonicParsing="false" text="Erstelldatum" />
+                        <Label layoutX="14.0" layoutY="14.0" text="Zu exportierende Spalten:">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <Button layoutX="14.0" layoutY="113.0" mnemonicParsing="false" onAction="#onExpressionSelectSaveLocationButtonClick" text="Speicherort festlegen" />
+                        <Label fx:id="expressionSaveLocationLabel" disable="true" layoutX="151.0" layoutY="117.0" prefHeight="17.0" prefWidth="183.0" text="Speicherpfad..." />
+                        <Button cancelButton="true" layoutX="260.0" layoutY="161.0" mnemonicParsing="false" onAction="#onCancelButtonClick" text="Abbrechen" />
+                        <Button defaultButton="true" layoutX="173.0" layoutY="161.0" mnemonicParsing="false" onAction="#onExpressionExportButtonClick" text="Exportieren" />
+                     </children>
+                  </AnchorPane>
+               </content>
+          </Tab>
+            <Tab closable="false" text="Zugehörigkeiten">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <CheckBox fx:id="belongToNameCheckBox" layoutX="14.0" layoutY="39.0" mnemonicParsing="false" text="Gruppenname" />
+                        <CheckBox fx:id="belongToContentCheckBox" layoutX="14.0" layoutY="62.0" mnemonicParsing="false" text="Wortname" />
+                        <Label layoutX="14.0" layoutY="14.0" text="Zu exportierende Spalten:">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <Button layoutX="14.0" layoutY="113.0" mnemonicParsing="false" onAction="#onBelongsToSelectSaveLocationButtonClick" text="Speicherort festlegen" />
+                        <Label fx:id="belongToSaveLocationLabel" disable="true" layoutX="151.0" layoutY="117.0" prefHeight="17.0" prefWidth="183.0" text="Speicherpfad..." />
+                        <Button cancelButton="true" layoutX="260.0" layoutY="161.0" mnemonicParsing="false" onAction="#onCancelButtonClick" text="Abbrechen" />
+                        <Button defaultButton="true" layoutX="173.0" layoutY="161.0" mnemonicParsing="false" onAction="#onBelongsToExportButtonClick" text="Exportieren" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="200.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nitramproductions.com.wordclassifier.controller.ImportFromCSVController">
+   <children>
+      <Label layoutX="24.0" layoutY="24.0" text="Zu importierende Tabelle:">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Button layoutX="24.0" layoutY="123.0" mnemonicParsing="false" onAction="#onSelectFileLocationButtonClick" text="Datei auswählen" />
+      <Label fx:id="fileLocationLabel" disable="true" layoutX="133.0" layoutY="127.0" prefHeight="17.0" prefWidth="203.0" text="Dateipfad..." />
+      <Button cancelButton="true" layoutX="262.0" layoutY="161.0" mnemonicParsing="false" onAction="#onCancelButtonClick" text="Abbrechen" />
+      <Button defaultButton="true" layoutX="175.0" layoutY="161.0" mnemonicParsing="false" onAction="#onImportButtonClick" text="Importieren" />
+      <RadioButton fx:id="groupRadioButton" layoutX="24.0" layoutY="49.0" mnemonicParsing="false" text="Gruppen" />
+      <RadioButton fx:id="expressionRadioButton" layoutX="24.0" layoutY="72.0" mnemonicParsing="false" text="Wörter" />
+      <RadioButton fx:id="belongToRadioButton" layoutX="24.0" layoutY="95.0" mnemonicParsing="false" text="Zugehörigkeiten" />
+      <Hyperlink layoutX="43.0" layoutY="162.0" onAction="#onFormatRequirementsHyperlinkClick" text="Formatierungsvorgabe" />
+      <ImageView fitHeight="17.0" fitWidth="17.0" layoutX="24.0" layoutY="165.0" preserveRatio="true">
+         <image>
+            <Image url="@info-icon.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>

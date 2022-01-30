@@ -38,6 +38,17 @@
                     </items>
                   </Menu>
                   <SeparatorMenuItem mnemonicParsing="false" />
+                  <Menu mnemonicParsing="false" text="Importieren">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#onImportCSVMenuItemClick" text="CSV" />
+                    </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Exportieren">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#onExportCSVMenuItemClick" text="CSV" />
+                    </items>
+                  </Menu>
+                  <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#onCloseMenuItemClick" text="Schließen">
                      <accelerator>
                         <KeyCodeCombination alt="DOWN" code="F4" control="UP" meta="UP" shift="UP" shortcut="UP" />
