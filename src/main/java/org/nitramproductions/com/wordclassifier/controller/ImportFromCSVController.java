@@ -9,12 +9,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class ImportFromCSVController {
 
@@ -59,7 +61,45 @@ public class ImportFromCSVController {
 
     @FXML
     private void onFormatRequirementsHyperlinkClick() {
-
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.getDialogPane().setPrefSize(450,660);
+        alert.setTitle("Formatierungsvorgabe");
+        alert.setHeaderText("Information zur Formatierung");
+        alert.setContentText("""
+                Allgemein sind keine Sonderzeichen außer
+                !"#$%&'()*+,-./:;=<>?@[\\]^_`{|}~ erlaubt!
+                \s
+                Notwendige Spalten bei Gruppen: NAME, DATE_MODIFIED, CREATION_DATE
+                NAME muss zwingend angegeben werden!
+                Beispiel:
+                NAME,DATE_MODIFIED,CREATION_DATE
+                Emotionen,2022-01-01 00:00:00,2022-01-01
+                \s
+                Änderungsdatum und/oder Erstelldatum kann optional ausgelassen werden
+                Beispiel:
+                NAME,DATE_MODIFIED,CREATION_DATE
+                Bücher
+                \s
+                Notwendige Spalten bei Wörtern: CONTENT, DATE_MODIFIED, CREATION_DATE
+                CONTENT muss zwingend angegeben werden!
+                Beispiel:
+                CONTENT,DATE_MODIFIED,CREATION_DATE
+                Wut,2022-01-01 00:00:00,2022-01-01 00:00:00
+                \s
+                Änderungsdatum und/oder Erstelldatum kann optional ausgelassen werden
+                Beispiel:
+                CONTENT,DATE_MODIFIED,CREATION_DATE
+                The Shining
+                \s
+                Notwendige Spalten bei Zugehörigkeiten: NAME, CONTENT
+                NAME und CONTENT muss zwingend angegeben werden!
+                Beispiel:
+                NAME,CONTENT
+                Emotionen,Wut
+                Bücher,The Shining""");
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        alert.showAndWait();
     }
 
     @FXML
