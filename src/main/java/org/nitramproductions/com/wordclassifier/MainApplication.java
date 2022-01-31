@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.nitramproductions.com.wordclassifier.controller.MainController;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -17,6 +18,7 @@ public class MainApplication extends Application {
     public void start(Stage stage) throws IOException {
         Thread.setDefaultUncaughtExceptionHandler(MainApplication::showError);
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("controller/main.fxml"));
+        fxmlLoader.setControllerFactory(controller -> new MainController(stage));
         Scene scene = new Scene(fxmlLoader.load(), 800, 600);
         stage.setTitle("WordClassifier");
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("controller/book-icon.png"))));

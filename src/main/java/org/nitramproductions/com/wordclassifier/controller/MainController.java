@@ -27,6 +27,7 @@ import org.nitramproductions.com.wordclassifier.model.Group;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.prefs.Preferences;
 
 public class MainController {
 
@@ -66,19 +67,25 @@ public class MainController {
     private final SearchHelper searchHelper = new SearchHelper();
     private final SelectionHelper selectionHelper = new SelectionHelper();
     private final BooleanProperty needToReloadData = new SimpleBooleanProperty(false);
+    private final Stage stage;
+    private final Preferences preferences;
 
-    public MainController() throws SQLException, IOException {
-        connectionManager.initialize();
+    public MainController(Stage stage) {
+        this.stage = stage;
+        preferences = Preferences.userRoot().node("/wordclassifier");
     }
 
     @FXML
-    private void initialize() throws SQLException {
+    private void initialize() throws SQLException, IOException {
+        connectionManager.initialize();
         initializeGroupLists();
         initializeExpressionLists();
         initializeTableViews();
         initializeTableViewColumns();
         initializeChoiceBoxes();
         initializeKeyboardShortcuts();
+
+        setPreferencesOnClose();
 
         searchLeftTableView();
         searchRightTableView();
@@ -372,7 +379,18 @@ public class MainController {
 
     @FXML
     private void onCloseMenuItemClick() {
+        setPreferences();
         Stage stage = (Stage) menuBar.getScene().getWindow();
         stage.close();
+    }
+
+    private void setPreferencesOnClose() {
+        stage.setOnCloseRequest(event -> setPreferences());
+    }
+
+    private void setPreferences() {
+        preferences.putBoolean("WINDOW_MAXIMIZED", stage.isMaximized());
+        preferences.putDouble("WINDOW_WIDTH",stage.getWidth());
+        preferences.putDouble("WINDOW_HEIGHT",stage.getHeight());
     }
 }
