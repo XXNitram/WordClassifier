@@ -394,5 +394,6 @@ public class MainController {
         preferences.putDouble("WINDOW_HEIGHT",stage.getHeight());
         preferences.putDouble("WINDOW_POSITION_X", stage.getX());
         preferences.putDouble("WINDOW_POSITION_Y", stage.getY());
+        preferences.putBoolean("DARK_MODE", darkMode.isSelected());
     }
 }
