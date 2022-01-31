@@ -86,6 +86,7 @@ public class MainController {
         initializeChoiceBoxes();
         initializeKeyboardShortcuts();
         initializeDarkModeCheckMenuItem();
+        initializeColumnCheckMenuItems();
 
         setPreferencesOnClose();
 
@@ -182,6 +183,15 @@ public class MainController {
     private void initializeDarkModeCheckMenuItem() {
         boolean darkModePref = preferences.getBoolean("DARK_MODE", false);
         darkModeCheckMenuItem.setSelected(darkModePref);
+    }
+
+    private void initializeColumnCheckMenuItems() {
+        boolean groupDateModifiedColumnEnabledPref = preferences.getBoolean("GROUP_MODIFICATION_DATE_COLUMN_ENABLED", true);
+        boolean expressionDateModifiedEnabledPref = preferences.getBoolean("EXPRESSION_MODIFICATION_DATE_COLUMN_ENABLED", true);
+        leftTableViewDateModifiedColumn.setVisible(groupDateModifiedColumnEnabledPref);
+        rightTableViewDateModifiedColumn.setVisible(expressionDateModifiedEnabledPref);
+        groupDateModifiedColumnCheckMenuItem.setSelected(groupDateModifiedColumnEnabledPref);
+        expressionDateModifiedColumnCheckMenuItem.setSelected(expressionDateModifiedEnabledPref);
     }
 
     private void searchLeftTableView() {
@@ -402,5 +412,7 @@ public class MainController {
         preferences.putDouble("WINDOW_POSITION_X", mainStage.getX());
         preferences.putDouble("WINDOW_POSITION_Y", mainStage.getY());
         preferences.putBoolean("DARK_MODE", darkModeCheckMenuItem.isSelected());
+        preferences.putBoolean("GROUP_MODIFICATION_DATE_COLUMN_ENABLED", groupDateModifiedColumnCheckMenuItem.isSelected());
+        preferences.putBoolean("EXPRESSION_MODIFICATION_DATE_COLUMN_ENABLED", expressionDateModifiedColumnCheckMenuItem.isSelected());
     }
 }
