@@ -20,22 +20,22 @@ public class CSVManager {
 
     public void writeSpecificGroupColumnsToCSV(List<Columns> columns, String filePath) throws SQLException {
         String query = queryHelper.getSpecificGroupColumnsQuery(columns);
-        try (Connection connection = DataSource.getConnection()) {
-            new Csv().write(connection, filePath, query, null);
-        }
+        writeToCSV(filePath, query);
     }
 
     public void writeSpecificExpressionColumnsToCSV(List<Columns> columns, String filePath) throws SQLException {
         String query = queryHelper.getSpecificExpressionColumnsQuery(columns);
-        try (Connection connection = DataSource.getConnection()) {
-            new Csv().write(connection, filePath, query, null);
-        }
+        writeToCSV(filePath, query);
     }
 
     public void writeSpecificBelongToColumnsToCSV(List<Columns> columns, String filePath) throws SQLException {
         String query = queryHelper.getSpecificBelongsToColumnsQuery(columns);
+        writeToCSV(filePath, query);
+    }
+
+    private void writeToCSV(String filePath, String query) throws SQLException {
         try (Connection connection = DataSource.getConnection()) {
-            new Csv().write(connection, filePath, query, null);
+            new Csv().write(connection, filePath, query, "ISO8859_15");
         }
     }
 
