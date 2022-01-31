@@ -52,7 +52,11 @@ public class MainController {
     @FXML
     private MenuBar menuBar;
     @FXML
-    private CheckMenuItem darkMode;
+    private CheckMenuItem darkModeCheckMenuItem;
+    @FXML
+    private CheckMenuItem groupDateModifiedColumnCheckMenuItem;
+    @FXML
+    private CheckMenuItem expressionDateModifiedColumnCheckMenuItem;
     @FXML
     private ToggleSwitch toggleSwitch;
 
@@ -177,7 +181,7 @@ public class MainController {
 
     private void initializeDarkModeCheckMenuItem() {
         boolean darkModePref = preferences.getBoolean("DARK_MODE", false);
-        darkMode.setSelected(darkModePref);
+        darkModeCheckMenuItem.setSelected(darkModePref);
     }
 
     private void searchLeftTableView() {
@@ -310,12 +314,22 @@ public class MainController {
     }
 
     @FXML
-    private void onDarkModeCheckMenuClick() {
-        if (darkMode.isSelected()) {
+    private void onDarkModeCheckMenuItemClick() {
+        if (darkModeCheckMenuItem.isSelected()) {
             mainStage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         } else {
             mainStage.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         }
+    }
+
+    @FXML
+    private void onGroupDateModifiedColumnCheckMenuItemClick() {
+        leftTableViewDateModifiedColumn.setVisible(groupDateModifiedColumnCheckMenuItem.isSelected());
+    }
+
+    @FXML
+    private void onExpressionDateModifiedColumnCheckMenuItemClick() {
+        rightTableViewDateModifiedColumn.setVisible(expressionDateModifiedColumnCheckMenuItem.isSelected());
     }
 
     @FXML
@@ -361,7 +375,7 @@ public class MainController {
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(menuBar.getParent().getScene().getWindow());
         Scene scene = new Scene(root, width, height);
-        if (darkMode.isSelected()) {
+        if (darkModeCheckMenuItem.isSelected()) {
             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         }
         stage.setTitle(title);
@@ -387,6 +401,6 @@ public class MainController {
         preferences.putDouble("WINDOW_HEIGHT", mainStage.getHeight());
         preferences.putDouble("WINDOW_POSITION_X", mainStage.getX());
         preferences.putDouble("WINDOW_POSITION_Y", mainStage.getY());
-        preferences.putBoolean("DARK_MODE", darkMode.isSelected());
+        preferences.putBoolean("DARK_MODE", darkModeCheckMenuItem.isSelected());
     }
 }

@@ -57,7 +57,21 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Ansicht">
             <items>
-                  <CheckMenuItem fx:id="darkMode" mnemonicParsing="false" onAction="#onDarkModeCheckMenuClick" text="Dark Mode" />
+                  <CheckMenuItem fx:id="darkModeCheckMenuItem" mnemonicParsing="false" onAction="#onDarkModeCheckMenuItemClick" text="Dark Mode" />
+                  <Menu mnemonicParsing="false" text="Spalten">
+                     <items>
+                        <Menu mnemonicParsing="false" text="Gruppen">
+                           <items>
+                              <CheckMenuItem fx:id="groupDateModifiedColumnCheckMenuItem" mnemonicParsing="false" onAction="#onGroupDateModifiedColumnCheckMenuItemClick" text="Änderungsdatum" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Wörter">
+                           <items>
+                              <CheckMenuItem fx:id="expressionDateModifiedColumnCheckMenuItem" mnemonicParsing="false" onAction="#onExpressionDateModifiedColumnCheckMenuItemClick" text="Änderungsdatum" />
+                           </items>
+                        </Menu>
+                     </items>
+                  </Menu>
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Hilfe">
