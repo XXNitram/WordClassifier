@@ -84,6 +84,7 @@ public class MainController {
         initializeTableViewColumns();
         initializeChoiceBoxes();
         initializeKeyboardShortcuts();
+        initializeDarkModeCheckMenuItem();
 
         setPreferencesOnClose();
 
@@ -176,6 +177,11 @@ public class MainController {
             menuBar.getScene().getAccelerators().put(keyCombinationEdit, runnableEdit);
             menuBar.getScene().getAccelerators().put(keyCombinationDelete, runnableDelete);
         });
+    }
+
+    private void initializeDarkModeCheckMenuItem() {
+        boolean darkModePref = preferences.getBoolean("DARK_MODE", false);
+        darkMode.setSelected(darkModePref);
     }
 
     private void searchLeftTableView() {
@@ -314,11 +320,10 @@ public class MainController {
 
     @FXML
     private void onDarkModeCheckMenuClick() {
-        Scene scene = menuBar.getScene();
         if (darkMode.isSelected()) {
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         } else {
-            scene.getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+            stage.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         }
     }
 

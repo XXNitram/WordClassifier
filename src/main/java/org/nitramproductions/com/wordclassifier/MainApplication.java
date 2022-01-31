@@ -3,7 +3,6 @@ package org.nitramproductions.com.wordclassifier;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
@@ -26,10 +25,14 @@ public class MainApplication extends Application {
         double stagePositionX = preferences.getDouble("WINDOW_POSITION_X", 800);
         double stagePositionY= preferences.getDouble("WINDOW_POSITION_Y", 400);
         boolean stageMaximized = preferences.getBoolean("WINDOW_MAXIMIZED", false);
+        boolean darkMode = preferences.getBoolean("DARK_MODE", false);
 
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("controller/main.fxml"));
         fxmlLoader.setControllerFactory(controller -> new MainController(stage));
         Scene scene = new Scene(fxmlLoader.load());
+        if (darkMode) {
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("controller/darkMode.css")).toExternalForm());
+        }
         stage.setScene(scene);
         stage.setTitle("WordClassifier");
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("controller/book-icon.png"))));
