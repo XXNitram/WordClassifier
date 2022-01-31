@@ -26,15 +26,16 @@ public class MainApplication extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("controller/main.fxml"));
         fxmlLoader.setControllerFactory(controller -> new MainController(stage));
-        Scene scene = new Scene(fxmlLoader.load(), stageWidth, stageHeight);
+        Scene scene = new Scene(fxmlLoader.load());
+        stage.setScene(scene);
         stage.setTitle("WordClassifier");
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("controller/book-icon.png"))));
         stage.setMaximized(stageMaximized);
-        stage.setScene(scene);
-        stage.sizeToScene();
-        stage.show();
         stage.setMinWidth(680);
         stage.setMinHeight(300);
+        stage.setWidth(stageWidth);
+        stage.setHeight(stageHeight);
+        stage.show();
     }
 
     private static void showError(Thread t, Throwable e) {
