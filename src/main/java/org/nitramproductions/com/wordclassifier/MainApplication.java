@@ -3,6 +3,7 @@ package org.nitramproductions.com.wordclassifier;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
@@ -22,6 +23,8 @@ public class MainApplication extends Application {
         Preferences preferences = Preferences.userRoot().node("/wordclassifier");
         double stageWidth = preferences.getDouble("WINDOW_WIDTH", 800);
         double stageHeight = preferences.getDouble("WINDOW_HEIGHT", 600);
+        double stagePositionX = preferences.getDouble("WINDOW_POSITION_X", 800);
+        double stagePositionY= preferences.getDouble("WINDOW_POSITION_Y", 400);
         boolean stageMaximized = preferences.getBoolean("WINDOW_MAXIMIZED", false);
 
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("controller/main.fxml"));
@@ -35,6 +38,8 @@ public class MainApplication extends Application {
         stage.setMinHeight(300);
         stage.setWidth(stageWidth);
         stage.setHeight(stageHeight);
+        stage.setX(stagePositionX);
+        stage.setY(stagePositionY);
         stage.show();
     }
 
