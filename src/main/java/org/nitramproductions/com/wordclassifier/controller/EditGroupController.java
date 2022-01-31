@@ -1,7 +1,6 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -57,13 +56,13 @@ public class EditGroupController {
     private final ValidationHelper validationHelper = new ValidationHelper();
     private final SearchHelper searchHelper = new SearchHelper();
 
+    private final MainController mainController;
     private final Group groupToEdit;
-    private final BooleanProperty needToReloadData;
     private List<Expression> expressionsBelongingToGroupList;
 
-    public EditGroupController(Group groupToEdit, BooleanProperty needToReloadData) {
+    public EditGroupController(MainController mainController, Group groupToEdit) {
         this.groupToEdit = groupToEdit;
-        this.needToReloadData = needToReloadData;
+        this.mainController = mainController;
     }
 
     @FXML
@@ -186,7 +185,7 @@ public class EditGroupController {
             }
         }
         connectionManager.updateGroupModificationDate(groupToEdit);
-        needToReloadData.set(true);
+        mainController.reloadData();
         Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.close();
     }

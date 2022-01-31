@@ -1,6 +1,5 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -50,11 +49,10 @@ public class CreateGroupController {
     private final SelectionHelper selectionHelper = new SelectionHelper();
     private final ValidationHelper validationHelper = new ValidationHelper();
     private final SearchHelper searchHelper = new SearchHelper();
+    private final MainController mainController;
 
-    private BooleanProperty needToReloadData;
-
-    public CreateGroupController() {
-
+    public CreateGroupController(MainController mainController) {
+        this.mainController = mainController;
     }
 
     @FXML
@@ -141,8 +139,7 @@ public class CreateGroupController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        needToReloadData.set(true);
+        mainController.reloadData();
         Stage stage = (Stage) createNewButton.getScene().getWindow();
         stage.close();
     }
@@ -150,9 +147,5 @@ public class CreateGroupController {
     private void onCancelButtonClick() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
-    }
-
-    public void setNeedToReloadDataBooleanProperty(BooleanProperty needToReloadData) {
-        this.needToReloadData = needToReloadData;
     }
 }

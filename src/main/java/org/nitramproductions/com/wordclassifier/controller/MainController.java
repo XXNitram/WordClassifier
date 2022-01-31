@@ -1,7 +1,5 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -66,12 +64,11 @@ public class MainController {
     private final ConnectionManager connectionManager = new ConnectionManager();
     private final SearchHelper searchHelper = new SearchHelper();
     private final SelectionHelper selectionHelper = new SelectionHelper();
-    private final BooleanProperty needToReloadData = new SimpleBooleanProperty(false);
-    private final Stage stage;
+    private final Stage mainStage;
     private final Preferences preferences;
 
-    public MainController(Stage stage) {
-        this.stage = stage;
+    public MainController(Stage mainStage) {
+        this.mainStage = mainStage;
         preferences = Preferences.userRoot().node("/wordclassifier");
     }
 
@@ -95,7 +92,6 @@ public class MainController {
         updateLeftTableViewDependingOnSelectionInRightTableView();
         updateRightTableViewDependingOnSelectionInLeftTableView();
         listenToToggleSwitchAndUpdateTableView();
-        reloadGroupData();
     }
 
     private void initializeGroupLists() throws SQLException {
@@ -229,13 +225,8 @@ public class MainController {
                 updateTableViewDependingOnToggleSwitch(newSelection));
     }
 
-    private void reloadGroupData() {
-        needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection) {
-                updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
-                needToReloadData.set(false);
-            }
-        });
+    public void reloadData() {
+        updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
     }
 
     private void updateTableViewDependingOnToggleSwitch(Boolean expressionIsSwitchedOn) {
@@ -277,7 +268,7 @@ public class MainController {
     private void openEditGroupView() throws IOException {
         Group groupToEdit = leftTableView.getSelectionModel().getSelectedItem();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editGroup.fxml"));
-        fxmlLoader.setControllerFactory(controller -> new EditGroupController(groupToEdit, needToReloadData));
+        fxmlLoader.setControllerFactory(controller -> new EditGroupController(this, groupToEdit));
         Parent root = fxmlLoader.load();
         createNewStage(root, "Gruppe bearbeiten", 783, 440);
     }
@@ -285,7 +276,7 @@ public class MainController {
     private void openEditExpressionView() throws IOException {
         Expression expressionToEdit = rightTableView.getSelectionModel().getSelectedItem();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editExpression.fxml"));
-        fxmlLoader.setControllerFactory(controller -> new EditExpressionController(expressionToEdit, needToReloadData));
+        fxmlLoader.setControllerFactory(controller -> new EditExpressionController(this, expressionToEdit));
         Parent root = fxmlLoader.load();
         createNewStage(root, "Wort bearbeiten", 783, 440);
     }
@@ -321,34 +312,32 @@ public class MainController {
     @FXML
     private void onDarkModeCheckMenuClick() {
         if (darkMode.isSelected()) {
-            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+            mainStage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         } else {
-            stage.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+            mainStage.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         }
     }
 
     @FXML
     private void onCreateNewGroupMenuItemClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGroup.fxml"));
+        fxmlLoader.setControllerFactory(controller -> new CreateGroupController(this));
         Parent root = fxmlLoader.load();
-        CreateGroupController createGroupController = fxmlLoader.getController();
-        createGroupController.setNeedToReloadDataBooleanProperty(needToReloadData);
         createNewStage(root, "Neue Gruppe Erstellen", 783, 440);
     }
 
     @FXML
     private void onCreateNewExpressionMenuItemClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createExpression.fxml"));
+        fxmlLoader.setControllerFactory(controller -> new CreateExpressionController(this));
         Parent root = fxmlLoader.load();
-        CreateExpressionController createExpressionController = fxmlLoader.getController();
-        createExpressionController.setNeedToReloadDataBooleanProperty(needToReloadData);
         createNewStage(root, "Neues Wort Erstellen", 783, 440);
     }
 
     @FXML
     private void onImportCSVMenuItemClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("importFromCSV.fxml"));
-        fxmlLoader.setControllerFactory(controller -> new ImportFromCSVController(needToReloadData));
+        fxmlLoader.setControllerFactory(controller -> new ImportFromCSVController(this));
         Parent root = fxmlLoader.load();
         createNewStage(root, "Importieren", 350, 200);
     }
@@ -385,20 +374,19 @@ public class MainController {
     @FXML
     private void onCloseMenuItemClick() {
         setPreferences();
-        Stage stage = (Stage) menuBar.getScene().getWindow();
-        stage.close();
+        mainStage.close();
     }
 
     private void setPreferencesOnClose() {
-        stage.setOnCloseRequest(event -> setPreferences());
+        mainStage.setOnCloseRequest(event -> setPreferences());
     }
 
     private void setPreferences() {
-        preferences.putBoolean("WINDOW_MAXIMIZED", stage.isMaximized());
-        preferences.putDouble("WINDOW_WIDTH",stage.getWidth());
-        preferences.putDouble("WINDOW_HEIGHT",stage.getHeight());
-        preferences.putDouble("WINDOW_POSITION_X", stage.getX());
-        preferences.putDouble("WINDOW_POSITION_Y", stage.getY());
+        preferences.putBoolean("WINDOW_MAXIMIZED", mainStage.isMaximized());
+        preferences.putDouble("WINDOW_WIDTH", mainStage.getWidth());
+        preferences.putDouble("WINDOW_HEIGHT", mainStage.getHeight());
+        preferences.putDouble("WINDOW_POSITION_X", mainStage.getX());
+        preferences.putDouble("WINDOW_POSITION_Y", mainStage.getY());
         preferences.putBoolean("DARK_MODE", darkMode.isSelected());
     }
 }

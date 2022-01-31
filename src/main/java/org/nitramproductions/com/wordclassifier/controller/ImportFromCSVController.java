@@ -1,7 +1,6 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -32,10 +31,10 @@ public class ImportFromCSVController {
     private String fileLocation;
     private final ToggleGroup toggleGroup = new ToggleGroup();
     private final CSVManager csvManager = new CSVManager();
-    private final BooleanProperty needToReloadData;
+    private final MainController mainController;
 
-    public ImportFromCSVController(BooleanProperty needToReloadData) {
-        this.needToReloadData = needToReloadData;
+    public ImportFromCSVController(MainController mainController) {
+        this.mainController = mainController;
     }
 
     @FXML
@@ -121,7 +120,7 @@ public class ImportFromCSVController {
         } else if (toggleGroup.getSelectedToggle() == belongToRadioButton) {
             csvManager.readAndInsertBelongsToFromCSV(fileLocation);
         }
-        needToReloadData.set(true);
+        mainController.reloadData();
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
