@@ -393,6 +393,6 @@ public class MainController {
         preferences.putDouble("WINDOW_WIDTH",stage.getWidth());
         preferences.putDouble("WINDOW_HEIGHT",stage.getHeight());
         preferences.putDouble("WINDOW_POSITION_X", stage.getX());
-        preferences.putDouble("WINDOW_POSITION_y", stage.getY());
+        preferences.putDouble("WINDOW_POSITION_Y", stage.getY());
     }
 }
