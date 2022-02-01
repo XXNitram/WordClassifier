@@ -1,5 +1,6 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -89,6 +90,7 @@ public class MainController {
         initializeKeyboardShortcuts();
         initializeDarkModeCheckMenuItem();
         initializeColumnCheckMenuItems();
+        initializeSplitPaneDividerPosition();
 
         setPreferencesOnClose();
 
@@ -147,6 +149,7 @@ public class MainController {
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         leftTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         leftTableViewDateModifiedColumn.setReorderable(false);
+        Platform.runLater(() -> leftTableView.resizeColumn(leftTableViewNameColumn, preferences.getDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0)));
 
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
         rightTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
@@ -154,6 +157,7 @@ public class MainController {
         rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         rightTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         rightTableViewDateModifiedColumn.setReorderable(false);
+        Platform.runLater(() -> rightTableView.resizeColumn(rightTableViewNameColumn, preferences.getDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0)));
     }
 
     private void initializeChoiceBoxes() {
@@ -198,6 +202,10 @@ public class MainController {
         rightTableViewDateModifiedColumn.setVisible(expressionDateModifiedEnabledPref);
         groupDateModifiedColumnCheckMenuItem.setSelected(groupDateModifiedColumnEnabledPref);
         expressionDateModifiedColumnCheckMenuItem.setSelected(expressionDateModifiedEnabledPref);
+    }
+
+    private void initializeSplitPaneDividerPosition() {
+        splitPane.setDividerPosition(0, preferences.getDouble("SPLIT_PANE_DIVIDER_POSITION", 0.5));
     }
 
     private void searchLeftTableView() {
