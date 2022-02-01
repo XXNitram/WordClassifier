@@ -71,6 +71,7 @@
                         </Menu>
                      </items>
                   </Menu>
+                  <MenuItem mnemonicParsing="false" onAction="#onResetUIMenuItemClick" text="Zurücksetzen" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <CheckMenuItem fx:id="darkModeCheckMenuItem" mnemonicParsing="false" onAction="#onDarkModeCheckMenuItemClick" text="Dark Mode" />
             </items>
@@ -82,7 +83,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <SplitPane dividerPositions="0.5" layoutY="26.0" prefHeight="375.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+      <SplitPane fx:id="splitPane" dividerPositions="0.5" layoutY="26.0" prefHeight="375.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>

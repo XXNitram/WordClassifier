@@ -50,6 +50,8 @@ public class MainController {
     @FXML
     private TextField rightTableViewSearchTextField;
     @FXML
+    private SplitPane splitPane;
+    @FXML
     private MenuBar menuBar;
     @FXML
     private CheckMenuItem darkModeCheckMenuItem;
@@ -141,13 +143,17 @@ public class MainController {
     private void initializeTableViewColumns() {
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         leftTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
+        leftTableViewNameColumn.setReorderable(false);
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         leftTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
+        leftTableViewDateModifiedColumn.setReorderable(false);
 
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
         rightTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
+        rightTableViewNameColumn.setReorderable(false);
         rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         rightTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
+        rightTableViewDateModifiedColumn.setReorderable(false);
     }
 
     private void initializeChoiceBoxes() {
@@ -340,6 +346,15 @@ public class MainController {
     @FXML
     private void onExpressionDateModifiedColumnCheckMenuItemClick() {
         rightTableViewDateModifiedColumn.setVisible(expressionDateModifiedColumnCheckMenuItem.isSelected());
+    }
+
+    @FXML
+    private void onResetUIMenuItemClick() {
+        splitPane.setDividerPositions(0.5);
+        double leftTableViewColumnDelta = (leftTableView.getWidth() / 2) - leftTableViewNameColumn.getWidth();
+        leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewColumnDelta);
+        double rightTableViewColumnDelta = (rightTableView.getWidth() / 2) - rightTableViewNameColumn.getWidth();
+        rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewColumnDelta);
     }
 
     @FXML
