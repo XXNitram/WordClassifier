@@ -429,5 +429,10 @@ public class MainController {
         preferences.putBoolean("DARK_MODE", darkModeCheckMenuItem.isSelected());
         preferences.putBoolean("GROUP_MODIFICATION_DATE_COLUMN_ENABLED", groupDateModifiedColumnCheckMenuItem.isSelected());
         preferences.putBoolean("EXPRESSION_MODIFICATION_DATE_COLUMN_ENABLED", expressionDateModifiedColumnCheckMenuItem.isSelected());
+        preferences.putDouble("SPLIT_PANE_DIVIDER_POSITION", splitPane.getDividerPositions()[0]);
+        double leftTableViewNameColumnOffsetFromCenter = leftTableViewNameColumn.getWidth() - (leftTableView.getWidth() / 2);
+        preferences.putDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", leftTableViewNameColumnOffsetFromCenter);
+        double rightTableViewNameColumnOffsetFromCenter = rightTableViewNameColumn.getWidth() - (rightTableView.getWidth() / 2);
+        preferences.putDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", rightTableViewNameColumnOffsetFromCenter);
     }
 }
