@@ -143,6 +143,11 @@ public class MainController {
     }
 
     private void initializeTableViewColumns() {
+        initializeLeftTableViewColumns();
+        initializeRightTableViewColumns();
+    }
+
+    private void initializeLeftTableViewColumns() {
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         leftTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         leftTableViewNameColumn.setReorderable(false);
@@ -150,7 +155,9 @@ public class MainController {
         leftTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         leftTableViewDateModifiedColumn.setReorderable(false);
         Platform.runLater(() -> leftTableView.resizeColumn(leftTableViewNameColumn, preferences.getDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0)));
+    }
 
+    private void initializeRightTableViewColumns() {
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
         rightTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         rightTableViewNameColumn.setReorderable(false);
