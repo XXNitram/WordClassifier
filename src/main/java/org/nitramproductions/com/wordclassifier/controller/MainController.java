@@ -74,6 +74,14 @@ public class MainController {
     private final Stage mainStage;
     private final Preferences preferences;
 
+    private double stageWidth;
+    private double stageHeight;
+    private double stageXPosition;
+    private double stageYPosition;
+    private boolean isMaximized = false;
+    private double oldStageXPosition;
+    private double oldStageYPosition;
+
     public MainController(Stage mainStage) {
         this.mainStage = mainStage;
         preferences = Preferences.userRoot().node("/wordclassifier");
@@ -92,6 +100,7 @@ public class MainController {
         initializeColumnCheckMenuItems();
         initializeSplitPaneDividerPosition();
         initializeTableViewDependingOnToggleSwitch();
+        initializeStageSizeAndPositionListeners();
 
         setPreferencesOnClose();
 
@@ -223,6 +232,42 @@ public class MainController {
         boolean toggleSwitchSelectedPref = preferences.getBoolean("TOGGLE_SWITCH_SELECTED", false);
         updateTableViewDependingOnToggleSwitch(toggleSwitchSelectedPref);
         toggleSwitch.setSelected(toggleSwitchSelectedPref);
+    }
+
+    private void initializeStageSizeAndPositionListeners() {
+        mainStage.widthProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!isMaximized) {
+                stageWidth = newValue.doubleValue();
+            }
+        });
+
+        mainStage.heightProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!isMaximized) {
+                stageHeight = newValue.doubleValue();
+            }
+        });
+
+        mainStage.xProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!isMaximized) {
+                stageXPosition = newValue.doubleValue();
+                oldStageXPosition = oldValue.doubleValue();
+            }
+        });
+
+        mainStage.yProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!isMaximized) {
+                stageYPosition = newValue.doubleValue();
+                oldStageYPosition = oldValue.doubleValue();
+            }
+        });
+
+        mainStage.maximizedProperty().addListener((observableValue, oldValue, newValue) -> {
+            isMaximized = newValue;
+            if (isMaximized) {
+                stageXPosition = oldStageXPosition;
+                stageYPosition = oldStageYPosition;
+            }
+        });
     }
 
     private void searchLeftTableView() {
@@ -446,19 +491,22 @@ public class MainController {
     }
 
     private void setPreferences() {
+        preferences.putDouble("WINDOW_WIDTH", stageWidth);
+        preferences.putDouble("WINDOW_HEIGHT", stageHeight);
+        preferences.putDouble("WINDOW_POSITION_X", stageXPosition);
+        preferences.putDouble("WINDOW_POSITION_Y", stageYPosition);
         preferences.putBoolean("WINDOW_MAXIMIZED", mainStage.isMaximized());
-        preferences.putDouble("WINDOW_WIDTH", mainStage.getWidth());
-        preferences.putDouble("WINDOW_HEIGHT", mainStage.getHeight());
-        preferences.putDouble("WINDOW_POSITION_X", mainStage.getX());
-        preferences.putDouble("WINDOW_POSITION_Y", mainStage.getY());
-        preferences.putBoolean("DARK_MODE", darkModeCheckMenuItem.isSelected());
+
         preferences.putBoolean("GROUP_MODIFICATION_DATE_COLUMN_ENABLED", groupDateModifiedColumnCheckMenuItem.isSelected());
         preferences.putBoolean("EXPRESSION_MODIFICATION_DATE_COLUMN_ENABLED", expressionDateModifiedColumnCheckMenuItem.isSelected());
         preferences.putDouble("SPLIT_PANE_DIVIDER_POSITION", splitPane.getDividerPositions()[0]);
+        preferences.putBoolean("DARK_MODE", darkModeCheckMenuItem.isSelected());
+
         double leftTableViewNameColumnOffsetFromCenter = leftTableViewNameColumn.getWidth() - (leftTableView.getWidth() / 2);
-        preferences.putDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", leftTableViewNameColumnOffsetFromCenter);
         double rightTableViewNameColumnOffsetFromCenter = rightTableViewNameColumn.getWidth() - (rightTableView.getWidth() / 2);
+        preferences.putDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", leftTableViewNameColumnOffsetFromCenter);
         preferences.putDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", rightTableViewNameColumnOffsetFromCenter);
+
         preferences.putBoolean("TOGGLE_SWITCH_SELECTED", toggleSwitch.isSelected());
     }
 }
