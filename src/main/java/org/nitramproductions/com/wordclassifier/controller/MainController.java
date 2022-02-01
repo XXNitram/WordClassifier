@@ -155,7 +155,8 @@ public class MainController {
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         leftTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         leftTableViewDateModifiedColumn.setReorderable(false);
-        Platform.runLater(() -> leftTableView.resizeColumn(leftTableViewNameColumn, preferences.getDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0)));
+        double leftTableViewNameColumnOffsetFromCenterPref = preferences.getDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0);
+        Platform.runLater(() -> leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewNameColumnOffsetFromCenterPref));
     }
 
     private void initializeRightTableViewColumns() {
@@ -165,7 +166,8 @@ public class MainController {
         rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         rightTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         rightTableViewDateModifiedColumn.setReorderable(false);
-        Platform.runLater(() -> rightTableView.resizeColumn(rightTableViewNameColumn, preferences.getDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0)));
+        double rightTableViewNameColumnOffsetFromCenterPref = preferences.getDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0);
+        Platform.runLater(() -> rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewNameColumnOffsetFromCenterPref));
     }
 
     private void initializeChoiceBoxes() {
@@ -213,13 +215,14 @@ public class MainController {
     }
 
     private void initializeSplitPaneDividerPosition() {
-        splitPane.setDividerPosition(0, preferences.getDouble("SPLIT_PANE_DIVIDER_POSITION", 0.5));
+        double dividerPositionPref = preferences.getDouble("SPLIT_PANE_DIVIDER_POSITION", 0.5);
+        splitPane.setDividerPosition(0, dividerPositionPref);
     }
 
     private void initializeTableViewDependingOnToggleSwitch() {
-        boolean toggleSwitchSelected = preferences.getBoolean("TOGGLE_SWITCH_SELECTED", false);
-        updateTableViewDependingOnToggleSwitch(toggleSwitchSelected);
-        toggleSwitch.setSelected(toggleSwitchSelected);
+        boolean toggleSwitchSelectedPref = preferences.getBoolean("TOGGLE_SWITCH_SELECTED", false);
+        updateTableViewDependingOnToggleSwitch(toggleSwitchSelectedPref);
+        toggleSwitch.setSelected(toggleSwitchSelectedPref);
     }
 
     private void searchLeftTableView() {
