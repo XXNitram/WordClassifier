@@ -91,6 +91,7 @@ public class MainController {
         initializeDarkModeCheckMenuItem();
         initializeColumnCheckMenuItems();
         initializeSplitPaneDividerPosition();
+        initializeTableViewDependingOnToggleSwitch();
 
         setPreferencesOnClose();
 
@@ -213,6 +214,12 @@ public class MainController {
 
     private void initializeSplitPaneDividerPosition() {
         splitPane.setDividerPosition(0, preferences.getDouble("SPLIT_PANE_DIVIDER_POSITION", 0.5));
+    }
+
+    private void initializeTableViewDependingOnToggleSwitch() {
+        boolean toggleSwitchSelected = preferences.getBoolean("TOGGLE_SWITCH_SELECTED", false);
+        updateTableViewDependingOnToggleSwitch(toggleSwitchSelected);
+        toggleSwitch.setSelected(toggleSwitchSelected);
     }
 
     private void searchLeftTableView() {
@@ -449,6 +456,6 @@ public class MainController {
         preferences.putDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", leftTableViewNameColumnOffsetFromCenter);
         double rightTableViewNameColumnOffsetFromCenter = rightTableViewNameColumn.getWidth() - (rightTableView.getWidth() / 2);
         preferences.putDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", rightTableViewNameColumnOffsetFromCenter);
-        preferences.putBoolean("TOGGLE_SWITCH_ON", toggleSwitch.isSelected());
+        preferences.putBoolean("TOGGLE_SWITCH_SELECTED", toggleSwitch.isSelected());
     }
 }
