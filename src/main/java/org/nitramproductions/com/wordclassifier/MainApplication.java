@@ -7,24 +7,43 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.nitramproductions.com.wordclassifier.controller.MainController;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.prefs.Preferences;
 
 public class MainApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
         Thread.setDefaultUncaughtExceptionHandler(MainApplication::showError);
+
+        Preferences preferences = Preferences.userRoot().node("/wordclassifier");
+        double stageWidth = preferences.getDouble("WINDOW_WIDTH", 800);
+        double stageHeight = preferences.getDouble("WINDOW_HEIGHT", 600);
+        double stagePositionX = preferences.getDouble("WINDOW_POSITION_X", 800);
+        double stagePositionY= preferences.getDouble("WINDOW_POSITION_Y", 400);
+        boolean stageMaximized = preferences.getBoolean("WINDOW_MAXIMIZED", false);
+        boolean darkMode = preferences.getBoolean("DARK_MODE", false);
+
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("controller/main.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 800, 600);
+        fxmlLoader.setControllerFactory(controller -> new MainController(stage));
+        Scene scene = new Scene(fxmlLoader.load());
+        if (darkMode) {
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("controller/darkMode.css")).toExternalForm());
+        }
+        stage.setScene(scene);
         stage.setTitle("WordClassifier");
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("controller/book-icon.png"))));
-        stage.setScene(scene);
-        stage.sizeToScene();
+        stage.setMaximized(stageMaximized);
+        stage.setMinWidth(680);
+        stage.setMinHeight(300);
+        stage.setWidth(stageWidth);
+        stage.setHeight(stageHeight);
+        stage.setX(stagePositionX);
+        stage.setY(stagePositionY);
         stage.show();
-        stage.setMinWidth(stage.getWidth());
-        stage.setMinHeight(stage.getHeight());
     }
 
     private static void showError(Thread t, Throwable e) {

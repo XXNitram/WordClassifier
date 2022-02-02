@@ -1,7 +1,6 @@
 package org.nitramproductions.com.wordclassifier.controller;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -26,7 +25,9 @@ import org.nitramproductions.com.wordclassifier.model.Group;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
+import java.util.prefs.Preferences;
 
 public class MainController {
 
@@ -51,9 +52,15 @@ public class MainController {
     @FXML
     private TextField rightTableViewSearchTextField;
     @FXML
+    private SplitPane splitPane;
+    @FXML
     private MenuBar menuBar;
     @FXML
-    private CheckMenuItem darkMode;
+    private CheckMenuItem darkModeCheckMenuItem;
+    @FXML
+    private CheckMenuItem groupDateModifiedColumnCheckMenuItem;
+    @FXML
+    private CheckMenuItem expressionDateModifiedColumnCheckMenuItem;
     @FXML
     private ToggleSwitch toggleSwitch;
 
@@ -65,20 +72,38 @@ public class MainController {
     private final ConnectionManager connectionManager = new ConnectionManager();
     private final SearchHelper searchHelper = new SearchHelper();
     private final SelectionHelper selectionHelper = new SelectionHelper();
-    private final BooleanProperty needToReloadData = new SimpleBooleanProperty(false);
+    private final Stage mainStage;
+    private final Preferences preferences;
 
-    public MainController() throws SQLException, IOException {
-        connectionManager.initialize();
+    private double stageWidth;
+    private double stageHeight;
+    private double stageXPosition;
+    private double stageYPosition;
+    private boolean isMaximized = false;
+    private double oldStageXPosition;
+    private double oldStageYPosition;
+
+    public MainController(Stage mainStage) {
+        this.mainStage = mainStage;
+        preferences = Preferences.userRoot().node("/wordclassifier");
     }
 
     @FXML
-    private void initialize() throws SQLException {
+    private void initialize() throws SQLException, IOException {
+        connectionManager.initialize();
         initializeGroupLists();
         initializeExpressionLists();
         initializeTableViews();
         initializeTableViewColumns();
         initializeChoiceBoxes();
         initializeKeyboardShortcuts();
+        initializeDarkModeCheckMenuItem();
+        initializeColumnCheckMenuItems();
+        initializeSplitPaneDividerPosition();
+        initializeTableViewDependingOnToggleSwitch();
+        initializeStageSizeAndPositionListeners();
+
+        setPreferencesOnClose();
 
         searchLeftTableView();
         searchRightTableView();
@@ -87,7 +112,6 @@ public class MainController {
         updateLeftTableViewDependingOnSelectionInRightTableView();
         updateRightTableViewDependingOnSelectionInLeftTableView();
         listenToToggleSwitchAndUpdateTableView();
-        reloadGroupData();
     }
 
     private void initializeGroupLists() throws SQLException {
@@ -130,15 +154,30 @@ public class MainController {
     }
 
     private void initializeTableViewColumns() {
+        initializeLeftTableViewColumns();
+        initializeRightTableViewColumns();
+    }
+
+    private void initializeLeftTableViewColumns() {
         leftTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         leftTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
+        leftTableViewNameColumn.setReorderable(false);
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         leftTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
+        leftTableViewDateModifiedColumn.setReorderable(false);
+        double leftTableViewNameColumnOffsetFromCenterPref = preferences.getDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0);
+        Platform.runLater(() -> leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewNameColumnOffsetFromCenterPref));
+    }
 
+    private void initializeRightTableViewColumns() {
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
         rightTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
+        rightTableViewNameColumn.setReorderable(false);
         rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         rightTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
+        rightTableViewDateModifiedColumn.setReorderable(false);
+        double rightTableViewNameColumnOffsetFromCenterPref = preferences.getDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0);
+        Platform.runLater(() -> rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewNameColumnOffsetFromCenterPref));
     }
 
     private void initializeChoiceBoxes() {
@@ -171,6 +210,67 @@ public class MainController {
         });
     }
 
+    private void initializeDarkModeCheckMenuItem() {
+        boolean darkModePref = preferences.getBoolean("DARK_MODE", false);
+        darkModeCheckMenuItem.setSelected(darkModePref);
+    }
+
+    private void initializeColumnCheckMenuItems() {
+        boolean groupDateModifiedColumnEnabledPref = preferences.getBoolean("GROUP_MODIFICATION_DATE_COLUMN_ENABLED", true);
+        boolean expressionDateModifiedEnabledPref = preferences.getBoolean("EXPRESSION_MODIFICATION_DATE_COLUMN_ENABLED", true);
+        leftTableViewDateModifiedColumn.setVisible(groupDateModifiedColumnEnabledPref);
+        rightTableViewDateModifiedColumn.setVisible(expressionDateModifiedEnabledPref);
+        groupDateModifiedColumnCheckMenuItem.setSelected(groupDateModifiedColumnEnabledPref);
+        expressionDateModifiedColumnCheckMenuItem.setSelected(expressionDateModifiedEnabledPref);
+    }
+
+    private void initializeSplitPaneDividerPosition() {
+        double dividerPositionPref = preferences.getDouble("SPLIT_PANE_DIVIDER_POSITION", 0.5);
+        splitPane.setDividerPosition(0, dividerPositionPref);
+    }
+
+    private void initializeTableViewDependingOnToggleSwitch() {
+        boolean toggleSwitchSelectedPref = preferences.getBoolean("TOGGLE_SWITCH_SELECTED", false);
+        updateTableViewDependingOnToggleSwitch(toggleSwitchSelectedPref);
+        toggleSwitch.setSelected(toggleSwitchSelectedPref);
+    }
+
+    private void initializeStageSizeAndPositionListeners() {
+        mainStage.widthProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!isMaximized) {
+                stageWidth = newValue.doubleValue();
+            }
+        });
+
+        mainStage.heightProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!isMaximized) {
+                stageHeight = newValue.doubleValue();
+            }
+        });
+
+        mainStage.xProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!isMaximized) {
+                stageXPosition = newValue.doubleValue();
+                oldStageXPosition = oldValue.doubleValue();
+            }
+        });
+
+        mainStage.yProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!isMaximized) {
+                stageYPosition = newValue.doubleValue();
+                oldStageYPosition = oldValue.doubleValue();
+            }
+        });
+
+        mainStage.maximizedProperty().addListener((observableValue, oldValue, newValue) -> {
+            isMaximized = newValue;
+            if (isMaximized) {
+                stageXPosition = oldStageXPosition;
+                stageYPosition = oldStageYPosition;
+            }
+        });
+    }
+
     private void searchLeftTableView() {
         searchHelper.searchFilteredGroupListDependingOnChoiceBox(leftTableViewSearchTextField, leftTableViewChoiceBox, filteredGroupList);
         searchHelper.clearTextFieldIfChoiceBoxChanged(leftTableViewChoiceBox, leftTableViewSearchTextField);
@@ -190,7 +290,16 @@ public class MainController {
             if (newSelection != null && !toggleSwitch.isSelected()) {
                 try {
                     observableExpressionList.clear();
-                    observableExpressionList.addAll(connectionManager.getExpressionsBelongingToGroup(newSelection));
+                    List<Expression> belongingExpressions = connectionManager.getExpressionsBelongingToGroup(newSelection);
+                    if (belongingExpressions.isEmpty()) {
+                        rightTableView.setPlaceholder(new Label("Diese Gruppe hat keine zugeordneten Wörter!"));
+                        rightTableViewNameColumn.setVisible(false);
+                        rightTableViewDateModifiedColumn.setVisible(false);
+                        return;
+                    }
+                    rightTableViewNameColumn.setVisible(true);
+                    rightTableViewDateModifiedColumn.setVisible(true);
+                    observableExpressionList.addAll(belongingExpressions);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -203,7 +312,16 @@ public class MainController {
             if (newSelection != null && toggleSwitch.isSelected()) {
                 try {
                     observableGroupList.clear();
-                    observableGroupList.addAll(connectionManager.getGroupsBelongingToExpression(newSelection));
+                    List<Group> belongingGroups = connectionManager.getGroupsBelongingToExpression(newSelection);
+                    if (belongingGroups.isEmpty()) {
+                        leftTableView.setPlaceholder(new Label("Dieses Wort ist zu keiner Gruppe zugeordnet!"));
+                        leftTableViewNameColumn.setVisible(false);
+                        leftTableViewDateModifiedColumn.setVisible(false);
+                        return;
+                    }
+                    leftTableViewNameColumn.setVisible(true);
+                    leftTableViewDateModifiedColumn.setVisible(true);
+                    observableGroupList.addAll(belongingGroups);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -216,24 +334,29 @@ public class MainController {
                 updateTableViewDependingOnToggleSwitch(newSelection));
     }
 
-    private void reloadGroupData() {
-        needToReloadData.addListener((observableValue, oldSelection, newSelection) -> {
-            if (newSelection) {
-                updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
-                needToReloadData.set(false);
-            }
-        });
+    public void reloadData() {
+        updateTableViewDependingOnToggleSwitch(toggleSwitch.isSelected());
     }
 
     private void updateTableViewDependingOnToggleSwitch(Boolean expressionIsSwitchedOn) {
         clearAll();
         if (!expressionIsSwitchedOn) {
+            leftTableViewNameColumn.setVisible(true);
+            leftTableViewDateModifiedColumn.setVisible(true);
+            rightTableViewNameColumn.setVisible(false);
+            rightTableViewDateModifiedColumn.setVisible(false);
+            rightTableView.setPlaceholder(new Label("Bitte Gruppe auswählen um zugeordnete Wörter zu sehen!"));
             try {
                 observableGroupList.addAll(connectionManager.getAllGroups());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
+            rightTableViewNameColumn.setVisible(true);
+            rightTableViewDateModifiedColumn.setVisible(true);
+            leftTableViewNameColumn.setVisible(false);
+            leftTableViewDateModifiedColumn.setVisible(false);
+            leftTableView.setPlaceholder(new Label("Bitte Wort auswählen um zugeordnete Gruppen zu sehen!"));
             try {
                 observableExpressionList.addAll(connectionManager.getAllExpressions());
             } catch (SQLException e) {
@@ -264,7 +387,7 @@ public class MainController {
     private void openEditGroupView() throws IOException {
         Group groupToEdit = leftTableView.getSelectionModel().getSelectedItem();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editGroup.fxml"));
-        fxmlLoader.setControllerFactory(controller -> new EditGroupController(groupToEdit, needToReloadData));
+        fxmlLoader.setControllerFactory(controller -> new EditGroupController(this, groupToEdit));
         Parent root = fxmlLoader.load();
         createNewStage(root, "Gruppe bearbeiten", 783, 440);
     }
@@ -272,7 +395,7 @@ public class MainController {
     private void openEditExpressionView() throws IOException {
         Expression expressionToEdit = rightTableView.getSelectionModel().getSelectedItem();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("editExpression.fxml"));
-        fxmlLoader.setControllerFactory(controller -> new EditExpressionController(expressionToEdit, needToReloadData));
+        fxmlLoader.setControllerFactory(controller -> new EditExpressionController(this, expressionToEdit));
         Parent root = fxmlLoader.load();
         createNewStage(root, "Wort bearbeiten", 783, 440);
     }
@@ -306,37 +429,53 @@ public class MainController {
     }
 
     @FXML
-    private void onDarkModeCheckMenuClick() {
-        Scene scene = menuBar.getScene();
-        if (darkMode.isSelected()) {
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+    private void onDarkModeCheckMenuItemClick() {
+        if (darkModeCheckMenuItem.isSelected()) {
+            mainStage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         } else {
-            scene.getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+            mainStage.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         }
+    }
+
+    @FXML
+    private void onGroupDateModifiedColumnCheckMenuItemClick() {
+        leftTableViewDateModifiedColumn.setVisible(groupDateModifiedColumnCheckMenuItem.isSelected());
+    }
+
+    @FXML
+    private void onExpressionDateModifiedColumnCheckMenuItemClick() {
+        rightTableViewDateModifiedColumn.setVisible(expressionDateModifiedColumnCheckMenuItem.isSelected());
+    }
+
+    @FXML
+    private void onResetUIMenuItemClick() {
+        splitPane.setDividerPositions(0.5);
+        double leftTableViewColumnDelta = (leftTableView.getWidth() / 2) - leftTableViewNameColumn.getWidth();
+        leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewColumnDelta);
+        double rightTableViewColumnDelta = (rightTableView.getWidth() / 2) - rightTableViewNameColumn.getWidth();
+        rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewColumnDelta);
     }
 
     @FXML
     private void onCreateNewGroupMenuItemClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGroup.fxml"));
+        fxmlLoader.setControllerFactory(controller -> new CreateGroupController(this));
         Parent root = fxmlLoader.load();
-        CreateGroupController createGroupController = fxmlLoader.getController();
-        createGroupController.setNeedToReloadDataBooleanProperty(needToReloadData);
         createNewStage(root, "Neue Gruppe Erstellen", 783, 440);
     }
 
     @FXML
     private void onCreateNewExpressionMenuItemClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createExpression.fxml"));
+        fxmlLoader.setControllerFactory(controller -> new CreateExpressionController(this));
         Parent root = fxmlLoader.load();
-        CreateExpressionController createExpressionController = fxmlLoader.getController();
-        createExpressionController.setNeedToReloadDataBooleanProperty(needToReloadData);
         createNewStage(root, "Neues Wort Erstellen", 783, 440);
     }
 
     @FXML
     private void onImportCSVMenuItemClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("importFromCSV.fxml"));
-        fxmlLoader.setControllerFactory(controller -> new ImportFromCSVController(needToReloadData));
+        fxmlLoader.setControllerFactory(controller -> new ImportFromCSVController(this));
         Parent root = fxmlLoader.load();
         createNewStage(root, "Importieren", 350, 200);
     }
@@ -360,7 +499,7 @@ public class MainController {
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(menuBar.getParent().getScene().getWindow());
         Scene scene = new Scene(root, width, height);
-        if (darkMode.isSelected()) {
+        if (darkModeCheckMenuItem.isSelected()) {
             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         }
         stage.setTitle(title);
@@ -372,7 +511,31 @@ public class MainController {
 
     @FXML
     private void onCloseMenuItemClick() {
-        Stage stage = (Stage) menuBar.getScene().getWindow();
-        stage.close();
+        setPreferences();
+        mainStage.close();
+    }
+
+    private void setPreferencesOnClose() {
+        mainStage.setOnCloseRequest(event -> setPreferences());
+    }
+
+    private void setPreferences() {
+        preferences.putDouble("WINDOW_WIDTH", stageWidth);
+        preferences.putDouble("WINDOW_HEIGHT", stageHeight);
+        preferences.putDouble("WINDOW_POSITION_X", stageXPosition);
+        preferences.putDouble("WINDOW_POSITION_Y", stageYPosition);
+        preferences.putBoolean("WINDOW_MAXIMIZED", mainStage.isMaximized());
+
+        preferences.putBoolean("GROUP_MODIFICATION_DATE_COLUMN_ENABLED", groupDateModifiedColumnCheckMenuItem.isSelected());
+        preferences.putBoolean("EXPRESSION_MODIFICATION_DATE_COLUMN_ENABLED", expressionDateModifiedColumnCheckMenuItem.isSelected());
+        preferences.putDouble("SPLIT_PANE_DIVIDER_POSITION", splitPane.getDividerPositions()[0]);
+        preferences.putBoolean("DARK_MODE", darkModeCheckMenuItem.isSelected());
+
+        double leftTableViewNameColumnOffsetFromCenter = leftTableViewNameColumn.getWidth() - (leftTableView.getWidth() / 2);
+        double rightTableViewNameColumnOffsetFromCenter = rightTableViewNameColumn.getWidth() - (rightTableView.getWidth() / 2);
+        preferences.putDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", leftTableViewNameColumnOffsetFromCenter);
+        preferences.putDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", rightTableViewNameColumnOffsetFromCenter);
+
+        preferences.putBoolean("TOGGLE_SWITCH_SELECTED", toggleSwitch.isSelected());
     }
 }

@@ -7,6 +7,6 @@ public class CustomTooltip extends Tooltip {
     public CustomTooltip(String text) {
         super(text);
         setWrapText(true);
-        setPrefWidth(250);
+        setMaxWidth(250);
     }
 }

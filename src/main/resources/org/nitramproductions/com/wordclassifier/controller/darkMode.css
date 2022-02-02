@@ -42,8 +42,8 @@
 }
 
 .table-view .column-header .label{
-    -fx-alignment: CENTER_LEFT;
-    -fx-font-weight: none;
+    -fx-alignment: CENTER;
+    -fx-font-weight: bold;
 }
 
 .list-cell:even,

@@ -12,6 +12,7 @@ module org.nitramproductions.com.wordclassifier {
     requires java.net.http;
     requires java.sql;
     requires java.desktop;
+    requires java.prefs;
     requires com.h2database;
     requires com.zaxxer.hikari;
     requires com.fasterxml.jackson.databind;
