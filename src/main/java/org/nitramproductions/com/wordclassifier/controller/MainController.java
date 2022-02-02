@@ -25,6 +25,7 @@ import org.nitramproductions.com.wordclassifier.model.Group;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
@@ -289,7 +290,16 @@ public class MainController {
             if (newSelection != null && !toggleSwitch.isSelected()) {
                 try {
                     observableExpressionList.clear();
-                    observableExpressionList.addAll(connectionManager.getExpressionsBelongingToGroup(newSelection));
+                    List<Expression> belongingExpressions = connectionManager.getExpressionsBelongingToGroup(newSelection);
+                    if (belongingExpressions.isEmpty()) {
+                        rightTableView.setPlaceholder(new Label("Diese Gruppe hat keine zugeordneten Wörter!"));
+                        rightTableViewNameColumn.setVisible(false);
+                        rightTableViewDateModifiedColumn.setVisible(false);
+                        return;
+                    }
+                    rightTableViewNameColumn.setVisible(true);
+                    rightTableViewDateModifiedColumn.setVisible(true);
+                    observableExpressionList.addAll(belongingExpressions);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -302,7 +312,16 @@ public class MainController {
             if (newSelection != null && toggleSwitch.isSelected()) {
                 try {
                     observableGroupList.clear();
-                    observableGroupList.addAll(connectionManager.getGroupsBelongingToExpression(newSelection));
+                    List<Group> belongingGroups = connectionManager.getGroupsBelongingToExpression(newSelection);
+                    if (belongingGroups.isEmpty()) {
+                        leftTableView.setPlaceholder(new Label("Dieses Wort ist zu keiner Gruppe zugeordnet!"));
+                        leftTableViewNameColumn.setVisible(false);
+                        leftTableViewDateModifiedColumn.setVisible(false);
+                        return;
+                    }
+                    leftTableViewNameColumn.setVisible(true);
+                    leftTableViewDateModifiedColumn.setVisible(true);
+                    observableGroupList.addAll(belongingGroups);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -322,12 +341,22 @@ public class MainController {
     private void updateTableViewDependingOnToggleSwitch(Boolean expressionIsSwitchedOn) {
         clearAll();
         if (!expressionIsSwitchedOn) {
+            leftTableViewNameColumn.setVisible(true);
+            leftTableViewDateModifiedColumn.setVisible(true);
+            rightTableViewNameColumn.setVisible(false);
+            rightTableViewDateModifiedColumn.setVisible(false);
+            rightTableView.setPlaceholder(new Label("Bitte Gruppe auswählen um zugeordnete Wörter zu sehen!"));
             try {
                 observableGroupList.addAll(connectionManager.getAllGroups());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
+            rightTableViewNameColumn.setVisible(true);
+            rightTableViewDateModifiedColumn.setVisible(true);
+            leftTableViewNameColumn.setVisible(false);
+            leftTableViewDateModifiedColumn.setVisible(false);
+            leftTableView.setPlaceholder(new Label("Bitte Wort auswählen um zugeordnete Gruppen zu sehen!"));
             try {
                 observableExpressionList.addAll(connectionManager.getAllExpressions());
             } catch (SQLException e) {
