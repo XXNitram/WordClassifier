@@ -70,7 +70,7 @@ public class MainApplication extends Application {
         Alert alert = new Alert(Alert.AlertType.ERROR, "Es ist ein Fehler aufgetreten!\n");
         alert.initOwner(primaryStage);
         alert.initModality(Modality.APPLICATION_MODAL);
-        alert.setX((primaryStage.getX() + (primaryStage.getWidth() / 2)) - 200);
+        alert.setX((primaryStage.getX() + (primaryStage.getWidth() / 2)) - 190);
         alert.setY((primaryStage.getY() + (primaryStage.getHeight() / 2)) - 100);
         alert.setResizable(false);
         alert.getDialogPane().setExpandableContent(textArea);
@@ -80,6 +80,11 @@ public class MainApplication extends Application {
             }
         });
 
+        Preferences preferences = Preferences.userRoot().node("/wordclassifier");
+        boolean darkMode = preferences.getBoolean("DARK_MODE", false);
+        if (darkMode) {
+            alert.getDialogPane().getScene().getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("controller/darkMode.css")).toExternalForm());
+        }
         alert.showAndWait();
     }
 

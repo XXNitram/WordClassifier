@@ -464,15 +464,6 @@ public class MainController {
     }
 
     @FXML
-    private void onDarkModeCheckMenuItemClick() {
-        if (darkModeCheckMenuItem.isSelected()) {
-            mainStage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
-        } else {
-            mainStage.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
-        }
-    }
-
-    @FXML
     private void onGroupDateModifiedColumnCheckMenuItemClick() {
         leftTableViewDateModifiedColumn.setVisible(groupDateModifiedColumnCheckMenuItem.isSelected());
         if (groupDateModifiedColumnCheckMenuItem.isSelected()) {
@@ -527,6 +518,16 @@ public class MainController {
     private void resetRightTableViewColumns() {
         double rightTableViewColumnDeltaReset = (rightTableView.getWidth() / 2) - rightTableViewNameColumn.getWidth();
         rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewColumnDeltaReset);
+    }
+
+    @FXML
+    private void onDarkModeCheckMenuItemClick() {
+        if (darkModeCheckMenuItem.isSelected()) {
+            mainStage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        } else {
+            mainStage.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        preferences.putBoolean("DARK_MODE", darkModeCheckMenuItem.isSelected());
     }
 
     @FXML

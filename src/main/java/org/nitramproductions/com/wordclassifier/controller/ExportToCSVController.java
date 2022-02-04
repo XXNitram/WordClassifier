@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
@@ -15,6 +16,8 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.prefs.Preferences;
 
 public class ExportToCSVController {
 
@@ -45,6 +48,7 @@ public class ExportToCSVController {
     private String expressionSaveLocation;
     private String belongToSaveLocation;
     private final CSVManager csvManager = new CSVManager();
+    private boolean darkMode;
 
     public ExportToCSVController() {
 
@@ -52,7 +56,8 @@ public class ExportToCSVController {
 
     @FXML
     private void initialize() {
-
+        Preferences preferences = Preferences.userRoot().node("/wordclassifier");
+        darkMode = preferences.getBoolean("DARK_MODE", false);
     }
 
     @FXML
@@ -100,11 +105,11 @@ public class ExportToCSVController {
     @FXML
     private void onGroupExportButtonClick(ActionEvent event) throws SQLException {
         if (!groupNameCheckBox.isSelected() && !groupDateModifiedCheckBox.isSelected() && !groupCreationDateCheckBox.isSelected()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
-            alert.showAndWait();
+            alertIfNoColumnIsSpecified();
             return;
         }
-        if (alertIfNoFileLocationIsSpecified(groupSaveLocation)) {
+        if (groupSaveLocation == null || groupSaveLocation.isEmpty()) {
+            alertIfNoSaveLocationIsSpecified();
             return;
         }
         List<Columns> groupColumns = new ArrayList<>();
@@ -126,11 +131,11 @@ public class ExportToCSVController {
     @FXML
     private void onExpressionExportButtonClick(ActionEvent event) throws SQLException {
         if (!expressionContentCheckBox.isSelected() && !expressionDateModifiedCheckBox.isSelected() && !expressionCreationDateCheckBox.isSelected()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
-            alert.showAndWait();
+            alertIfNoColumnIsSpecified();
             return;
         }
-        if (alertIfNoFileLocationIsSpecified(expressionSaveLocation)) {
+        if (expressionSaveLocation == null || expressionSaveLocation.isEmpty()) {
+            alertIfNoSaveLocationIsSpecified();
             return;
         }
         List<Columns> expressionColumns = new ArrayList<>();
@@ -152,11 +157,11 @@ public class ExportToCSVController {
     @FXML
     private void onBelongsToExportButtonClick(ActionEvent event) throws SQLException {
         if (!belongToNameCheckBox.isSelected() && !belongToContentCheckBox.isSelected()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
-            alert.showAndWait();
+            alertIfNoColumnIsSpecified();
             return;
         }
-        if (alertIfNoFileLocationIsSpecified(belongToSaveLocation)) {
+        if (belongToSaveLocation == null || belongToSaveLocation.isEmpty()) {
+            alertIfNoSaveLocationIsSpecified();
             return;
         }
         List<Columns> belongToColumns = new ArrayList<>();
@@ -179,12 +184,23 @@ public class ExportToCSVController {
         stage.close();
     }
 
-    private boolean alertIfNoFileLocationIsSpecified(String saveLocation) {
-        if (saveLocation == null || saveLocation.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
-            alert.showAndWait();
-            return true;
+    private void alertIfNoColumnIsSpecified() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        if (darkMode) {
+            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
         }
-        return false;
+        alert.showAndWait();
+    }
+
+    private void alertIfNoSaveLocationIsSpecified() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        if (darkMode) {
+           stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        alert.showAndWait();
     }
 }

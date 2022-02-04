@@ -16,6 +16,7 @@ import org.nitramproductions.com.wordclassifier.database.CSVManager;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.prefs.Preferences;
 
 public class ImportFromCSVController {
 
@@ -32,6 +33,7 @@ public class ImportFromCSVController {
     private final ToggleGroup toggleGroup = new ToggleGroup();
     private final CSVManager csvManager = new CSVManager();
     private final MainController mainController;
+    private boolean darkMode;
 
     public ImportFromCSVController(MainController mainController) {
         this.mainController = mainController;
@@ -39,6 +41,8 @@ public class ImportFromCSVController {
 
     @FXML
     private void initialize() {
+        Preferences preferences = Preferences.userRoot().node("/wordclassifier");
+        darkMode = preferences.getBoolean("DARK_MODE", false);
         groupRadioButton.setToggleGroup(toggleGroup);
         expressionRadioButton.setToggleGroup(toggleGroup);
         belongToRadioButton.setToggleGroup(toggleGroup);
@@ -98,19 +102,20 @@ public class ImportFromCSVController {
                 Bücher,The Shining""");
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        if (darkMode) {
+            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
         alert.showAndWait();
     }
 
     @FXML
     private void onImportButtonClick(ActionEvent event) throws SQLException {
         if (toggleGroup.getSelectedToggle() == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte eine Tabelle auswählen!");
-            alert.showAndWait();
+            alertIfNoTableIsSpecified();
             return;
         }
         if (fileLocation == null || fileLocation.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
-            alert.showAndWait();
+            alertIfNoFileLocationIsSpecified();
             return;
         }
         if (toggleGroup.getSelectedToggle() == groupRadioButton) {
@@ -131,5 +136,25 @@ public class ImportFromCSVController {
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
+    }
+
+    private void alertIfNoTableIsSpecified() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte eine Tabelle auswählen!");
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        if (darkMode) {
+            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        alert.showAndWait();
+    }
+
+    private void alertIfNoFileLocationIsSpecified() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        if (darkMode) {
+            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+        }
+        alert.showAndWait();
     }
 }
