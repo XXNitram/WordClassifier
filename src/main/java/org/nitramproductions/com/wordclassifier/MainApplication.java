@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.nitramproductions.com.wordclassifier.controller.MainController;
@@ -17,8 +18,11 @@ import java.util.prefs.Preferences;
 
 public class MainApplication extends Application {
 
+    private static Stage primaryStage;
+
     @Override
     public void start(Stage stage) throws IOException {
+        primaryStage = stage;
         Thread.setDefaultUncaughtExceptionHandler(MainApplication::showError);
 
         Preferences preferences = Preferences.userRoot().node("/wordclassifier");
@@ -64,6 +68,10 @@ public class MainApplication extends Application {
         textArea.setWrapText(true);
 
         Alert alert = new Alert(Alert.AlertType.ERROR, "Es ist ein Fehler aufgetreten!\n");
+        alert.initOwner(primaryStage);
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.setX((primaryStage.getX() + (primaryStage.getWidth() / 2)) - 200);
+        alert.setY((primaryStage.getY() + (primaryStage.getHeight() / 2)) - 100);
         alert.setResizable(false);
         alert.getDialogPane().setExpandableContent(textArea);
         alert.getDialogPane().expandedProperty().addListener((observableValue, oldSelection, newSelection) -> {
