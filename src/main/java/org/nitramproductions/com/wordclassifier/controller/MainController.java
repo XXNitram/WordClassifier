@@ -83,6 +83,9 @@ public class MainController {
     private double oldStageXPosition;
     private double oldStageYPosition;
 
+    double leftTableViewColumnDelta;
+    double rightTableViewColumnDelta;
+
     public MainController(Stage mainStage) {
         this.mainStage = mainStage;
         preferences = Preferences.userRoot().node("/wordclassifier");
@@ -165,8 +168,8 @@ public class MainController {
         leftTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         leftTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         leftTableViewDateModifiedColumn.setReorderable(false);
-        double leftTableViewNameColumnOffsetFromCenterPref = preferences.getDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0);
-        Platform.runLater(() -> leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewNameColumnOffsetFromCenterPref));
+        leftTableViewColumnDelta = preferences.getDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0);
+        Platform.runLater(() -> leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewColumnDelta));
     }
 
     private void initializeRightTableViewColumns() {
@@ -176,8 +179,8 @@ public class MainController {
         rightTableViewDateModifiedColumn.setCellValueFactory(cellData -> cellData.getValue().formattedDateModifiedProperty());
         rightTableViewDateModifiedColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         rightTableViewDateModifiedColumn.setReorderable(false);
-        double rightTableViewNameColumnOffsetFromCenterPref = preferences.getDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0);
-        Platform.runLater(() -> rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewNameColumnOffsetFromCenterPref));
+        rightTableViewColumnDelta = preferences.getDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", 0);
+        Platform.runLater(() -> rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewColumnDelta));
     }
 
     private void initializeChoiceBoxes() {
@@ -231,7 +234,7 @@ public class MainController {
 
     private void initializeTableViewDependingOnToggleSwitch() {
         boolean toggleSwitchSelectedPref = preferences.getBoolean("TOGGLE_SWITCH_SELECTED", false);
-        updateTableViewDependingOnToggleSwitch(toggleSwitchSelectedPref);
+        Platform.runLater(() -> updateTableViewDependingOnToggleSwitch(toggleSwitchSelectedPref));
         toggleSwitch.setSelected(toggleSwitchSelectedPref);
     }
 
@@ -293,12 +296,18 @@ public class MainController {
                     List<Expression> belongingExpressions = connectionManager.getExpressionsBelongingToGroup(newSelection);
                     if (belongingExpressions.isEmpty()) {
                         rightTableView.setPlaceholder(new Label("Diese Gruppe hat keine zugeordneten Wörter!"));
+                        updateRightTableViewColumnDelta();
                         rightTableViewNameColumn.setVisible(false);
                         rightTableViewDateModifiedColumn.setVisible(false);
                         return;
                     }
-                    rightTableViewNameColumn.setVisible(true);
-                    rightTableViewDateModifiedColumn.setVisible(true);
+                    if(!rightTableViewNameColumn.isVisible()) {
+                        rightTableViewNameColumn.setVisible(true);
+                        if (expressionDateModifiedColumnCheckMenuItem.isSelected()) {
+                            rightTableViewDateModifiedColumn.setVisible(true);
+                        }
+                        rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewColumnDelta);
+                    }
                     observableExpressionList.addAll(belongingExpressions);
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -315,12 +324,18 @@ public class MainController {
                     List<Group> belongingGroups = connectionManager.getGroupsBelongingToExpression(newSelection);
                     if (belongingGroups.isEmpty()) {
                         leftTableView.setPlaceholder(new Label("Dieses Wort ist zu keiner Gruppe zugeordnet!"));
+                        updateLeftTableViewColumnDelta();
                         leftTableViewNameColumn.setVisible(false);
                         leftTableViewDateModifiedColumn.setVisible(false);
                         return;
                     }
-                    leftTableViewNameColumn.setVisible(true);
-                    leftTableViewDateModifiedColumn.setVisible(true);
+                    if (!leftTableViewNameColumn.isVisible()) {
+                        leftTableViewNameColumn.setVisible(true);
+                        if (groupDateModifiedColumnCheckMenuItem.isSelected()) {
+                            leftTableViewDateModifiedColumn.setVisible(true);
+                        }
+                        leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewColumnDelta);
+                    }
                     observableGroupList.addAll(belongingGroups);
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -341,28 +356,48 @@ public class MainController {
     private void updateTableViewDependingOnToggleSwitch(Boolean expressionIsSwitchedOn) {
         clearAll();
         if (!expressionIsSwitchedOn) {
-            leftTableViewNameColumn.setVisible(true);
-            leftTableViewDateModifiedColumn.setVisible(true);
+            if (!leftTableViewNameColumn.isVisible()) {
+                leftTableViewNameColumn.setVisible(true);
+                if (groupDateModifiedColumnCheckMenuItem.isSelected()) {
+                    leftTableViewDateModifiedColumn.setVisible(true);
+                }
+                leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewColumnDelta);
+            }
+            rightTableView.setPlaceholder(new Label("Bitte Gruppe auswählen um zugeordnete Wörter zu sehen!"));
+            updateRightTableViewColumnDelta();
             rightTableViewNameColumn.setVisible(false);
             rightTableViewDateModifiedColumn.setVisible(false);
-            rightTableView.setPlaceholder(new Label("Bitte Gruppe auswählen um zugeordnete Wörter zu sehen!"));
             try {
                 observableGroupList.addAll(connectionManager.getAllGroups());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
-            rightTableViewNameColumn.setVisible(true);
-            rightTableViewDateModifiedColumn.setVisible(true);
+            if (!rightTableViewNameColumn.isVisible()) {
+                rightTableViewNameColumn.setVisible(true);
+                if (expressionDateModifiedColumnCheckMenuItem.isSelected()) {
+                    rightTableViewDateModifiedColumn.setVisible(true);
+                }
+                rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewColumnDelta);
+            }
+            leftTableView.setPlaceholder(new Label("Bitte Wort auswählen um zugeordnete Gruppen zu sehen!"));
+            updateLeftTableViewColumnDelta();
             leftTableViewNameColumn.setVisible(false);
             leftTableViewDateModifiedColumn.setVisible(false);
-            leftTableView.setPlaceholder(new Label("Bitte Wort auswählen um zugeordnete Gruppen zu sehen!"));
             try {
                 observableExpressionList.addAll(connectionManager.getAllExpressions());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void updateLeftTableViewColumnDelta() {
+        leftTableViewColumnDelta = leftTableViewNameColumn.getWidth() - (leftTableView.getWidth() / 2);
+    }
+
+    private void updateRightTableViewColumnDelta() {
+        rightTableViewColumnDelta = rightTableViewNameColumn.getWidth() - (rightTableView.getWidth() / 2);
     }
 
     private void clearAll() {
@@ -440,20 +475,58 @@ public class MainController {
     @FXML
     private void onGroupDateModifiedColumnCheckMenuItemClick() {
         leftTableViewDateModifiedColumn.setVisible(groupDateModifiedColumnCheckMenuItem.isSelected());
+        if (groupDateModifiedColumnCheckMenuItem.isSelected()) {
+            resetLeftTableViewColumns();
+        }
     }
 
     @FXML
     private void onExpressionDateModifiedColumnCheckMenuItemClick() {
         rightTableViewDateModifiedColumn.setVisible(expressionDateModifiedColumnCheckMenuItem.isSelected());
+        if (expressionDateModifiedColumnCheckMenuItem.isSelected()) {
+            resetRightTableViewColumns();
+        }
     }
 
     @FXML
     private void onResetUIMenuItemClick() {
         splitPane.setDividerPositions(0.5);
-        double leftTableViewColumnDelta = (leftTableView.getWidth() / 2) - leftTableViewNameColumn.getWidth();
-        leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewColumnDelta);
-        double rightTableViewColumnDelta = (rightTableView.getWidth() / 2) - rightTableViewNameColumn.getWidth();
-        rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewColumnDelta);
+        if (!groupDateModifiedColumnCheckMenuItem.isSelected()) {
+            leftTableViewDateModifiedColumn.setVisible(true);
+            groupDateModifiedColumnCheckMenuItem.setSelected(true);
+        }
+        if (!leftTableViewNameColumn.isVisible()) {
+            leftTableViewNameColumn.setVisible(true);
+            leftTableViewDateModifiedColumn.setVisible(true);
+            resetLeftTableViewColumns();
+            updateLeftTableViewColumnDelta();
+            leftTableViewNameColumn.setVisible(false);
+            leftTableViewDateModifiedColumn.setVisible(false);
+        }
+        resetLeftTableViewColumns();
+        if (!expressionDateModifiedColumnCheckMenuItem.isSelected()) {
+            rightTableViewDateModifiedColumn.setVisible(true);
+            expressionDateModifiedColumnCheckMenuItem.setSelected(true);
+        }
+        if (!rightTableViewNameColumn.isVisible()) {
+            rightTableViewNameColumn.setVisible(true);
+            rightTableViewDateModifiedColumn.setVisible(true);
+            resetRightTableViewColumns();
+            updateRightTableViewColumnDelta();
+            rightTableViewNameColumn.setVisible(false);
+            rightTableViewDateModifiedColumn.setVisible(false);
+        }
+        resetRightTableViewColumns();
+    }
+
+    private void resetLeftTableViewColumns() {
+        double leftTableViewColumnDeltaReset = (leftTableView.getWidth() / 2) - leftTableViewNameColumn.getWidth();
+        leftTableView.resizeColumn(leftTableViewNameColumn, leftTableViewColumnDeltaReset);
+    }
+
+    private void resetRightTableViewColumns() {
+        double rightTableViewColumnDeltaReset = (rightTableView.getWidth() / 2) - rightTableViewNameColumn.getWidth();
+        rightTableView.resizeColumn(rightTableViewNameColumn, rightTableViewColumnDeltaReset);
     }
 
     @FXML
@@ -511,8 +584,7 @@ public class MainController {
 
     @FXML
     private void onCloseMenuItemClick() {
-        setPreferences();
-        mainStage.close();
+        throw new RuntimeException();
     }
 
     private void setPreferencesOnClose() {
@@ -531,10 +603,10 @@ public class MainController {
         preferences.putDouble("SPLIT_PANE_DIVIDER_POSITION", splitPane.getDividerPositions()[0]);
         preferences.putBoolean("DARK_MODE", darkModeCheckMenuItem.isSelected());
 
-        double leftTableViewNameColumnOffsetFromCenter = leftTableViewNameColumn.getWidth() - (leftTableView.getWidth() / 2);
-        double rightTableViewNameColumnOffsetFromCenter = rightTableViewNameColumn.getWidth() - (rightTableView.getWidth() / 2);
-        preferences.putDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", leftTableViewNameColumnOffsetFromCenter);
-        preferences.putDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", rightTableViewNameColumnOffsetFromCenter);
+        updateLeftTableViewColumnDelta();
+        updateRightTableViewColumnDelta();
+        preferences.putDouble("LEFT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", leftTableViewColumnDelta);
+        preferences.putDouble("RIGHT_TABLE_VIEW_NAME_COLUMN_OFFSET_FROM_CENTER", rightTableViewColumnDelta);
 
         preferences.putBoolean("TOGGLE_SWITCH_SELECTED", toggleSwitch.isSelected());
     }
