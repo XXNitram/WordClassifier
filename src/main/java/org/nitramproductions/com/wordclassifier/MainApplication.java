@@ -5,8 +5,10 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.nitramproductions.com.wordclassifier.controller.MainController;
 
 import java.io.IOException;
@@ -46,16 +48,30 @@ public class MainApplication extends Application {
         stage.show();
     }
 
-    private static void showError(Thread t, Throwable e) {
+    private static void showError(Thread thread, Throwable throwable) {
         if (Platform.isFxApplicationThread()) {
-            showErrorAlert();
+            showErrorAlert(throwable);
         } else {
-            System.err.println("An unexpected error occurred in " + t);
+            System.err.println("An unexpected error occurred in " + thread);
         }
     }
 
-    private static void showErrorAlert() {
-        Alert alert = new Alert(Alert.AlertType.ERROR, "Es ist ein Fehler aufgetreten!");
+    private static void showErrorAlert(Throwable throwable) {
+        String stacktrace = ExceptionUtils.getStackTrace(throwable);
+        TextArea textArea = new TextArea(stacktrace);
+        textArea.setPrefSize(500, 200);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Es ist ein Fehler aufgetreten!\n");
+        alert.setResizable(false);
+        alert.getDialogPane().setExpandableContent(textArea);
+        alert.getDialogPane().expandedProperty().addListener((observableValue, oldSelection, newSelection) -> {
+            if (newSelection) {
+                alert.setResizable(false);
+            }
+        });
+
         alert.showAndWait();
     }
 
