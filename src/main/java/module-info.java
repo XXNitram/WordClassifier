@@ -16,6 +16,7 @@ module org.nitramproductions.com.wordclassifier {
     requires com.h2database;
     requires com.zaxxer.hikari;
     requires com.fasterxml.jackson.databind;
+    requires org.apache.commons.lang3;
 
     opens org.nitramproductions.com.wordclassifier to javafx.fxml;
     exports org.nitramproductions.com.wordclassifier;

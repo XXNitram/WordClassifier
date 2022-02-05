@@ -8,6 +8,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.nitramproductions.com.wordclassifier.controller.helper.AlertHelper;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
 import org.nitramproductions.com.wordclassifier.database.helper.Columns;
 
@@ -45,6 +46,7 @@ public class ExportToCSVController {
     private String expressionSaveLocation;
     private String belongToSaveLocation;
     private final CSVManager csvManager = new CSVManager();
+    private final AlertHelper alertHelper = new AlertHelper();
 
     public ExportToCSVController() {
 
@@ -99,12 +101,14 @@ public class ExportToCSVController {
 
     @FXML
     private void onGroupExportButtonClick(ActionEvent event) throws SQLException {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
         if (!groupNameCheckBox.isSelected() && !groupDateModifiedCheckBox.isSelected() && !groupCreationDateCheckBox.isSelected()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
-            alert.showAndWait();
+            alertIfNoColumnIsSpecified(stage);
             return;
         }
-        if (alertIfNoFileLocationIsSpecified(groupSaveLocation)) {
+        if (groupSaveLocation == null || groupSaveLocation.isEmpty()) {
+            alertIfNoSaveLocationIsSpecified(stage);
             return;
         }
         List<Columns> groupColumns = new ArrayList<>();
@@ -118,19 +122,19 @@ public class ExportToCSVController {
             groupColumns.add(Columns.CREATION_DATE);
         }
         csvManager.writeSpecificGroupColumnsToCSV(groupColumns, groupSaveLocation);
-        Node node = (Node) event.getSource();
-        Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     private void onExpressionExportButtonClick(ActionEvent event) throws SQLException {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
         if (!expressionContentCheckBox.isSelected() && !expressionDateModifiedCheckBox.isSelected() && !expressionCreationDateCheckBox.isSelected()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
-            alert.showAndWait();
+            alertIfNoColumnIsSpecified(stage);
             return;
         }
-        if (alertIfNoFileLocationIsSpecified(expressionSaveLocation)) {
+        if (expressionSaveLocation == null || expressionSaveLocation.isEmpty()) {
+            alertIfNoSaveLocationIsSpecified(stage);
             return;
         }
         List<Columns> expressionColumns = new ArrayList<>();
@@ -144,19 +148,19 @@ public class ExportToCSVController {
             expressionColumns.add(Columns.CREATION_DATE);
         }
         csvManager.writeSpecificExpressionColumnsToCSV(expressionColumns, expressionSaveLocation);
-        Node node = (Node) event.getSource();
-        Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     private void onBelongsToExportButtonClick(ActionEvent event) throws SQLException {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
         if (!belongToNameCheckBox.isSelected() && !belongToContentCheckBox.isSelected()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
-            alert.showAndWait();
+            alertIfNoColumnIsSpecified(stage);
             return;
         }
-        if (alertIfNoFileLocationIsSpecified(belongToSaveLocation)) {
+        if (belongToSaveLocation == null || belongToSaveLocation.isEmpty()) {
+            alertIfNoSaveLocationIsSpecified(stage);
             return;
         }
         List<Columns> belongToColumns = new ArrayList<>();
@@ -167,8 +171,6 @@ public class ExportToCSVController {
             belongToColumns.add(Columns.CONTENT);
         }
         csvManager.writeSpecificBelongToColumnsToCSV(belongToColumns, belongToSaveLocation);
-        Node node = (Node) event.getSource();
-        Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
     }
 
@@ -179,12 +181,13 @@ public class ExportToCSVController {
         stage.close();
     }
 
-    private boolean alertIfNoFileLocationIsSpecified(String saveLocation) {
-        if (saveLocation == null || saveLocation.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
-            alert.showAndWait();
-            return true;
-        }
-        return false;
+    private void alertIfNoColumnIsSpecified(Stage stage) {
+        Alert alert = alertHelper.createNewErrorAlert("Bitte mindestens eine Spalte auswählen!", stage);
+        alert.showAndWait();
+    }
+
+    private void alertIfNoSaveLocationIsSpecified(Stage stage) {
+        Alert alert = alertHelper.createNewErrorAlert("Bitte einen Speicherort wählen!", stage);
+        alert.showAndWait();
     }
 }

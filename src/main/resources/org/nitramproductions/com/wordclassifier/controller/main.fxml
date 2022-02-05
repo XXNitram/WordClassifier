@@ -78,6 +78,7 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Hilfe">
             <items>
+                  <MenuItem mnemonicParsing="false" onAction="#onSendBugReportMenuItemClick" text="Fehler melden..." />
               <MenuItem mnemonicParsing="false" onAction="#onAboutMenuItemClick" text="About" />
             </items>
           </Menu>

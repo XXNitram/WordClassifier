@@ -17,7 +17,7 @@
       </Label>
       <ImageView fitHeight="100.0" fitWidth="100.0" layoutX="123.0" layoutY="43.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@book-icon.png" />
+            <Image url="@helper/book-icon.png" />
          </image>
       </ImageView>
       <ImageView fx:id="imageView" fitHeight="163.0" fitWidth="354.0" layoutX="123.0" layoutY="165.0" pickOnBounds="true" preserveRatio="true" />

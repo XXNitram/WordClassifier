@@ -7,10 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
-import org.nitramproductions.com.wordclassifier.controller.helper.SearchHelper;
-import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
-import org.nitramproductions.com.wordclassifier.controller.helper.TooltipForEllipsizedCells;
-import org.nitramproductions.com.wordclassifier.controller.helper.ValidationHelper;
+import org.nitramproductions.com.wordclassifier.controller.helper.*;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
@@ -49,6 +46,7 @@ public class CreateExpressionController {
     private final SelectionHelper selectionHelper = new SelectionHelper();
     private final ValidationHelper validationHelper = new ValidationHelper();
     private final SearchHelper searchHelper = new SearchHelper();
+    private final TooltipForTextFieldHelper tooltipForTextFieldHelper = new TooltipForTextFieldHelper();
     private final MainController mainController;
 
     public CreateExpressionController(MainController mainController) {
@@ -60,6 +58,7 @@ public class CreateExpressionController {
         initializeLists();
         initializeTableViews();
         initializeTableViewColumns();
+        initializeTextField();
         initializeButtons();
         searchTableViews();
         validateNewNameTextField();
@@ -83,6 +82,10 @@ public class CreateExpressionController {
         leftTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
         rightTableViewNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         rightTableViewNameColumn.setCellFactory(column -> new TooltipForEllipsizedCells<>());
+    }
+
+    private void initializeTextField() {
+        tooltipForTextFieldHelper.setTooltipForTextFieldIfContentExceedsWidthAndListenToChanges(newNameTextField);
     }
 
     private void initializeButtons() {

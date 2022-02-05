@@ -8,14 +8,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.nitramproductions.com.wordclassifier.controller.helper.AlertHelper;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.Objects;
 
 public class ImportFromCSVController {
 
@@ -31,6 +31,7 @@ public class ImportFromCSVController {
     private String fileLocation;
     private final ToggleGroup toggleGroup = new ToggleGroup();
     private final CSVManager csvManager = new CSVManager();
+    private final AlertHelper alertHelper = new AlertHelper();
     private final MainController mainController;
 
     public ImportFromCSVController(MainController mainController) {
@@ -59,7 +60,9 @@ public class ImportFromCSVController {
     }
 
     @FXML
-    private void onFormatRequirementsHyperlinkClick() {
+    private void onFormatRequirementsHyperlinkClick(ActionEvent event) {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.getDialogPane().setPrefSize(450,660);
         alert.setTitle("Formatierungsvorgabe");
@@ -96,21 +99,25 @@ public class ImportFromCSVController {
                 NAME,CONTENT
                 Emotionen,Wut
                 Bücher,The Shining""");
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        alert.initOwner(stage);
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.setResizable(false);
+        alertHelper.setPositionToCenterOfParentStage(alert, stage);
+        alertHelper.setIcon(alert);
+        alertHelper.setDarkMode(alert);
         alert.showAndWait();
     }
 
     @FXML
     private void onImportButtonClick(ActionEvent event) throws SQLException {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
         if (toggleGroup.getSelectedToggle() == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte eine Tabelle auswählen!");
-            alert.showAndWait();
+            alertIfNoTableIsSpecified(stage);
             return;
         }
         if (fileLocation == null || fileLocation.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
-            alert.showAndWait();
+            alertIfNoFileLocationIsSpecified(stage);
             return;
         }
         if (toggleGroup.getSelectedToggle() == groupRadioButton) {
@@ -121,8 +128,6 @@ public class ImportFromCSVController {
             csvManager.readAndInsertBelongsToFromCSV(fileLocation);
         }
         mainController.reloadData();
-        Node node = (Node) event.getSource();
-        Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
     }
 
@@ -131,5 +136,15 @@ public class ImportFromCSVController {
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
+    }
+
+    private void alertIfNoTableIsSpecified(Stage stage) {
+        Alert alert = alertHelper.createNewErrorAlert("Bitte eine Tabelle auswählen!", stage);
+        alert.showAndWait();
+    }
+
+    private void alertIfNoFileLocationIsSpecified(Stage stage) {
+        Alert alert = alertHelper.createNewErrorAlert("Bitte einen Speicherort wählen!", stage);
+        alert.showAndWait();
     }
 }

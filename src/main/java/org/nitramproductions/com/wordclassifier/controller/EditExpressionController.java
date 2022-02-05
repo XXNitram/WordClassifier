@@ -8,10 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.TooltipWrapper;
-import org.nitramproductions.com.wordclassifier.controller.helper.SearchHelper;
-import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
-import org.nitramproductions.com.wordclassifier.controller.helper.TooltipForEllipsizedCells;
-import org.nitramproductions.com.wordclassifier.controller.helper.ValidationHelper;
+import org.nitramproductions.com.wordclassifier.controller.helper.*;
 import org.nitramproductions.com.wordclassifier.database.ConnectionManager;
 import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
@@ -55,6 +52,7 @@ public class EditExpressionController {
     private final SelectionHelper selectionHelper = new SelectionHelper();
     private final ValidationHelper validationHelper = new ValidationHelper();
     private final SearchHelper searchHelper = new SearchHelper();
+    private final TooltipForTextFieldHelper tooltipForTextFieldHelper = new TooltipForTextFieldHelper();
 
     private  final MainController mainController;
     private final Expression expressionToEdit;
@@ -120,7 +118,11 @@ public class EditExpressionController {
 
     private void initializeNameField() {
         nameTextField.setText(expressionToEdit.getContent());
-        Platform.runLater(() -> nameTextField.getParent().requestFocus());
+        Platform.runLater(() -> {
+            nameTextField.getParent().requestFocus();
+            tooltipForTextFieldHelper.setTooltipForTextFieldIfContentExceedsWidth(nameTextField);
+        });
+        tooltipForTextFieldHelper.setTooltipForTextFieldIfContentExceedsWidthAndListenToChanges(nameTextField);
     }
 
     private void initializeDateLabels() {
