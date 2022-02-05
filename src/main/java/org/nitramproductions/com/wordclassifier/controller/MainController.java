@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
+import org.nitramproductions.com.wordclassifier.controller.helper.NetworkHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.SearchHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.SelectionHelper;
 import org.nitramproductions.com.wordclassifier.controller.helper.TooltipForEllipsizedCells;
@@ -24,6 +25,8 @@ import org.nitramproductions.com.wordclassifier.model.Expression;
 import org.nitramproductions.com.wordclassifier.model.Group;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -72,6 +75,7 @@ public class MainController {
     private final ConnectionManager connectionManager = new ConnectionManager();
     private final SearchHelper searchHelper = new SearchHelper();
     private final SelectionHelper selectionHelper = new SelectionHelper();
+    private final NetworkHelper networkHelper = new NetworkHelper();
     private final Stage mainStage;
     private final Preferences preferences;
 
@@ -559,6 +563,19 @@ public class MainController {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("exportToCSV.fxml"));
         Parent root = fxmlLoader.load();
         createNewStage(root, "Exportieren", 350, 230);
+    }
+
+    @FXML
+    private void onSendBugReportMenuItemClick() throws URISyntaxException, IOException {
+        String mailto = "mailto:matti.55@hotmail.de" +
+                "?subject=Wordclassifier%20Fehlerbericht" +
+                "&body=Beschreibung%20des%20Fehlers%3A%0D%0A%0D%0A%2F%2F%20Hier%20schreiben%0D%0A%0D%0A" +
+                "Wie%20reproduziere%20ich%20den%20Fehler%3A%0D%0A%0D%0A%2F%2F%20Hier%20schreiben%0D%0A%0D%0A" +
+                "Was%20soll%20passieren%3F%0D%0A%0D%0A%2F%2F%20Hier%20schreiben%0D%0A%0D%0A" +
+                "Was%20ist%20stattdessen%20passiert%3F%0D%0A%0D%0A%2F%2F%20Hier%20schreiben%0D%0A%0D%0A" +
+                "Sonstige%20Bemerkungen%3A%0D%0A%0D%0A%2F%2F%20Hier%20schreiben";
+        URI mailtoURI = new URI(mailto);
+        networkHelper.openDefaultMailClient(mailtoURI);
     }
 
     @FXML
