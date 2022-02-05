@@ -39,8 +39,8 @@ public class AboutController {
     private final AnimationHelper animationHelper = new AnimationHelper();
 
     public AboutController() throws URISyntaxException, IOException {
-        latestReleaseGithubAPI = new URI("https://api.github.com/repos/atom/atom/releases/latest");
-        latestReleaseGithub = new URI("https://github.com/atom/atom/releases/latest");
+        latestReleaseGithubAPI = new URI("https://api.github.com/repos/XXNitram/WordClassifier/releases/latest");
+        latestReleaseGithub = new URI("https://github.com/XXNitram/WordClassifier/releases/latest");
         getProjectVersion();
     }
 
