@@ -24,6 +24,12 @@ public class NetworkHelper {
         }
     }
 
+    public void openDefaultMailClient(URI uri) throws IOException {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MAIL)) {
+            Desktop.getDesktop().mail(uri);
+        }
+    }
+
     public String getLatestGithubReleaseVersion(URI latestGithubReleaseAPI) throws IOException, InterruptedException {
         HttpResponse<String> response = getLatestGithubReleaseResponse(latestGithubReleaseAPI);
         Map<String, Object> map = parseJSONResponseToMap(response);
