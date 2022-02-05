@@ -587,7 +587,8 @@ public class MainController {
 
     @FXML
     private void onCloseMenuItemClick() {
-        throw new RuntimeException();
+        setPreferences();
+        mainStage.close();
     }
 
     private void setPreferencesOnClose() {
