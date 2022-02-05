@@ -568,14 +568,16 @@ public class MainController {
         createNewStage(root, "About", 600, 400);
     }
 
-    private void createNewStage(Parent root, String title, int width, int height) {
+    private void createNewStage(Parent root, String title, double width, double height) {
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(menuBar.getParent().getScene().getWindow());
+        stage.initOwner(mainStage);
         Scene scene = new Scene(root, width, height);
         if (darkModeCheckMenuItem.isSelected()) {
             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("helper/darkMode.css")).toExternalForm());
         }
+        stage.setX((mainStage.getX() + (mainStage.getWidth() / 2)) - (width / 2));
+        stage.setY((mainStage.getY() + (mainStage.getHeight() / 2)) - (height / 2));
         stage.setTitle(title);
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("helper/book-icon.png"))));
         stage.setResizable(false);
