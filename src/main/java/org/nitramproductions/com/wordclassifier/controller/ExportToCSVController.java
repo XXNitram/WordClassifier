@@ -101,12 +101,14 @@ public class ExportToCSVController {
 
     @FXML
     private void onGroupExportButtonClick(ActionEvent event) throws SQLException {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
         if (!groupNameCheckBox.isSelected() && !groupDateModifiedCheckBox.isSelected() && !groupCreationDateCheckBox.isSelected()) {
-            alertIfNoColumnIsSpecified();
+            alertIfNoColumnIsSpecified(stage);
             return;
         }
         if (groupSaveLocation == null || groupSaveLocation.isEmpty()) {
-            alertIfNoSaveLocationIsSpecified();
+            alertIfNoSaveLocationIsSpecified(stage);
             return;
         }
         List<Columns> groupColumns = new ArrayList<>();
@@ -120,19 +122,19 @@ public class ExportToCSVController {
             groupColumns.add(Columns.CREATION_DATE);
         }
         csvManager.writeSpecificGroupColumnsToCSV(groupColumns, groupSaveLocation);
-        Node node = (Node) event.getSource();
-        Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     private void onExpressionExportButtonClick(ActionEvent event) throws SQLException {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
         if (!expressionContentCheckBox.isSelected() && !expressionDateModifiedCheckBox.isSelected() && !expressionCreationDateCheckBox.isSelected()) {
-            alertIfNoColumnIsSpecified();
+            alertIfNoColumnIsSpecified(stage);
             return;
         }
         if (expressionSaveLocation == null || expressionSaveLocation.isEmpty()) {
-            alertIfNoSaveLocationIsSpecified();
+            alertIfNoSaveLocationIsSpecified(stage);
             return;
         }
         List<Columns> expressionColumns = new ArrayList<>();
@@ -146,19 +148,19 @@ public class ExportToCSVController {
             expressionColumns.add(Columns.CREATION_DATE);
         }
         csvManager.writeSpecificExpressionColumnsToCSV(expressionColumns, expressionSaveLocation);
-        Node node = (Node) event.getSource();
-        Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     private void onBelongsToExportButtonClick(ActionEvent event) throws SQLException {
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
         if (!belongToNameCheckBox.isSelected() && !belongToContentCheckBox.isSelected()) {
-            alertIfNoColumnIsSpecified();
+            alertIfNoColumnIsSpecified(stage);
             return;
         }
         if (belongToSaveLocation == null || belongToSaveLocation.isEmpty()) {
-            alertIfNoSaveLocationIsSpecified();
+            alertIfNoSaveLocationIsSpecified(stage);
             return;
         }
         List<Columns> belongToColumns = new ArrayList<>();
@@ -169,8 +171,6 @@ public class ExportToCSVController {
             belongToColumns.add(Columns.CONTENT);
         }
         csvManager.writeSpecificBelongToColumnsToCSV(belongToColumns, belongToSaveLocation);
-        Node node = (Node) event.getSource();
-        Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
     }
 
@@ -181,13 +181,13 @@ public class ExportToCSVController {
         stage.close();
     }
 
-    private void alertIfNoColumnIsSpecified() {
-        Alert alert = alertHelper.createNewErrorAlert("Bitte mindestens eine Spalte auswählen!");
+    private void alertIfNoColumnIsSpecified(Stage stage) {
+        Alert alert = alertHelper.createNewErrorAlert("Bitte mindestens eine Spalte auswählen!", stage);
         alert.showAndWait();
     }
 
-    private void alertIfNoSaveLocationIsSpecified() {
-        Alert alert = alertHelper.createNewErrorAlert("Bitte einen Speicherort wählen!");
+    private void alertIfNoSaveLocationIsSpecified(Stage stage) {
+        Alert alert = alertHelper.createNewErrorAlert("Bitte einen Speicherort wählen!", stage);
         alert.showAndWait();
     }
 }
