@@ -70,8 +70,8 @@ public class MainApplication extends Application {
         Alert alert = new Alert(Alert.AlertType.ERROR, "Es ist ein Fehler aufgetreten!\n");
         alert.initOwner(primaryStage);
         alert.initModality(Modality.APPLICATION_MODAL);
-        alert.setX((primaryStage.getX() + (primaryStage.getWidth() / 2)) - 190);
-        alert.setY((primaryStage.getY() + (primaryStage.getHeight() / 2)) - 100);
+        alert.setX((primaryStage.getX() + (primaryStage.getWidth() / 2)) - (alert.getWidth() / 2));
+        alert.setY((primaryStage.getY() + (primaryStage.getHeight() / 2)) - (alert.getHeight() / 2));
         alert.setResizable(false);
         alert.getDialogPane().setExpandableContent(textArea);
         alert.getDialogPane().expandedProperty().addListener((observableValue, oldSelection, newSelection) -> {
