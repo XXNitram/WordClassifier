@@ -523,9 +523,9 @@ public class MainController {
     @FXML
     private void onDarkModeCheckMenuItemClick() {
         if (darkModeCheckMenuItem.isSelected()) {
-            mainStage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+            mainStage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("helper/darkMode.css")).toExternalForm());
         } else {
-            mainStage.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+            mainStage.getScene().getStylesheets().remove(Objects.requireNonNull(getClass().getResource("helper/darkMode.css")).toExternalForm());
         }
         preferences.putBoolean("DARK_MODE", darkModeCheckMenuItem.isSelected());
     }
@@ -574,10 +574,10 @@ public class MainController {
         stage.initOwner(menuBar.getParent().getScene().getWindow());
         Scene scene = new Scene(root, width, height);
         if (darkModeCheckMenuItem.isSelected()) {
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("helper/darkMode.css")).toExternalForm());
         }
         stage.setTitle(title);
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("helper/book-icon.png"))));
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();

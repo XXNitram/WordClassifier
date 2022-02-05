@@ -8,15 +8,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.nitramproductions.com.wordclassifier.controller.helper.AlertHelper;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.Objects;
-import java.util.prefs.Preferences;
 
 public class ImportFromCSVController {
 
@@ -32,8 +30,8 @@ public class ImportFromCSVController {
     private String fileLocation;
     private final ToggleGroup toggleGroup = new ToggleGroup();
     private final CSVManager csvManager = new CSVManager();
+    private final AlertHelper alertHelper = new AlertHelper();
     private final MainController mainController;
-    private boolean darkMode;
 
     public ImportFromCSVController(MainController mainController) {
         this.mainController = mainController;
@@ -41,8 +39,6 @@ public class ImportFromCSVController {
 
     @FXML
     private void initialize() {
-        Preferences preferences = Preferences.userRoot().node("/wordclassifier");
-        darkMode = preferences.getBoolean("DARK_MODE", false);
         groupRadioButton.setToggleGroup(toggleGroup);
         expressionRadioButton.setToggleGroup(toggleGroup);
         belongToRadioButton.setToggleGroup(toggleGroup);
@@ -100,11 +96,8 @@ public class ImportFromCSVController {
                 NAME,CONTENT
                 Emotionen,Wut
                 Bücher,The Shining""");
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
-        if (darkMode) {
-            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
-        }
+        alertHelper.setIcon(alert);
+        alertHelper.setDarkMode(alert);
         alert.showAndWait();
     }
 
@@ -139,22 +132,12 @@ public class ImportFromCSVController {
     }
 
     private void alertIfNoTableIsSpecified() {
-        Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte eine Tabelle auswählen!");
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
-        if (darkMode) {
-            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
-        }
+        Alert alert = alertHelper.createNewErrorAlert("Bitte eine Tabelle auswählen!");
         alert.showAndWait();
     }
 
     private void alertIfNoFileLocationIsSpecified() {
-        Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
-        if (darkMode) {
-            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
-        }
+        Alert alert = alertHelper.createNewErrorAlert("Bitte einen Speicherort wählen!");
         alert.showAndWait();
     }
 }

@@ -6,9 +6,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.nitramproductions.com.wordclassifier.controller.helper.AlertHelper;
 import org.nitramproductions.com.wordclassifier.database.CSVManager;
 import org.nitramproductions.com.wordclassifier.database.helper.Columns;
 
@@ -16,8 +16,6 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.prefs.Preferences;
 
 public class ExportToCSVController {
 
@@ -48,7 +46,7 @@ public class ExportToCSVController {
     private String expressionSaveLocation;
     private String belongToSaveLocation;
     private final CSVManager csvManager = new CSVManager();
-    private boolean darkMode;
+    private final AlertHelper alertHelper = new AlertHelper();
 
     public ExportToCSVController() {
 
@@ -56,8 +54,7 @@ public class ExportToCSVController {
 
     @FXML
     private void initialize() {
-        Preferences preferences = Preferences.userRoot().node("/wordclassifier");
-        darkMode = preferences.getBoolean("DARK_MODE", false);
+
     }
 
     @FXML
@@ -185,22 +182,12 @@ public class ExportToCSVController {
     }
 
     private void alertIfNoColumnIsSpecified() {
-        Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte mindestens eine Spalte auswählen!");
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
-        if (darkMode) {
-            stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
-        }
+        Alert alert = alertHelper.createNewErrorAlert("Bitte mindestens eine Spalte auswählen!");
         alert.showAndWait();
     }
 
     private void alertIfNoSaveLocationIsSpecified() {
-        Alert alert = new Alert(Alert.AlertType.ERROR, "Bitte einen Speicherort wählen!");
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("book-icon.png"))));
-        if (darkMode) {
-           stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("darkMode.css")).toExternalForm());
-        }
+        Alert alert = alertHelper.createNewErrorAlert("Bitte einen Speicherort wählen!");
         alert.showAndWait();
     }
 }

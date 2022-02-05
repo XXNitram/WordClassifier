@@ -37,11 +37,11 @@ public class MainApplication extends Application {
         fxmlLoader.setControllerFactory(controller -> new MainController(stage));
         Scene scene = new Scene(fxmlLoader.load());
         if (darkMode) {
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("controller/darkMode.css")).toExternalForm());
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("controller/helper/darkMode.css")).toExternalForm());
         }
         stage.setScene(scene);
         stage.setTitle("WordClassifier");
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("controller/book-icon.png"))));
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("controller/helper/book-icon.png"))));
         stage.setMaximized(stageMaximized);
         stage.setMinWidth(680);
         stage.setMinHeight(300);
@@ -83,7 +83,7 @@ public class MainApplication extends Application {
         Preferences preferences = Preferences.userRoot().node("/wordclassifier");
         boolean darkMode = preferences.getBoolean("DARK_MODE", false);
         if (darkMode) {
-            alert.getDialogPane().getScene().getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("controller/darkMode.css")).toExternalForm());
+            alert.getDialogPane().getScene().getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("controller/helper/darkMode.css")).toExternalForm());
         }
         alert.showAndWait();
     }
